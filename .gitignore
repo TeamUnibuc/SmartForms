@@ -1,0 +1,8 @@
+# VSCode config
+.vscode/
+
+# Backend
+*.pyc
+
+# Frontend
+node_modules/
