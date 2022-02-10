@@ -3,27 +3,35 @@ Entry point of the backend.
 Starts a FastAPI server.
 """
 
-from typing import List
-from fastapi import FastAPI, File, UploadFile
+from dotenv import load_dotenv
+from fastapi import FastAPI
 import uvicorn
 import routers
+import logging
+import sys
+import os
 
-app = FastAPI()
+def init_environment():
+    """
+        Loads .env and initializes logging.
+    """
+    load_dotenv()
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-app.include_router(routers.form_router.router)
-app.include_router(routers.entry_router.router)
-app.include_router(routers.inference_router.router)
-
-# @app.post("/")
-# async def fun(file: List[UploadFile] = File(...)):
-#     print(file[0].filename)
-#     # f = File(file[0])
-#     # with open("file.pdf", "wb") as fout:
-#     #     fout.write(file[0])
-#     # print(f)
-#     # print(file)
-#     return { "status": "OK" }
-
+def main():
+    """
+        Starts the FastAPI server.
+    """
+    init_environment()
+    app = FastAPI()
+    app.include_router(routers.form_router.router)
+    app.include_router(routers.entry_router.router)
+    app.include_router(routers.inference_router.router)
+    uvicorn.run(
+        app,
+        host=os.environ['SERVER_HOST'],
+        port=int(os.environ['SERVER_PORT'])
+    )
 
 if __name__ == "__main__":
-    uvicorn.run(app)
+    main()
