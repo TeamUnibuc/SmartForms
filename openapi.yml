@@ -68,6 +68,242 @@ paths:
               formPdfBinary:
                 type: "string"
                 format: "binary"
+      security:
+        - smartFormsAuth:
+          - "access"
+  # list all forms created by a user
+  /form/list:
+    get:
+      tags:
+      - "form"
+      summary: "Returns a list of forms created by the user"
+      description: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Data for pagination"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            # offset of the requested data
+            offset:
+              type: "integer"
+            # number of requested elements
+            count:
+              type: "integer"
+      responses:
+        "405":
+          description: "User is not authenticated."
+        "200":
+          description: "OK."
+          schema:
+            type: "object"
+            properties: 
+              totalFormsCount:
+                type: "integer"
+              forms:
+                type: "array"
+                items: 
+                  $ref: "#/definitions/FormDescription"
+      security:
+        - smartFormsAuth:
+          - "access"
+  # list all forms created by a user
+  /form/{formId}:
+    get:
+      tags:
+      - "form"
+      summary: "Returns the form indicated by the Id"
+      description: ""
+      produces:
+      - "application/json"
+      responses:
+        "405":
+          description: "User is not authenticated, form doesn't exist or not authorized"
+        "200":
+          description: "OK."
+          schema:
+            $ref: "#/definitions/FormDescription"
+      security:
+        - smartFormsAuth:
+          - "access"
+    delete:
+      tags:
+      - "form"
+      summary: "Deletes the form indicated by the Id"
+      description: ""
+      responses:
+        "405":
+          description: "User is not authenticated, form doesn't exist or not authorized"
+        "200":
+          description: "OK."
+      security:
+        - smartFormsAuth:
+          - "access"
+  # changes if a form can be filled online or not
+  /form/online-access/{formId}:
+    put:
+      tags:
+      - "form"
+      summary: "Sets if a form can be filled online or not"
+      description: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "if the form can be filled online or not"
+        required: true
+        schema:
+          type: "object"
+          properties: 
+            canBeFilledOnline:
+              type: "boolean"
+            needsToBeSignedIn:
+              type: "boolean"
+      responses:
+        "405":
+          description: "User is not authenticated, form does not exist or not authorized."
+        "200":
+          description: "OK."
+      security:
+        - smartFormsAuth:
+          - "access"
+  # fill a form online
+  # resolves only if the form can be filled online
+  /entry/{formId}:
+    get:
+      tags:
+      - "entry"
+      summary: "Returns the form indicated by the Id, to be filled"
+      description: ""
+      produces:
+      - "application/json"
+      responses:
+        "405":
+          description: "User is not authenticated, form doesn't exist or not authorized."
+        "201":
+          description: "The form can't be filled online."
+        "200":
+          description: "OK."
+          schema:
+            $ref: "#/definitions/FormDescription"
+    post:
+      tags:
+      - "entry"
+      summary: "Sends a user's response to the form."
+      description: ""
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Answers to the form"
+        required: true
+        schema:
+          $ref: "#/definitions/FormAnswer"
+      responses:
+        "405":
+          description: "User is not authenticated, form doesn't exist or not authorized"
+        "200":
+          description: "OK."
+  # lists entries for a form
+  /entry/view/{formId}:
+    get:
+      tags:
+      - "entry"
+      summary: "Returns the entries sent to a form"
+      description: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Data for pagination"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            # offset of the requested data
+            offset:
+              type: "integer"
+            # number of requested elements
+            count:
+              type: "integer"
+      responses:
+        "405":
+          description: "User is not authenticated, form doesn't exist or not authorized."
+        "201":
+          description: "The form can't be filled online."
+        "200":
+          description: "OK."
+          schema:
+            type: "object"
+            properties: 
+              totalEntriesCount:
+                type: "integer"
+              entries:
+                type: "array"
+                items:
+                  $ref: "#/definitions/FormAnswer"
+      security:
+        - smartFormsAuth:
+          - "access"
+  # tries to extract content from a form
+  /inference:
+    post:
+      tags:
+      - "inference"
+      summary: "Extracts content from a form"
+      description: ""
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Data for pagination"
+        required: true
+        schema:
+          type: "object"
+          properties: 
+            file:
+              title: "File"
+              type: "array"
+              items:
+                type: "string"
+                format: "binary"
+      responses:
+        "405":
+          description: "User is not authenticated, form doesn't exist or not authorized."
+        "200":
+          description: "OK."
+          schema:
+            $ref: "#/definitions/FormAnswer"
+            
+
+securityDefinitions:
+  smartFormsAuth:
+    type: "oauth2"
+    authorizationUrl: "google.com sau cv de genu"
+    flow: "implicit"
+    scopes:
+      access: "be authenticated"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+
 
 definitions:
   # stores a single question with text answer
@@ -109,7 +345,7 @@ definitions:
     properties:
       name:
         type: "string"
-      id:
+      formId:
         type: "string"
       description:
         type: "string"
@@ -117,4 +353,26 @@ definitions:
         type: "array"
         items: 
           $ref: "#/definitions/FormQuestion"
-
+      # if the users are able to submit answers by visiting the
+      # specific url.
+      canBeFilledOnline:
+        type: "boolean"
+      # if online users have to be signed-in
+      needsToBeSignedInToSubmit:
+        type: "boolean"
+      
+  # info about a form 
+  FormAnswer:
+    type: "object"
+    properties:
+      answerId:
+        type: "string"
+      formId:
+        type: "string"
+      # empty if not logged in
+      userId:
+        type: "string"
+      answers:
+        type: "array"
+        items:
+          type: "string"
