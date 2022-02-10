@@ -1,7 +1,7 @@
 # List of requirements for the backend
 
 # Mongodb connector
-pymongo
+pymongo[srv]
 
 # FastAPI HTTP lib
 uvicorn[standard]
@@ -9,9 +9,7 @@ fastapi
 python-multipart
 
 # OCR NN
-torch
-torchvision
-torchaudio
+tensorflow
 
 # Vision framework
 opencv-python
