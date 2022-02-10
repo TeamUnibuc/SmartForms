@@ -13,3 +13,5 @@ tensorflow
 
 # Vision framework
 opencv-python
+fpdf
+qrcode

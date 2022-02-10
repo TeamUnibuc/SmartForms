@@ -21,7 +21,7 @@ class FormDescription(BaseModel):
     """
         Stores a single form.
     """
-    name: str
+    title: str
     formId: str = ""
     description: str
     questions: List[Union[FormMultipleChoiceQuestion, FormTextQuestion]]

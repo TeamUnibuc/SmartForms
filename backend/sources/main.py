@@ -10,6 +10,7 @@ import routers
 import logging
 import sys
 import os
+import tester
 
 def init_environment():
     """
@@ -23,6 +24,9 @@ def main():
         Starts the FastAPI server.
     """
     init_environment()
+    tester.run()
+    return
+    
     app = FastAPI()
     app.include_router(routers.form_router.router)
     app.include_router(routers.entry_router.router)
