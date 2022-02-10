@@ -1,0 +1,115 @@
+swagger: "2.0"
+info:
+  description: "API specs for the connection between the backend and the frontend of the SmartForms project."
+  version: "1.0.0"
+  title: "Swagger SmartForms"
+
+paths:
+  # preview a form, without creating it
+  /form/preview:
+    post:
+      tags:
+      - "form"
+      summary: "Preview the PDF output of a given form description"
+      description: "The backend creates a form based on the specification passed to it, and generates a PDF to be displayed in a side-panel. This DOES NOT save the PDF file."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/pdf"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Description of the form to create."
+        required: true
+        schema:
+          $ref: "#/definitions/FormDescription"
+      responses:
+        "405":
+          description: "Invalid input. String stores the error message."
+          schema:
+            type: "string"
+        "200":
+          description: "OK. String stores the binary PDF."
+          schema:
+            type: "string"
+            format: "binary"
+  # create a form
+  /form/create:
+    post:
+      tags:
+      - "form"
+      summary: "Create the PDF form of a given form description"
+      description: "The backend creates a form based on the specification passed to it, and generates a PDF, which is saved to DB."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/pdf"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Description of the form to create."
+        required: true
+        schema:
+          $ref: "#/definitions/FormDescription"
+      responses:
+        "405":
+          description: "Invalid input. String stores the error message."
+          schema:
+            type: "string"
+        "200":
+          description: "OK. String stores the binary PDF."
+          schema:
+            type: "string"
+            format: "binary"
+
+definitions:
+  # stores a single question with text answer
+  FormTextQuestion:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      maxAnswerLength:
+        type: "integer"
+  
+  # stores a single question with multiple-choice answer
+  FormMultipleChoiceQuestion:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      choices:
+        type: "array"
+        items:
+          type: "string"
+
+  # wrapper for having one of two possible questions
+  FormQuestion:
+    type: "object"
+    properties:
+      textQuestion:
+        $ref: "#/definitions/FormTextQuestion"
+      multipleChoiceQuestion:
+        $ref: "#/definitions/FormMultipleChoiceQuestion"
+
+  # info about a form 
+  FormDescription:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      id:
+        type: "string"
+      description:
+        type: "string"
+      questions:
+        type: "array"
+        items: 
+          $ref: "#/definitions/FormQuestion"
+
