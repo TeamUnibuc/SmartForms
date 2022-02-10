@@ -61,8 +61,13 @@ paths:
         "200":
           description: "OK. String stores the binary PDF."
           schema:
-            type: "string"
-            format: "binary"
+            type: "object"
+            properties: 
+              formId:
+                type: "integer"
+              formPdfBinary:
+                type: "string"
+                format: "binary"
 
 definitions:
   # stores a single question with text answer
