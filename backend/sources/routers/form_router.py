@@ -1,26 +1,28 @@
 from typing import List
-from fastapi import APIRouter, File, UploadFile, Response
+from fastapi import APIRouter, Response
 from pydantic import BaseModel
+import database
 import routers.models as models
 import pdf_generator
-import fastapi
-from fastapi.responses import StreamingResponse
-import io
+import internal_types
 
 router = APIRouter(
     prefix="/form",
     tags=["form"]
 )
 
+class PreviewFormReturnModel(BaseModel):
+    formPdfBase64: str
 
 @router.post(
     "/preview",
     responses = {
         200: {
-            "model": bytes,
-            "description": "Bytes represent a PDF file."
+            "model": PreviewFormReturnModel,
+            "description": "Base64 encoding of the PDF file."
         },
-        400: {
+        201: {
+            "model": str,
             "description": "Invalid input. Error message."
         }
     }
@@ -32,24 +34,27 @@ async def get_form_preview(form: models.FormDescription):
     """
     try:
         model = pdf_generator.create_form_from_description(form)
-        return Response(model.extract_raw_pdf_bytes(), media_type="application/pdf")
+        ret = PreviewFormReturnModel(
+            formPdfBase64=model.extract_base_64_encoded_pdf()
+        )
+        return ret
     except Exception as e:
-        return Response(repr(e), status_code=200)
-        # TODO: Change status code
+        return Response(repr(e), status_code=201)
 
 
 class CreateFormReturnModel(BaseModel):
     formId: str
-    formPdfBinary: bytes
+    formPdfBase64: str
 
 @router.post(
     "/create",
     responses = {
         200: {
             "model": CreateFormReturnModel,
-            "description": "Ok."
+            "description": "Ok. Returns the new ID, and the base64 encoding of the PDF."
         },
-        400: {
+        201: {
+            "model": str,
             "description": "Invalid input. Error message."
         }
     }
@@ -58,7 +63,17 @@ async def create_form(form: models.FormDescription):
     """
         Creates a form, and returns its id and a preview.
     """
-    pass
+    try:
+        model = pdf_generator.create_form_from_description(form)
+        model.set_id()
+        database.get_collection(database.FORMS).insert_one(model.to_dict())
+        resp = CreateFormReturnModel(
+            formId=model.description.formId,
+            formPdfBase64=model.extract_base_64_encoded_pdf()
+        )
+        return resp
+    except Exception as e:
+        return Response(repr(e), status_code=201)
 
 
 class ListFormReceiveModel(BaseModel):
@@ -69,7 +84,7 @@ class ListFormReturnModel(BaseModel):
     forms: List[models.FormDescription]
     totalFormsCount: int
 
-@router.get(
+@router.post(
     "/list",
     responses = {
         200: {
@@ -85,7 +100,17 @@ async def get_forms_list(params: ListFormReceiveModel):
     """
         Returns the list of all available forms.
     """
-    return { "status": "ok" }
+
+    db = database.get_collection(database.FORMS)
+    
+    forms = [internal_types.pdf_form_from_dict(i).description for i in db.find(skip=params.offset, limit=params.count)]
+    nr_forms = db.count_documents({})
+
+    return ListFormReturnModel(
+        forms=forms,
+        totalFormsCount=nr_forms
+    )
+
 
 
 @router.get(
@@ -96,6 +121,7 @@ async def get_forms_list(params: ListFormReceiveModel):
             "description": "Ok."
         },
         400: {
+            "model": str,
             "description": "Invalid input. Error message."
         }
     }
@@ -104,7 +130,16 @@ async def get_form_description(formId: str):
     """
         Returns the description of a given form.
     """
-    return { "status": "ok" }
+    db = database.get_collection(database.FORMS)
+    forms = [internal_types.pdf_form_from_dict(i).description for i in db.find({"formId": formId})]
+
+    if len(forms) > 1:
+        raise Exception("Found multiple forms with same Id!")
+    
+    if len(forms) == 0:
+        raise Exception("No form with the given Id was found!")
+    
+    return internal_types.pdf_form_from_dict(forms[0]).description
 
 
 @router.get(

@@ -27,3 +27,9 @@ def get_database() -> Database:
     if Database.__instance__ is None:
         Database()
     return Database.__instance__
+
+FORMS = "Forms"
+ENTRIES = "Entries"
+
+def get_collection(collection: str):
+    return get_database().database.get_collection(collection)
