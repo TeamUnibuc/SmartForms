@@ -49,8 +49,5 @@ class PdfForm:
             "content": pickle.dumps(self)
         }
 
-    def set_id(self):
-        self.description.formId = "form-#" + str(random.randint(10**10, 2*10**10))
-
 def pdf_form_from_dict(d: dict) -> PdfForm:
     return pickle.loads(d["content"])

@@ -64,7 +64,6 @@ async def create_form(form: smart_forms_types.FormDescription):
     """
     try:
         model = pdf_processor.create_form_from_description(form)
-        model.set_id()
         database.get_collection(database.FORMS).insert_one(model.to_dict())
         resp = CreateFormReturnModel(
             formId=model.description.formId,

@@ -166,6 +166,10 @@ def _add_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: 
 
 
 def create_form_from_description(description: smart_forms_types.FormDescription) -> pdf_form.PdfForm:
+    # set an id if not existent
+    if description.formId == '':
+        description.formId = "form-#" + str(random.randint(10**10, 2*10**10))
+    
     form = pdf_form.PdfForm()
     form.description = description
     form.pdf_file = _create_pdf_with_borders(description.formId)
