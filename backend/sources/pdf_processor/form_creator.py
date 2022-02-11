@@ -7,6 +7,7 @@ from .constants import *
 import os
 import smart_forms_types.pdf_form as pdf_form
 import smart_forms_types
+import cv2 as cv
 
 def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     """Creates an empty PDF form, with the
@@ -20,22 +21,28 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     # set fill to black
     pdf.set_fill_color(0)
 
-    # upper-left corner
-    pdf.rect(
+    pdf.image(
+        BORDER_UP_LEFT_IMAGE_LOCATION,
         MARKER_PDF_OFFSET,
         MARKER_PDF_OFFSET,
-        MARKER_SMALL_SIDE,
-        MARKER_LARGE_SIDE,
-        style='F'
+        w=BORDER_IMAGE_SIZE,
+        h=BORDER_IMAGE_SIZE   
     )
-    pdf.rect(
+    pdf.image(
+        BORDER_DOWN_LEFT_IMAGE_LOCATION,
         MARKER_PDF_OFFSET,
-        MARKER_PDF_OFFSET,
-        MARKER_LARGE_SIDE,
-        MARKER_SMALL_SIDE,
-        style='F'
+        PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
+        w=BORDER_IMAGE_SIZE,
+        h=BORDER_IMAGE_SIZE
     )
-
+    pdf.image(
+        BORDER_DOWN_RIGHT_IMAGE_LOCATION,
+        PDF_W - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
+        PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
+        w=BORDER_IMAGE_SIZE,
+        h=BORDER_IMAGE_SIZE
+    )
+    
     # upper-right (QR code)
     file_name = "/tmp/smart-forms-img-" + str(random.randint(0, 10**10)) + ".png"
     qr_code_maker = qrcode.QRCode(
@@ -54,38 +61,6 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
         QR_CODE_SIZE
     )
     os.remove(file_name)
-
-    # # down-left
-    # pdf.rect(
-    #     MARKER_PDF_OFFSET,
-    #     PDF_H - MARKER_PDF_OFFSET - MARKER_LARGE_SIDE,
-    #     MARKER_SMALL_SIDE,
-    #     MARKER_LARGE_SIDE,
-    #     style='F'
-    # )
-    # pdf.rect(
-    #     MARKER_PDF_OFFSET,
-    #     PDF_H - MARKER_PDF_OFFSET - MARKER_SMALL_SIDE,
-    #     MARKER_LARGE_SIDE,
-    #     MARKER_SMALL_SIDE,
-    #     style='F'
-    # )
-
-    # # down-right
-    # pdf.rect(
-    #     PDF_W - MARKER_PDF_OFFSET - MARKER_SMALL_SIDE,
-    #     PDF_H - MARKER_PDF_OFFSET - MARKER_LARGE_SIDE, 
-    #     MARKER_SMALL_SIDE,
-    #     MARKER_LARGE_SIDE,
-    #     style='F'
-    # )
-    # pdf.rect(
-    #     PDF_W - MARKER_PDF_OFFSET - MARKER_LARGE_SIDE,
-    #     PDF_H - MARKER_PDF_OFFSET - MARKER_SMALL_SIDE,
-    #     MARKER_LARGE_SIDE,
-    #     MARKER_SMALL_SIDE,
-    #     style='F'
-    # )
     return pdf
 
 def _add_title_to_pdf(pdf: fpdf.FPDF, title: str):

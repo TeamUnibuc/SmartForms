@@ -55,3 +55,17 @@ def find_maching_template(picture: np.ndarray) -> smart_forms_types.PdfForm:
     form_dict = [i for i in database.get_collection(database.FORMS).find({ "formId": formId })]
     form = smart_forms_types.pdf_form_from_dict(form_dict[0])
     return form
+
+def find_answer_squares(fixed_picture: np.ndarray, form: smart_forms_types.PdfForm) -> List[List[np.ndarray]]:
+    """
+        fixed_picture: image where we already fixed the perspective transform.
+        Returns a list of squares.
+    """
+    squares_content = []
+
+    for squares in form.answer_squares_location:
+        question_content = []
+        for square in squares:
+            # multiplier_h = 
+            #TODO:
+            pass

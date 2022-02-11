@@ -6,10 +6,12 @@ PDF_W = 210
 
 
 # set dimensions for PDF markers and offesets
-MARKER_PDF_OFFSET = 15
-MARKER_SMALL_SIDE = 8
-MARKER_LARGE_SIDE = 20
+MARKER_PDF_OFFSET = 8
 QR_CODE_SIZE = 30
+BORDER_UP_LEFT_IMAGE_LOCATION = "../data/assets/border_ul.png"
+BORDER_DOWN_LEFT_IMAGE_LOCATION = "../data/assets/border_dl.png"
+BORDER_DOWN_RIGHT_IMAGE_LOCATION = "../data/assets/border_dr.png"
+BORDER_IMAGE_SIZE = 30
 
 # set dimension for the maximal width of the title on the PDF
 MAX_PDF_TITLE_WIDTH = 100
