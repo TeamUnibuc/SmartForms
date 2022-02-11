@@ -24,8 +24,6 @@ def main():
         Starts the FastAPI server.
     """
     init_environment()
-    tester.run()
-    return
     
     app = FastAPI()
     app.include_router(routers.form_router.router)
