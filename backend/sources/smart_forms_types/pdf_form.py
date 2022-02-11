@@ -4,7 +4,9 @@ Base class of a PDF form.
 import pickle
 import random
 from typing import List
-import routers.models
+# not importing smart_forms_types to not create
+# a circular dependency
+import smart_forms_types.models as models
 import fpdf
 import base64
 
@@ -22,7 +24,7 @@ class PdfForm:
         Internal representation of a pdf form.
     """
     # actual text within the pdf form
-    description: routers.models.FormDescription
+    description: models.FormDescription
     # raw data of the pdf render
     pdf_file: fpdf.FPDF
     

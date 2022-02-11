@@ -5,8 +5,8 @@ import qrcode
 import random
 from .constants import *
 import os
-import internal_types.pdf_form as pdf_form
-import routers.models as models
+import smart_forms_types.pdf_form as pdf_form
+import smart_forms_types
 
 def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     """Creates an empty PDF form, with the
@@ -165,7 +165,7 @@ def _add_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: 
     return (current_height, squares)
 
 
-def create_form_from_description(description: models.FormDescription) -> pdf_form.PdfForm:
+def create_form_from_description(description: smart_forms_types.FormDescription) -> pdf_form.PdfForm:
     form = pdf_form.PdfForm()
     form.description = description
     form.pdf_file = _create_pdf_with_borders(description.formId)
@@ -179,7 +179,7 @@ def create_form_from_description(description: models.FormDescription) -> pdf_for
     for question in description.questions:
         # for now we only process text questions
         # TODO: non-text questions
-        if isinstance(question, models.FormTextQuestion):
+        if isinstance(question, smart_forms_types.FormTextQuestion):
             current_height, answer_squares = _add_question(
                 form.pdf_file,
                 current_height,

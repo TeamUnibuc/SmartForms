@@ -4,7 +4,7 @@ import cv2 as cv
 import pdf2image
 import matplotlib.pyplot as plt
 import numpy as np
-import database, internal_types
+import database, smart_forms_types
 from .constants import *
 
 def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.ndarray:
@@ -43,7 +43,7 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
 
     return corrected_img
 
-def find_maching_template(picture: np.ndarray) -> internal_types.PdfForm:
+def find_maching_template(picture: np.ndarray) -> smart_forms_types.PdfForm:
     """
         Searches for the QR code and finds the ID.
     """
@@ -53,6 +53,5 @@ def find_maching_template(picture: np.ndarray) -> internal_types.PdfForm:
         raise Exception("Invalid number of QR codes found!")
 
     form_dict = [i for i in database.get_collection(database.FORMS).find({ "formId": formId })]
-    form = internal_types.pdf_form_from_dict(form_dict[0]).description
+    form = smart_forms_types.pdf_form_from_dict(form_dict[0]).description
     return form
-    

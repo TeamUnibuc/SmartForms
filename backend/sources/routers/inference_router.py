@@ -1,8 +1,7 @@
 from typing import List
 from fastapi import APIRouter, File, UploadFile
 from pydantic import BaseModel
-import routers.models as models
-import fastapi
+import smart_forms_types
 
 router = APIRouter(
     prefix="/inference",
@@ -13,7 +12,7 @@ router = APIRouter(
     "/",
     responses = {
         200: {
-            "model": models.FormAnswer,
+            "model": smart_forms_types.FormAnswer,
             "description": "Ok."
         },
         400: {

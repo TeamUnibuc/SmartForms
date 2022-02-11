@@ -10,7 +10,6 @@ import routers
 import logging
 import sys
 import os
-import tester
 
 def init_environment():
     """

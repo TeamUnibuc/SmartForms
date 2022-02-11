@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, File, UploadFile
 from pydantic import BaseModel
-import routers.models as models
+import smart_forms_types
 import fastapi
 
 router = APIRouter(
@@ -13,7 +13,7 @@ router = APIRouter(
     "/{formId}",
     responses = {
         200: {
-            "model": models.FormDescription,
+            "model": smart_forms_types.FormDescription,
             "description": "Ok."
         },
         400: {
@@ -40,7 +40,7 @@ async def entry_get_form(formId: str):
         }
     }
 )
-async def entry_submit_form(entry: models.FormAnswer, formId: str):
+async def entry_submit_form(entry: smart_forms_types.FormAnswer, formId: str):
     """
         Submits a new entry for a given form.
     """
@@ -52,7 +52,7 @@ class ViewEntriesReceiveModel(BaseModel):
     count: int
 
 class ViewEntriesReturnModel(BaseModel):
-    forms: List[models.FormAnswer]
+    forms: List[smart_forms_types.FormAnswer]
     totalFormsCount: int
 
 @router.get(
