@@ -23,3 +23,9 @@ frontend: frontend-packages
 
 conda-env:
 	conda env update -f conda_environment.yaml
+
+deploy:
+	chmod +x deploy_script.sh
+	./deploy_script.sh
+	@echo " ---- Deploy Finished ---- "
+	
