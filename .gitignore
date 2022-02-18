@@ -3,6 +3,7 @@
 
 # VSCode config
 .vscode/
+.editorconfig
 
 # Backend
 *.pyc

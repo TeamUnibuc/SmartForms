@@ -1,0 +1,11 @@
+name: SmartForms
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - pip
+  - pip:
+    - -r backend/requirements.txt
+  - nodejs=14
+  - yarn>=1.22
+  - make
