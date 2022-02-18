@@ -1,4 +1,4 @@
-.PHONY: default backend frontend frontend-packages conda-env
+.PHONY: default backend frontend frontend-packages conda-env deploy
 
 default:
 	@echo "available commands:"
