@@ -4,7 +4,7 @@ from pydantic import BaseModel
 import smart_forms_types
 
 router = APIRouter(
-    prefix="/inference",
+    prefix="/api/inference",
     tags=["inference"]
 )
 

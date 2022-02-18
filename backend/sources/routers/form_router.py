@@ -6,7 +6,7 @@ import pdf_processor
 import smart_forms_types
 
 router = APIRouter(
-    prefix="/form",
+    prefix="/api/form",
     tags=["form"]
 )
 

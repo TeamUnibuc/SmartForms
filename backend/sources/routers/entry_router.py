@@ -5,7 +5,7 @@ import smart_forms_types
 import fastapi
 
 router = APIRouter(
-    prefix="/entry",
+    prefix="/api/entry",
     tags=["entry"]
 )
 
