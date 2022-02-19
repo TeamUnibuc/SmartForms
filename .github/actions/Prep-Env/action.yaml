@@ -28,7 +28,7 @@ runs:
   - uses: actions/cache@v2
     with:
       path: ${{ matrix.prefix }}
-      key: ${{ matrix.label }}-conda-${{ hashFiles('environment.yml') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
+      key: ${{ matrix.label }}-conda-${{ hashFiles('conda_environment.yml') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
     id: cache
 
   - name: Update environment
