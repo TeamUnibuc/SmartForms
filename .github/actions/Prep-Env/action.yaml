@@ -5,7 +5,6 @@ runs:
   using: composite
   steps:
   - uses: conda-incubator/setup-miniconda@v2
-    shell: bash
     with: 
       activate-environment: SmartForms
       environment-file: conda_environment.yaml
