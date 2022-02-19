@@ -6,6 +6,8 @@ on:
 
 jobs:
   build-test:
+    environment: CI
+
     name: Build and Test
     runs-on: ubuntu-20.04
 
@@ -28,6 +30,8 @@ jobs:
           make test-ci
 
   deploy:
+    environment: CI
+
     name: Deploy to production
     runs-on: ubuntu-20.04
     needs: build-test
