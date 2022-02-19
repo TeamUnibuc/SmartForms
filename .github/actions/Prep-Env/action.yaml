@@ -4,9 +4,8 @@ description: 'Installs and activates the conda environment "SmartForms"'
 runs:
   using: composite
   steps:
-  - name: Cook environment
+  - uses: conda-incubator/setup-miniconda@v2
     shell: bash
-    uses: conda-incubator/setup-miniconda@v2
     with: 
       activate-environment: SmartForms
       environment-file: conda_environment.yaml
