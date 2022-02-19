@@ -1,0 +1,10 @@
+name: 'Test'
+description: 'Builds and tests the project.'
+
+runs:
+  using: composite
+  steps:
+    - name: Test
+      shell: bash
+      run: |
+        make test-ci

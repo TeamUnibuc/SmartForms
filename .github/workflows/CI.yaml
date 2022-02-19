@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+env:
+  CACHE_NUMBER: 0  # increase to reset cache manually
+
+jobs:
+  build-test:
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: Linux-64
+            prefix: /usr/share/miniconda3/envs/my-env
+
+    environment: CI
+    
+    name: Build & Test - ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Prepare environment
+        uses: ./.github/actions/Prep-Env
+
+      - name: Check env
+        run: conda info
+
+      - name: Build
+        uses: ./.github/actions/Build
+
+      - name: Test
+        uses: ./.github/actions/Test

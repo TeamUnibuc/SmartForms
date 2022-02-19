@@ -13,6 +13,9 @@ uvicorn[standard]
 fastapi
 python-multipart
 
+# dotenv support
+python-dotenv
+
 # OCR NN
 tensorflow
 sklearn

@@ -1,0 +1,44 @@
+name: 'Prepare Environment'
+description: 'Installs and activates the conda environment "SmartForms"'
+
+runs:
+  using: composite
+  steps:
+
+  # With this "classic" version, environment is rerun for everyworkflow...
+  # - uses: conda-incubator/setup-miniconda@v2
+  #   with: 
+  #     activate-environment: SmartForms
+  #     environment-file: conda_environment.yaml
+  #     auto-activate-base: false
+
+  # This option with 'mambaforge' can cache the environment in between runs
+  - name: Setup Mambaforge
+    uses: conda-incubator/setup-miniconda@v2
+    with:
+        miniforge-variant: Mambaforge
+        miniforge-version: latest
+        activate-environment: SmartForms
+        environment-file: conda_environment.yaml
+        auto-activate-base: false
+        use-mamba: true
+        
+
+  - name: Set cache date
+    shell: bash
+    run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+  - uses: actions/cache@v2
+    with:
+      path: ${{ matrix.prefix }}
+      key: ${{ matrix.label }}-conda-${{ hashFiles('conda_environment.yml') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
+    id: cache
+
+  - name: Update environment
+    shell: bash
+    run: mamba env update -n SmartForms -f conda_environment.yaml
+    if: steps.cache.outputs.cache-hit != 'true'
+
+  - name: Check CONDA env
+    run: echo $CONDA
+    shell: bash
