@@ -22,7 +22,7 @@ jobs:
 
     environment: CI
     
-    name: Build - ${{ matrix.label }}
+    name: Build & Test - ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
