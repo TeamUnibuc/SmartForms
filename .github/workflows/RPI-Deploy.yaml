@@ -40,7 +40,7 @@ jobs:
 
     name: Deploy to production
 
-    # needs: build-test
+    needs: build-test
  
     environment: Production
     runs-on: ubuntu-20.04
@@ -75,4 +75,5 @@ jobs:
           git config --global user.name "GitHub Actions"
 
           git remote add production deployer@smartforms.ml:/home/deployer/Production/SmartForms-GitBare/smart-forms.git
-          git push production main
+          git fetch --unshallow production
+          git push production main -f
