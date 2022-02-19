@@ -30,7 +30,7 @@ jobs:
       - name: Check env
         run: conda info
 
-      - name: Build & Test
+      - name: Build
         uses: ./.github/actions/Build
 
 
@@ -58,5 +58,5 @@ jobs:
       - name: Check env
         run: conda info
 
-      - name: Build & Test
+      - name: Test
         uses: ./.github/actions/Test
