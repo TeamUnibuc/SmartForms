@@ -64,7 +64,6 @@ jobs:
         #   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
         # --- Manual method
-      - name: Push to production
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/deployer
           chmod 600 /home/runner/.ssh/deployer
