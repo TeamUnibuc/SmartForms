@@ -1,0 +1,11 @@
+name: 'Test'
+description: 'Runs the tests for the project'
+
+runs:
+  using: composite
+  steps:
+  - name: Cook environment
+    shell: bash
+    uses: conda-incubator/setup-miniconda@v2
+    run: |
+      make test-ci

@@ -1,7 +1,10 @@
 name: 'Build'
 description: 'Builds the project. Checks for errors/linters'
 
-needs: ./.github/actions/Conda-Env
-
-run: |
-  make build
+runs:
+  using: composite
+  steps:
+    - name: Build
+      shell: bash
+      run: |
+        make build

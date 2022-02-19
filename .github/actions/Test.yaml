@@ -1,7 +1,0 @@
-name: 'Test'
-description: 'Runs the tests for the project'
-
-needs: ./.github/actions/Conda-Env
-
-run: |
-  make test-ci
