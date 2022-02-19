@@ -1,12 +1,9 @@
 name: 'Prepare Environment'
-description: 'BCheckouts, installs and activates the conda environment "SmartForms"'
+description: 'Installs and activates the conda environment "SmartForms"'
 
 runs:
   using: composite
   steps:
-  - name: Checkout
-    uses: actions/checkout@v2
-
   - name: Cook environment
     shell: bash
     uses: conda-incubator/setup-miniconda@v2
