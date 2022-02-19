@@ -20,12 +20,12 @@ jobs:
           auto-activate-base: false
 
       - name: Build
-      run: |
-        make build
+        run: |
+          make build
 
       - name: Test
-      run: |
-        make test-ci
+        run: |
+          make test-ci
 
   deploy:
     name: Deploy to production
@@ -41,6 +41,6 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Push to production
-      run: |
-        git remote add production ssh://deployer@smartforms.ml:22/home/deployer/Production/SmartForms-GitBare/smart-forms.git
-        git push production main
+        run: |
+          git remote add production ssh://deployer@smartforms.ml:22/home/deployer/Production/SmartForms-GitBare/smart-forms.git
+          git push production main
