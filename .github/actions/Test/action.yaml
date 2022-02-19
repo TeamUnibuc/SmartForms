@@ -1,14 +1,9 @@
-name: 'Build & Test'
+name: 'Test'
 description: 'Builds and tests the project.'
 
 runs:
   using: composite
   steps:
-    - name: Build
-      shell: bash
-      run: |
-        make build
-    
     - name: Test
       shell: bash
       run: |

@@ -36,6 +36,10 @@ runs:
     run: mamba env update -n SmartForms -f conda_environment.yaml
     if: steps.cache.outputs.cache-hit != 'true'
 
+  - name: Check CONDA env
+    run: echo $CONDA
+    shell: bash
+
   - name: Activate Environment
     shell: bash
-    run: conda activate SmartForms
+    run: $CONDA/bin/activate SmartForms
