@@ -6,39 +6,30 @@ on:
 
 jobs:
   build-test:
-    environment: CI
-
-    name: Build and Test
+    name: Build & Test
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup conda environment
-        uses: conda-incubator/setup-miniconda@v2
-        with: 
-          activate-environment: SmartForms
-          environment-file: conda_environment.yml
-          auto-activate-base: false
+      - name: Prepare environment
+        uses: ./.github/actions/Prep-Env
 
       - name: Build
-        run: |
-          make build
+        uses: ./.github/actions/Build
 
       - name: Test
-        run: |
-          make test-ci
+        uses: ./.github/actions/Test
 
   deploy:
     name: Deploy to production
 
     needs: build-test
  
-    environment: CI
+    environment: Production
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Add SSH Key
         uses: webfactory/ssh-agent@v.0.5.4

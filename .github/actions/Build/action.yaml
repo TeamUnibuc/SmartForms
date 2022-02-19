@@ -1,0 +1,10 @@
+name: 'Build'
+description: 'Builds the project.'
+
+runs:
+  using: composite
+  steps:
+    - name: Build
+      shell: bash
+      run: |
+        make build

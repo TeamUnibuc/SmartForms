@@ -4,30 +4,38 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  CACHE_NUMBER: 0  # increase to reset cache manually
+
 jobs:
   build-test:
-    name: Build and Test
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: Linux-64
+            prefix: /usr/share/miniconda3/envs/my-env
 
     environment: CI
-    runs-on: ubuntu-20.04
+    
+    name: Build & Test - ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: ls files
-        run: |
-          ls -la
+      - name: Prepare environment
+        uses: ./.github/actions/Prep-Env
 
-      - name: Setup conda environment
-        uses: conda-incubator/setup-miniconda@v2
-        with: 
-          activate-environment: SmartForms
-          environment-file: conda_environment.yaml
-          auto-activate-base: false
+      - name: Check env
+        run: conda info
 
       - name: Build
-        run: |
-          make build
+        uses: ./.github/actions/Build
 
       - name: Test
-        run: |
-          make test-ci
+        uses: ./.github/actions/Test
