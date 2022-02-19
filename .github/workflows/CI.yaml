@@ -6,14 +6,12 @@ on:
 
 jobs:
   build-test:
-    environment: CI
-    
     name: Build and Test
+
+    environment: CI
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-        run: |
-          echo "helo 1"
 
       - name: Setup conda environment
         uses: conda-incubator/setup-miniconda@v2
@@ -21,9 +19,6 @@ jobs:
           activate-environment: SmartForms
           environment-file: conda_environment.yml
           auto-activate-base: false
-
-      - run: |
-          echo "helo 2"
 
       - name: Build
         run: |
