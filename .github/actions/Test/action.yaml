@@ -8,4 +8,5 @@ runs:
     shell: bash
     uses: conda-incubator/setup-miniconda@v2
     run: |
+      conda info
       make test-ci
