@@ -1,4 +1,4 @@
-.PHONY: default backend frontend frontend-packages conda-env
+.PHONY: default backend frontend frontend-packages conda-env deploy
 
 default:
 	@echo "available commands:"
@@ -23,3 +23,9 @@ frontend: frontend-packages
 
 conda-env:
 	conda env update -f conda_environment.yaml
+
+deploy:
+	chmod +x deploy_script.sh
+	./deploy_script.sh
+	@echo " ---- Deploy Finished ---- "
+	
