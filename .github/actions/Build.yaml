@@ -1,0 +1,7 @@
+name: 'Build'
+description: 'Builds the project. Checks for errors/linters'
+
+needs: ./.github/actions/Conda-Env
+
+run: |
+  make build

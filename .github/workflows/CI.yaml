@@ -5,29 +5,25 @@ on:
     branches: [ main ]
 
 jobs:
-  build-test:
-    name: Build and Test
+  build:
+    name: Build
 
     environment: CI
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-
-      - name: ls files
-        run: |
-          ls -la
-
-      - name: Setup conda environment
-        uses: conda-incubator/setup-miniconda@v2
-        with: 
-          activate-environment: SmartForms
-          environment-file: conda_environment.yaml
-          auto-activate-base: false
-
+      - name: Checkout
+        uses: actions/checkout@v2
+        
       - name: Build
-        run: |
-          make build
+        uses: ./.github/actions/Build
 
+  test:
+    name: Test
+
+    needs: Build
+
+    environment: CI
+    runs-on: ubuntu-20.04
+    steps:
       - name: Test
-        run: |
-          make test-ci
+        uses: ./.github/actions/Test

@@ -1,0 +1,10 @@
+name: 'Conda Environment'
+description: 'Builds the SmartForms conda environment from the  .yaml file'
+
+needs: actions/checkout@v2
+
+uses: conda-incubator/setup-miniconda@v2
+with: 
+  activate-environment: SmartForms
+  environment-file: conda_environment.yaml
+  auto-activate-base: false
