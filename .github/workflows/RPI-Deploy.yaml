@@ -36,7 +36,7 @@ jobs:
   deploy:
     name: Deploy to production
 
-    needs: build-test
+    # needs: build-test
  
     environment: Production
     runs-on: ubuntu-20.04
@@ -44,6 +44,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Add Known Hosts
+        run: |
+          ssh-keyscan smartforms.ml >> /home/runner/.ssh/known_hosts
 
       - name: Add SSH Key
         uses: webfactory/ssh-agent@v0.5.4
