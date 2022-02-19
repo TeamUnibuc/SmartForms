@@ -14,7 +14,7 @@ jobs:
           echo "helo 1"
 
       - name: Setup conda environment
-      - uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v2
         with: 
           activate-environment: SmartForms
           environment-file: conda_environment.yml
