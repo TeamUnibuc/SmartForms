@@ -6,7 +6,5 @@ runs:
   steps:
   - name: Cook environment
     shell: bash
-    uses: conda-incubator/setup-miniconda@v2
     run: |
-      conda info
       make test-ci

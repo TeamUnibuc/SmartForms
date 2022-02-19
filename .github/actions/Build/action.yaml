@@ -7,5 +7,4 @@ runs:
     - name: Build
       shell: bash
       run: |
-        conda info
         make build

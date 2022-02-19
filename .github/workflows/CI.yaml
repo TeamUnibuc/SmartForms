@@ -11,10 +11,9 @@ jobs:
     environment: CI
     runs-on: ubuntu-20.04
     steps:
-      - run: conda info
+      - uses: ./.github/actions/Prep-Env
 
-      - name: Checkout
-        uses: actions/checkout@v2
+      - run: conda info
 
       - name: Build
         uses: ./.github/actions/Build
@@ -27,10 +26,9 @@ jobs:
     environment: CI
     runs-on: ubuntu-20.04
     steps:
-      - run: conda info
+      - uses: ./.github/actions/Prep-Env
 
-      - name: Checkout
-        uses: actions/checkout@v2
+      - run: conda info
 
       - name: Test
         uses: ./.github/actions/Test

@@ -1,9 +1,12 @@
-name: 'Conda Environment'
-description: 'Builds the SmartForms conda environment from the  .yaml file'
+name: 'Prepare Environment'
+description: 'BCheckouts, installs and activates the conda environment "SmartForms"'
 
 runs:
   using: composite
   steps:
+  - name: Checkout
+    uses: actions/checkout@v2
+
   - name: Cook environment
     shell: bash
     uses: conda-incubator/setup-miniconda@v2
