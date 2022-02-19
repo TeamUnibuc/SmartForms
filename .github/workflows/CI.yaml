@@ -20,7 +20,7 @@ jobs:
           environment-file: conda_environment.yml
           auto-activate-base: false
 
-        run: |
+      - run: |
           echo "helo 2"
 
       - name: Build
