@@ -42,11 +42,3 @@ runs:
   - name: Check CONDA env
     run: echo $CONDA
     shell: bash
-
-  # - name: Activate Environment
-  #   shell: bash
-  #   run: $CONDA/bin/activate SmartForms
-
-  - name: Check active environment
-    shell: bash
-    run: conda info
