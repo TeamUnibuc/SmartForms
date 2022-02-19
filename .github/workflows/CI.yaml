@@ -21,7 +21,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with: 
           activate-environment: SmartForms
-          environment-file: conda_environment.yml
+          environment-file: conda_environment.yaml
           auto-activate-base: false
 
       - name: Build
