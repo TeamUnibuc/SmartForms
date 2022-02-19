@@ -1,5 +1,10 @@
 # List of requirements for the backend
 
+# General
+pdf2image
+matplotlib
+numpy
+
 # Mongodb connector
 pymongo[srv]
 
@@ -10,8 +15,10 @@ python-multipart
 
 # OCR NN
 tensorflow
+sklearn
 
 # Vision framework
 opencv-python
 fpdf
 qrcode
+pdf2image

@@ -8,16 +8,19 @@ Relies mostly on:
 from typing import List
 import numpy as np
 import ocr.network
+import cv2 as cv
 
 IMAGE_SIZE = 30
 
 def predict_characters(imgs: np.ndarray) -> List[str]:
     """
-    imgs: 4d array, where:
+    imgs: 3d array, where:
         1st dim - number of images to predict
-        2nd dim - rgb channel
-        3-4 dim - image dimensions
+        2-3 dim - image dimensions
     """
+
+    imgs = [cv.resize(i, (IMAGE_SIZE, IMAGE_SIZE)) for i in imgs]
+    imgs = np.stack(imgs)
     
     # sanity check
     for i in imgs:

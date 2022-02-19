@@ -6,13 +6,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import database, smart_forms_types
 from .constants import *
+import pdf_processor.constants as constants
+import ocr
+import io
+from PIL import Image
 
 def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.ndarray:
     """
         Changes the perspective of the picture, to make it look like the template
     """
+    # TODO:
+    # NOT apply a threshold on the final image
+    # i.e. return a copy of the image WITHOUT a threshold
+    # as it reduces the quality of the image
+    
     def preprocess(img):
-        img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        if len(img.shape) == 3 and img.shape[2] == 3:
+            img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         _, img = cv.threshold(img, 128, 255, cv.THRESH_BINARY)
         return img 
     picture = preprocess(picture)
@@ -56,16 +66,70 @@ def find_maching_template(picture: np.ndarray) -> smart_forms_types.PdfForm:
     form = smart_forms_types.pdf_form_from_dict(form_dict[0])
     return form
 
-def find_answer_squares(fixed_picture: np.ndarray, form: smart_forms_types.PdfForm) -> List[List[np.ndarray]]:
+def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types.PdfForm) -> List[List[str]]:
     """
         fixed_picture: image where we already fixed the perspective transform.
         Returns a list of squares.
     """
-    squares_content = []
 
+    squares_content = []
+    multiplier_h = fixed_picture.shape[0] / constants.PDF_H
+    multiplier_w = fixed_picture.shape[1] / constants.PDF_W
+            
     for squares in form.answer_squares_location:
         question_content = []
         for square in squares:
-            # multiplier_h = 
-            #TODO:
-            pass
+            x = int(multiplier_h * square.x)
+            y = int(multiplier_w * square.y)
+            dx = int(multiplier_h * square.width)
+            dy = int(multiplier_w * square.width)
+            
+            cv.rectangle(fixed_picture, (x, y), (x+dx, y+dy), (0, 0, 0), thickness=10)
+
+            sq_img = fixed_picture[x:x+dx, y:y+dy]
+            question_content.append(sq_img)
+        plt.imshow(fixed_picture)
+        plt.show()
+
+        squares_content.append(ocr.predict_characters(np.stack(question_content)))
+
+
+    return squares_content
+
+def pdf_to_numpy(file: bytes) -> np.array:
+    """
+        converts a pdf binary to a numpy array
+    """
+    image = pdf2image.convert_from_bytes(file)[0]
+    image = np.array(image)
+    return image
+
+def process_file(file: bytes, filename: str) -> Tuple[smart_forms_types.PdfForm, List[List[str]]]:
+    """
+        Processes a file, extracting the content of its answer squares.
+        The file has to be an image or a pdf.
+    
+        TODO: Support zip files.
+    """
+    if filename[-4:] == ".pdf": # pdf file
+        image = pdf_to_numpy(file)
+        # TODO: Handle multiple pages
+    else: # try to read as image
+        image = np.array(Image.open(io.BytesIO(file)))
+
+    print(image.shape, flush=True)
+
+    # convert to grayscale
+    image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    
+    # find form.
+    form = find_maching_template(image)
+    fixed_image = change_image_perspective(image, pdf_to_numpy(form.extract_raw_pdf_bytes()))
+
+    print("Fixed image:", flush=True)
+    plt.imshow(fixed_image)
+    plt.show()
+
+    content = extract_content_from_form(fixed_image, form)
+
+    return (form, content)
