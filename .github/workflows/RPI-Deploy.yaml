@@ -60,15 +60,15 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/github_actions
-          chmod 600 /home/runner/.ssh/github_actions
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/deployer
+          chmod 600 /home/runner/.ssh/deployer
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add /home/runner/.ssh/github_actions
+          ssh-add /home/runner/.ssh/deployer
 
       - name: Push to production
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
-          git remote add production git@smartforms.ml:/home/deployer/Production/SmartForms-GitBare/smart-forms.git
+          git remote add production deployer@smartforms.ml:/home/deployer/Production/SmartForms-GitBare/smart-forms.git
           git push production main
