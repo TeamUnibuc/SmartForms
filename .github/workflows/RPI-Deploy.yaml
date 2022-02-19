@@ -8,13 +8,18 @@ jobs:
   build-test:
     environment: CI
 
-    name: Build and Test
+    name: Build & Test
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: ./.github/actions/Prep-Env
+      - name: Prepare environment
+        uses: ./.github/actions/Prep-Env
 
-      - uses: ./.github/actions/Build-Test
+      - name: Build
+        uses: ./.github/actions/Build
+
+      - name: Test
+        uses: ./.github/actions/Test
 
   deploy:
     name: Deploy to production
