@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 from pydantic import BaseModel
+import pickle
 
 class FormTextQuestion(BaseModel):
     """
@@ -36,3 +37,15 @@ class FormAnswer(BaseModel):
     formId: str
     userId: str
     answers: List[str]
+
+    def to_dict(self) -> dict:
+        return {
+            "formId": self.formId,
+            "answerId": self.answerId,
+            "userId": self.userId,
+            "content": pickle.dumps(self)
+        }
+
+def form_answer_from_dict(d: dict) -> FormAnswer:
+    return pickle.loads(d["content"])
+    

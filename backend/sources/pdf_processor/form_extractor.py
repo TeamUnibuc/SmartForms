@@ -23,7 +23,7 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
     def preprocess(img):
         if len(img.shape) == 3 and img.shape[2] == 3:
             img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        _, img = cv.threshold(img, 128, 255, cv.THRESH_BINARY)
+        _, img = cv.threshold(img, 100, 255, cv.THRESH_BINARY)
         return img 
     picture = preprocess(picture)
     template = preprocess(template)
@@ -84,7 +84,7 @@ def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types
             dx = int(multiplier_h * square.width)
             dy = int(multiplier_w * square.width)
             
-            cv.rectangle(fixed_picture, (x, y), (x+dx, y+dy), (0, 0, 0), thickness=10)
+            cv.rectangle(fixed_picture, (x, y), (x+dx, y+dy), (0, 0, 0), thickness=4)
 
             sq_img = fixed_picture[x:x+dx, y:y+dy]
             question_content.append(sq_img)

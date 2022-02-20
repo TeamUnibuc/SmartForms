@@ -10,7 +10,7 @@ import numpy as np
 import ocr.network
 import cv2 as cv
 
-IMAGE_SIZE = 30
+IMAGE_SIZE = 32
 
 def predict_characters(imgs: np.ndarray) -> List[str]:
     """
@@ -19,14 +19,14 @@ def predict_characters(imgs: np.ndarray) -> List[str]:
         2-3 dim - image dimensions
     """
 
-    imgs = [cv.resize(i, (IMAGE_SIZE, IMAGE_SIZE)) for i in imgs]
+    imgs = [cv.resize(i, (IMAGE_SIZE, IMAGE_SIZE)).reshape(IMAGE_SIZE, IMAGE_SIZE, 1) for i in imgs]
     imgs = np.stack(imgs)
-    
+
     # sanity check
     for i in imgs:
-        if i.shape != (IMAGE_SIZE, IMAGE_SIZE):
+        if i.shape != (IMAGE_SIZE, IMAGE_SIZE, 1):
             raise Exception(
-                f"Invalid size passed. Expected ({IMAGE_SIZE}, {IMAGE_SIZE}, received {i.shape}"
+                f"Invalid size passed. Expected ({IMAGE_SIZE}, {IMAGE_SIZE}, 1), received {i.shape}"
             )
 
     network = ocr.network.Network.get_instance()

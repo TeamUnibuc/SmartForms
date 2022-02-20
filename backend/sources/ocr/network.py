@@ -12,7 +12,8 @@ import cv2 as cv
 
 DATA_FOLDER = "../data/OCR/"
 MODEL_LOCATION = DATA_FOLDER + "ocr_model.bin"
-CHARACTERS = "abcdefghijklmnopqrstuvwxyz" +\
+CHARACTERS = " " +\
+             "abcdefghijklmnopqrstuvwxyz" +\
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +\
              "01234567890" +\
              "!@#$%^&*()-_=+[]\{}|;':\",./<>?"
@@ -22,9 +23,21 @@ def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
     """
     Returns X, Y
     """
-    X, Y = np.array([]), np.array([])
-    # TODO:
+    def process_img(img):
+        # resize to the good dimension
+        img = cv.resize(img, (ocr.IMAGE_SIZE, ocr.IMAGE_SIZE))
+        # resize to the good shape
+        img = img.reshape((ocr.IMAGE_SIZE, ocr.IMAGE_SIZE, 1))
+        # # make black be the lines and white the background
+        # img = 255. - img TODO:
+        return img
 
+    X = np.load(DATA_FOLDER + "alphanum-img.npy")
+    X = np.stack([process_img(i) for i in X])
+
+    Y = np.load(DATA_FOLDER + "alphanum-chr.npy")
+    Y = np.array([CHARACTERS_INDEX[i] for i in Y])
+    
     return X, Y
 
 class Network:
@@ -43,7 +56,7 @@ class Network:
         # handle singleton stuff
         if Network.__instance__ is not None:
             raise Exception("Singleton class Network instanciated twice.")
-        Network.__init__ = self
+        Network.__instance__ = self
 
         # initialization of the network
         self.model = keras.Sequential([
@@ -55,7 +68,7 @@ class Network:
             layers.Flatten(),
             layers.Dense(128, activation='relu'),
             layers.Dense(50, activation='relu'),
-            layers.Dense(10, activation='softmax')
+            layers.Dense(len(CHARACTERS), activation='softmax')
         ])
         self.model.compile(
             loss='categorical_crossentropy',
@@ -77,7 +90,7 @@ class Network:
         """
         x, y = load_train_data()
 
-        x_train, x_test, x_train, y_test = train_test_split(x, y, test_size = 0.2, random_state=21)
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state=21)
 
         # normalize
         x_train = x_train / 255.0
@@ -85,15 +98,17 @@ class Network:
 
         # one-hot encode
         y_test_raw = y_test
-        y_train = to_categorical(y_train)
-        y_test = to_categorical(y_test)
+        y_train = to_categorical(y_train, num_classes=len(CHARACTERS))
+        y_test = to_categorical(y_test, num_classes=len(CHARACTERS))
+
+        print(x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 
         print("Training model...")
         self.model.fit(
             x_train,
             y_train,
             validation_data=(x_test, y_test),
-            epochs=20,
+            epochs=30,
             batch_size=50,
         )
 
