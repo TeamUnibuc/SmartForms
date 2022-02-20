@@ -6,9 +6,6 @@ on:
 
 jobs:
   build-test:
-    name: Build & Test
-    runs-on: ubuntu-20.04
-
     defaults:
       run:
         shell: bash -l {0}
@@ -16,16 +13,22 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             label: Linux-64
             prefix: /usr/share/miniconda3/envs/my-env
 
+    name: Build & Test - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Prepare environment
         uses: ./.github/actions/Prep-Env
+
+      - name: Cheeck Conda Env
+        run: |
+          conda info
 
       - name: Build
         uses: ./.github/actions/Build
@@ -51,6 +54,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Add Known Hosts
         run: |
@@ -58,12 +64,6 @@ jobs:
           ssh-keyscan smartforms.ml >> /home/runner/.ssh/known_hosts
 
       - name: Add SSH Key & Push
-        # --- Some github action stuff
-        # uses: webfactory/ssh-agent@v0.5.4
-        # with:
-        #   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-        # --- Manual method
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/deployer
           chmod 600 /home/runner/.ssh/deployer
@@ -75,5 +75,4 @@ jobs:
           git config --global user.name "GitHub Actions"
 
           git remote add production deployer@smartforms.ml:/home/deployer/Production/SmartForms-GitBare/smart-forms.git
-          git fetch --unshallow production
           git push production main -f

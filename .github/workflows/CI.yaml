@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             label: Linux-64
             prefix: /usr/share/miniconda3/envs/my-env
 
@@ -31,7 +31,7 @@ jobs:
       - name: Prepare environment
         uses: ./.github/actions/Prep-Env
 
-      - name: Check env
+      - name: Check Conda env
         run: conda info
 
       - name: Build

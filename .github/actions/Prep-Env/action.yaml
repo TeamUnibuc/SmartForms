@@ -38,7 +38,3 @@ runs:
     shell: bash
     run: mamba env update -n SmartForms -f conda_environment.yaml
     if: steps.cache.outputs.cache-hit != 'true'
-
-  - name: Check CONDA env
-    run: echo $CONDA
-    shell: bash

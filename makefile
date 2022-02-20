@@ -38,9 +38,19 @@ test-ci:
 	$(MAKE) test-backend-ci
 	$(MAKE) test-frontend-ci
 
+# Delete the line 'tensorflow' from pip requirements for arm
+# Run the deploy script
+# Restore the requirements.txt file
 deploy:
+	cp ./backend/requirements.txt ./backend/requirements.txt.bak
+	sed -i '/tensorflow/d' ./backend/requirements.txt
+
 	chmod +x deploy_script.sh
 	./deploy_script.sh
+
+	rm ./backend/requirements.txt
+	mv ./backend/requirements.txt.bak ./backend/requirements.txt
+
 	@echo " ---- Deploy Finished ---- "
 
 conda-env:
