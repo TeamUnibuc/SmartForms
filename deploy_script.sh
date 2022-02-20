@@ -1,8 +1,14 @@
 #!/usr/bin/bash
 
+cat ./backend/requirements.txt
+
 # Conda envinronment
 source ~/miniconda3/bin/activate
+make conda-env
 conda activate SmartForms
+
+# Check conda env
+conda info
 
 echo "========  Installing npm/yarn dependencies"
 cd frontend
