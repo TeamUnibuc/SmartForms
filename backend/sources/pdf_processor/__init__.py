@@ -1,1 +1,2 @@
 from .form_creator import create_form_from_description
+from .form_extractor import extract_answer_from_form

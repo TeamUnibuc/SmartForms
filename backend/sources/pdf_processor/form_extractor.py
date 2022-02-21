@@ -1,3 +1,4 @@
+import logging
 from shutil import Error
 from typing import Any, List, Tuple
 import cv2 as cv
@@ -10,6 +11,8 @@ import pdf_processor.constants as constants
 import ocr
 import io
 from PIL import Image
+
+DEBUG = False
 
 def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.ndarray:
     """
@@ -88,8 +91,10 @@ def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types
 
             sq_img = fixed_picture[x:x+dx, y:y+dy]
             question_content.append(sq_img)
-        plt.imshow(fixed_picture)
-        plt.show()
+        
+        if DEBUG:
+            plt.imshow(fixed_picture)
+            plt.show()
 
         squares_content.append(ocr.predict_characters(np.stack(question_content)))
 
@@ -104,7 +109,7 @@ def pdf_to_numpy(file: bytes) -> np.array:
     image = np.array(image)
     return image
 
-def process_file(file: bytes, filename: str) -> Tuple[smart_forms_types.PdfForm, List[List[str]]]:
+def extract_answer_from_form(file: bytes, filename: str) -> Tuple[smart_forms_types.PdfForm, smart_forms_types.FormAnswer]:
     """
         Processes a file, extracting the content of its answer squares.
         The file has to be an image or a pdf.
@@ -117,7 +122,7 @@ def process_file(file: bytes, filename: str) -> Tuple[smart_forms_types.PdfForm,
     else: # try to read as image
         image = np.array(Image.open(io.BytesIO(file)))
 
-    print(image.shape, flush=True)
+    logging.debug(f"Image shape: {image.shape}")
 
     # convert to grayscale
     image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
@@ -126,10 +131,19 @@ def process_file(file: bytes, filename: str) -> Tuple[smart_forms_types.PdfForm,
     form = find_maching_template(image)
     fixed_image = change_image_perspective(image, pdf_to_numpy(form.extract_raw_pdf_bytes()))
 
-    print("Fixed image:", flush=True)
-    plt.imshow(fixed_image)
-    plt.show()
+    if DEBUG:
+        print("Fixed image:", flush=True)
+        plt.imshow(fixed_image)
+        plt.show()
 
     content = extract_content_from_form(fixed_image, form)
+    content = ["".join(i) for i in content]
 
-    return (form, content)
+    form_answer = smart_forms_types.FormAnswer(
+        answerId="",
+        formId=form.description.formId,
+        userId="",
+        answers=content
+    )
+
+    return (form, form_answer)
