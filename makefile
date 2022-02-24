@@ -32,7 +32,7 @@ test-backend-ci:
 	@echo "TODO: No backend tests to run :/"
 
 test-frontend-ci:
-	(cd frontend && CI=true yarn test)
+	(cd frontend && CI=true yarn test --watchAll=false)
 
 test-ci: 
 	$(MAKE) test-backend-ci
