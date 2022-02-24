@@ -1,25 +1,67 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { StylesProvider } from '@material-ui/styles';
+import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
 
-function App() {
+import Footer from '~/components/Footer';
+import Header from '~/components/Header';
+import { Home } from '~/pages'
+
+import { Grid, Box, Container, CssBaseline } from '@material-ui/core'
+import { ThemeProvider } from '@material-ui/styles'
+import { createTheme } from '@material-ui/core/styles';
+
+// Daca vrem sa adaugam culori la theme, aici trebuie sa facem asta
+const theme = createTheme({
+  palette: {
+    background:{
+      default: '#CDDDDD'
+    }
+  }
+})
+
+function App(): JSX.Element {
+  if (import.meta.env.DEV) {
+    console.log("Printing all env variables")
+    console.log(import.meta.env)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <StylesProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router basename={import.meta.env.BASE_URL}>
+        {/* <SnackProvider> */}
+        {/* <UserStatusProvider> */}
+
+          {/* <Snackbar /> */}
+
+          <Grid container>
+
+            <Grid item xs={12}>
+              <Header />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box pt={2} paddingBottom="100px">
+                <Container style={{display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1, width: '100%'}}>
+
+                  <Routes>
+                    <Route key="Home" path="/" element={<Home />}/>
+                  </Routes>
+
+                  <Footer />
+                </Container>
+
+              </Box>
+            </Grid>
+
+          </Grid>
+
+        {/* </UserStatusProvider> */}
+        {/* </SnackProvider> */}
+        </Router>
+      </ThemeProvider>
+    </StylesProvider>
   );
 }
 

@@ -24,7 +24,7 @@ frontend-packages:
 	(cd frontend && yarn)
 
 frontend: frontend-packages
-	(cd frontend && yarn start)
+	(cd frontend && yarn dev)
 
 build: frontend-packages
 
