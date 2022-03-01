@@ -87,9 +87,9 @@ def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types
             dx = int(multiplier_h * square.width)
             dy = int(multiplier_w * square.width)
             
-            cv.rectangle(fixed_picture, (x, y), (x+dx, y+dy), (0, 0, 0), thickness=4)
+            cv.rectangle(fixed_picture, (x, y), (x+dx, y+dy), (0, 255, 255), thickness=2)
 
-            sq_img = fixed_picture[x:x+dx, y:y+dy]
+            sq_img = fixed_picture[y:y+dy, x:x+dx]
             question_content.append(sq_img)
         
         if DEBUG:

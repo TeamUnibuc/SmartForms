@@ -9,7 +9,9 @@ from typing import List
 import numpy as np
 import ocr.network
 import cv2 as cv
+import matplotlib.pyplot as plt
 
+DEBUG = False
 IMAGE_SIZE = 32
 
 def predict_characters(imgs: np.ndarray) -> List[str]:
@@ -28,6 +30,13 @@ def predict_characters(imgs: np.ndarray) -> List[str]:
             raise Exception(
                 f"Invalid size passed. Expected ({IMAGE_SIZE}, {IMAGE_SIZE}, 1), received {i.shape}"
             )
+
+    if DEBUG:
+        fig, ax = plt.subplots(nrows=5, ncols=5)
+        for i in range(len(imgs)):
+            ax[i // 5][i % 5].imshow(imgs[i])
+
+        plt.show()
 
     network = ocr.network.Network.get_instance()
     return network.predict(imgs)
