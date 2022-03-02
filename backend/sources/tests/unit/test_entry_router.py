@@ -1,20 +1,24 @@
 import json
 import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
 
 import time
 import random
 import unittest
-from main import init_environment
+from main import init_state
 import main
 from fastapi.testclient import TestClient
 
-class TestRootEndpoint(unittest.TestCase):
+class TestEntryEndpoint(unittest.TestCase):
     def setUpClass() -> None:
-        init_environment()
+        init_state()
         
     def test_root_endpoint(self):
         self.assertEqual(1, 1)
+
+
+# TODO:
+# keeping this here for having a template
         # client = TestClient(fastapi_engine.app)
         # response = client.get("/")
         # self.assertEqual(response.status_code, 200)

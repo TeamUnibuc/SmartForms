@@ -12,30 +12,33 @@ import sys
 import os
 from starlette.middleware.sessions import SessionMiddleware
 
-def init_environment():
+# FastAPI app serving the API.
+app: FastAPI = None
+
+def init_state():
     """
-        Loads .env and initializes logging.
+        Loads .env, initializes logging and creates the webserver.
     """
+    global app
+
     load_dotenv()
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-def main():
-    """
-        Starts the FastAPI server.
-    """
-    init_environment()
-    
     app = FastAPI()
 
     # register a session middleware, for storing authentication
     # status and cookies
     app.add_middleware(SessionMiddleware, secret_key=os.getenv("COOKIES_SECRET"))
 
-    app.include_router(routers.form_router.router)
-    app.include_router(routers.entry_router.router)
-    app.include_router(routers.inference_router.router)
-    app.include_router(routers.user_router.router)
+    for router in routers.routers:
+        app.include_router(router)
 
+def main():
+    """
+        Starts the FastAPI server.
+    """
+    init_state()
+    
     uvicorn.run(
         app,
         host=os.environ['SERVER_HOST'],
