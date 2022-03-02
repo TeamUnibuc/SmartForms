@@ -25,3 +25,8 @@ opencv-python
 fpdf
 qrcode
 pdf2image
+
+# required for oauth authentication
+authlib
+itsdangerous
+httpx
