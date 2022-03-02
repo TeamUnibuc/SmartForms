@@ -12,11 +12,11 @@ class Database:
 
         self.client = pymongo.MongoClient(
             f"mongodb+srv://" +
-            f"{os.getenv('MONGO_USER')}:{os.getenv('MONGO_PASSWORD')}" +
-            f"@{os.getenv('MONGO_CLUSTER')}"
+            f"{os.environ['MONGO_USER']}:{os.environ['MONGO_PASSWORD']}" +
+            f"@{os.environ['MONGO_CLUSTER']}"
         )
 
-        self.database = self.client.get_database(os.getenv("MONGO_DB_NAME"))
+        self.database = self.client.get_database(os.environ["MONGO_DB_NAME"])
         logging.info("Connected to mongo cloud.")
         
     

@@ -41,7 +41,7 @@ async def home(request: Request):
     return HTMLResponse('<a href="/user/login">login</a>')
 
 
-@router.get('/login', tags=['authentication'])  # Tag it as "authentication" for our docs
+@router.get('/login')
 async def login(request: Request):
     # Redirect Google OAuth back to our application
     redirect_uri = request.url_for('auth')
@@ -60,7 +60,7 @@ async def auth(request: Request):
     return RedirectResponse(url='/user')
 
 
-@router.get('/logout', tags=['authentication'])  # Tag it as "authentication" for our docs
+@router.get('/logout')
 async def logout(request: Request):
     # Remove the user
     request.session.pop('user', None)

@@ -1,5 +1,5 @@
 .PHONY: default conda-env deploy 
-.PHONY: backend frontend frontend-packages build
+.PHONY: backend frontend frontend-packages build backend-tests
 .PHONY: test-ci test-frontend-ci test-backend-ci
 
 default:
@@ -7,6 +7,9 @@ default:
 
 	@echo "backend"
 	@echo "  -- Starts the backend server locally"
+
+	@echo "backend-tests"
+	@echo "  -- Starts the backend unit tests"
 
 	@echo "frontend"
 	@echo "  -- Starts frontend in interactive mode"
@@ -19,6 +22,9 @@ default:
 
 backend:
 	(cd backend/sources && python main.py)
+
+backend-tests:
+	(cd backend/sources && python -m unittest)
 
 frontend-packages:
 	(cd frontend && yarn)

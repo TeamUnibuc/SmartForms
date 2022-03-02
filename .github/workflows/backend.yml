@@ -32,5 +32,15 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with unittest
+      env:
+        MONGO_USER: ${{ secrets.MONGO_USER }} 
+        MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+        MONGO_CLUSTER: ${{ secrets.MONGO_CLUSTER }}
+        MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
+        SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        COOKIES_SECRET: ${{ secrets.COOKIES_SECRET }}
       run: |
         (cd backend/sources/ && python -m unittest)
