@@ -10,7 +10,7 @@ from authlib.integrations.starlette_client import OAuth
 # https://slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html
 
 router = APIRouter(
-    prefix="/user",
+    prefix="/api/user",
     tags=["login"]
 )
 
@@ -35,10 +35,10 @@ async def home(request: Request):
         html = (
             f'<pre>Email: {email}</pre><br>'
             '<a href="/docs">documentation</a><br>'
-            '<a href="/user/logout">logout</a>'
+            '<a href="/api/user/logout">logout</a>'
         )
         return HTMLResponse(html)
-    return HTMLResponse('<a href="/user/login">login</a>')
+    return HTMLResponse('<a href="/api/user/login">login</a>')
 
 
 @router.get('/login')
@@ -57,7 +57,7 @@ async def auth(request: Request):
     # Save the user
     request.session['user'] = dict(user)
 
-    return RedirectResponse(url='/user')
+    return RedirectResponse(url='/api/user')
 
 
 @router.get('/logout')
@@ -65,4 +65,4 @@ async def logout(request: Request):
     # Remove the user
     request.session.pop('user', None)
 
-    return RedirectResponse(url='/user')
+    return RedirectResponse(url='/api/user')

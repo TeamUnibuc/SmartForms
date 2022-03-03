@@ -137,7 +137,7 @@ async def get_form_description(formId: str):
     if len(forms) == 0:
         raise Exception("No form with the given Id was found!")
     
-    return smart_forms_types.pdf_form_from_dict(forms[0]).description
+    return forms[0]
 
 
 @router.get(
@@ -192,7 +192,7 @@ class UpdateFormReceiveModel(BaseModel):
         }
     }
 )
-async def update_form(params: UpdateFormReceiveModel, formId: str):
+async def update_form_visibility(params: UpdateFormReceiveModel, formId: str):
     """
         Updates online visibility of a form.
         Note: This does not affect the owner of the form.
