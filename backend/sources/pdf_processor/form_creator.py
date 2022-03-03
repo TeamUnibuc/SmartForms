@@ -8,6 +8,7 @@ import os
 import smart_forms_types.pdf_form as pdf_form
 import smart_forms_types
 import cv2 as cv
+import tempfile
 
 def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     """Creates an empty PDF form, with the
@@ -44,23 +45,23 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     )
     
     # upper-right (QR code)
-    file_name = "/tmp/smart-forms-img-" + str(random.randint(0, 10**10)) + ".png"
+    temp_file = tempfile.NamedTemporaryFile(suffix='.png')
     qr_code_maker = qrcode.QRCode(
         border=0
     )
     qr_code_maker.add_data(data)
     qr_code_maker.make(fit=True)
     qr_code = qr_code_maker.make_image()
-    qr_code.save(file_name)
+    qr_code.save(temp_file.name)
 
     pdf.image(
-        file_name,
+        temp_file.name,
         PDF_W - MARKER_PDF_OFFSET - QR_CODE_SIZE,
         MARKER_PDF_OFFSET,
         QR_CODE_SIZE,
         QR_CODE_SIZE
     )
-    os.remove(file_name)
+    temp_file.close()
     return pdf
 
 def _add_title_to_pdf(pdf: fpdf.FPDF, title: str):

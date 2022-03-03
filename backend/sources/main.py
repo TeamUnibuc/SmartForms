@@ -10,6 +10,7 @@ import routers
 import logging
 import sys
 import os
+from fastapi.responses import RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
 
 # FastAPI app serving the API.
@@ -39,6 +40,10 @@ def main():
     """
     init_state()
     
+    # add a redirect for now, to ease the workflow
+    @app.get('/')
+    async def redirect_to_user():
+        return RedirectResponse("/api/user")
     uvicorn.run(
         app,
         host=os.environ['SERVER_HOST'],
