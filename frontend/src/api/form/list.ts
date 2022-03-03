@@ -6,7 +6,7 @@ interface GetFormListParams {
 }
 
 interface GetFormListResults {
-  forms: FormDescription
+  forms: FormDescription[]
 }
 
 export const FormList = async(reqBody: GetFormListParams): Promise<GetFormListResults> =>

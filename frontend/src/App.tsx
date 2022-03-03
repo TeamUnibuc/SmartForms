@@ -4,7 +4,7 @@ import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
 
 import Footer from '~/components/Footer';
 import Header from '~/components/Header';
-import { Home, EditForm } from '~/pages'
+import { Home, EditForm, List } from '~/pages'
 
 import { Grid, Box, Container, CssBaseline } from '@material-ui/core'
 import { ThemeProvider } from '@material-ui/styles'
@@ -48,6 +48,7 @@ function App(): JSX.Element {
                   <Routes>
                     <Route key="Home" path="/" element={<Home />}/>
                     <Route key="EditForm" path="/edit-form" element={<EditForm />} />
+                    <Route key="List" path="/list" element={<List />} />
                   </Routes>
 
                   <Footer />
