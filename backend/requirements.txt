@@ -12,6 +12,9 @@ pymongo[srv]
 uvicorn[standard]
 fastapi
 python-multipart
+authlib
+httpx
+itsdangerous
 
 # dotenv support
 python-dotenv
@@ -19,6 +22,7 @@ python-dotenv
 # OCR NN
 tensorflow
 sklearn
+tensorflow-datasets
 
 # Vision framework
 opencv-python

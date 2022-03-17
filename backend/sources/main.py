@@ -12,6 +12,7 @@ import sys
 import os
 from fastapi.responses import RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
+import ocr.train_network as train_network
 
 # FastAPI app serving the API.
 app: FastAPI = None
@@ -49,6 +50,8 @@ def main():
         host=os.environ['SERVER_HOST'],
         port=int(os.environ['SERVER_PORT'])
     )
+
+# train_network.train_model()
 
 if __name__ == "__main__":
     main()

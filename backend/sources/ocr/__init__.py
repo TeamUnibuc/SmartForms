@@ -12,7 +12,8 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 
 DEBUG = False
-IMAGE_SIZE = 32
+# fixed to 28 as this is what most datasets offer
+IMAGE_SIZE = 28
 
 def predict_characters(imgs: np.ndarray) -> List[str]:
     """

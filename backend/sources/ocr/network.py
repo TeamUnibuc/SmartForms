@@ -12,6 +12,9 @@ import cv2 as cv
 
 DATA_FOLDER = "../data/OCR/"
 MODEL_LOCATION = DATA_FOLDER + "ocr_model.bin"
+# all possible characters
+# we only train by default on 0-9a-zA-Z, but the rest of them
+# are trainable on characters sent by the users
 CHARACTERS = " " +\
              "abcdefghijklmnopqrstuvwxyz" +\
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +\
@@ -19,26 +22,26 @@ CHARACTERS = " " +\
              "!@#$%^&*()-_=+[]\{}|;':\",./<>?"
 CHARACTERS_INDEX = { c: i for i, c in enumerate(CHARACTERS) }
 
-def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Returns X, Y
-    """
-    def process_img(img):
-        # resize to the good dimension
-        img = cv.resize(img, (ocr.IMAGE_SIZE, ocr.IMAGE_SIZE))
-        # resize to the good shape
-        img = img.reshape((ocr.IMAGE_SIZE, ocr.IMAGE_SIZE, 1))
-        # # make black be the lines and white the background
-        # img = 255. - img TODO:
-        return img
+# def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
+#     """
+#     Returns X, Y
+#     """
+#     def process_img(img):
+#         # resize to the good dimension
+#         img = cv.resize(img, (ocr.IMAGE_SIZE, ocr.IMAGE_SIZE))
+#         # resize to the good shape
+#         img = img.reshape((ocr.IMAGE_SIZE, ocr.IMAGE_SIZE, 1))
+#         # # make black be the lines and white the background
+#         # img = 255. - img TODO:
+#         return img
 
-    X = np.load(DATA_FOLDER + "alphanum-img.npy")
-    X = np.stack([process_img(i) for i in X])
+#     X = np.load(DATA_FOLDER + "alphanum-img.npy")
+#     X = np.stack([process_img(i) for i in X])
 
-    Y = np.load(DATA_FOLDER + "alphanum-chr.npy")
-    Y = np.array([CHARACTERS_INDEX[i] for i in Y])
+#     Y = np.load(DATA_FOLDER + "alphanum-chr.npy")
+#     Y = np.array([CHARACTERS_INDEX[i] for i in Y])
     
-    return X, Y
+#     return X, Y
 
 class Network:
     """
@@ -81,52 +84,7 @@ class Network:
             self.model.load_weights(MODEL_LOCATION)
             logging.info("Loaded model weights from disk.")
         except:
-            logging.info("Model not found on disk. Training...")
-            self.train_model()
-
-    def train_model(self):
-        """
-        Train the model on the data.
-        """
-        x, y = load_train_data()
-
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state=21)
-
-        # normalize
-        x_train = x_train / 255.0
-        x_test = x_test / 255.0
-
-        # one-hot encode
-        y_test_raw = y_test
-        y_train = to_categorical(y_train, num_classes=len(CHARACTERS))
-        y_test = to_categorical(y_test, num_classes=len(CHARACTERS))
-
-        print(x_train.shape, y_train.shape, x_test.shape, y_test.shape)
-
-        print("Training model...")
-        self.model.fit(
-            x_train,
-            y_train,
-            validation_data=(x_test, y_test),
-            epochs=30,
-            batch_size=50,
-        )
-
-        if not os.path.exists(DATA_FOLDER):
-            os.makedirs(DATA_FOLDER)
-
-        self.model.save_weights(MODEL_LOCATION)
-
-        # Final evaluation of the model
-        scores = self.model.evaluate(x_test, y_test, verbose=0)
-
-        predictions = np.argmax(self.model.predict(x_test), axis=1)
-        confusion_matrix = tensorflow.math.confusion_matrix(y_test_raw, predictions)
-
-        print("Confusion matrix:")
-        print(confusion_matrix)
-
-        print("Validation error: %.2f%%" % (100-scores[1]*100))
+            logging.info("Model not found on disk.")
 
     def predict(self, images: np.ndarray) -> List[str]:
         """

@@ -64,6 +64,7 @@ def find_maching_template(picture: np.ndarray) -> smart_forms_types.PdfForm:
     formId, points, _ = qrCodeDetector.detectAndDecode(picture)
     if len(points) != 1:
         raise Exception("Invalid number of QR codes found!")
+    print(f"Found form: {formId}")
 
     form_dict = [i for i in database.get_collection(database.FORMS).find({ "formId": formId })]
     form = smart_forms_types.pdf_form_from_dict(form_dict[0])
