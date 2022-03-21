@@ -32,7 +32,14 @@ def predict_characters(imgs: np.ndarray) -> List[str]:
                 f"Invalid size passed. Expected ({IMAGE_SIZE}, {IMAGE_SIZE}, 1), received {i.shape}"
             )
 
+    # Normalize to be the same format as training data
+    for i in range(len(imgs)):
+        imgs[i] = imgs[i] / 255
+        imgs[i] = 1. - imgs[i]
+
     if DEBUG:
+        print(f"Max value: {np.max(imgs[0])}")
+        print(f"Average value: {np.average(imgs[0])}")
         fig, ax = plt.subplots(nrows=5, ncols=5)
         for i in range(len(imgs)):
             ax[i // 5][i % 5].imshow(imgs[i])

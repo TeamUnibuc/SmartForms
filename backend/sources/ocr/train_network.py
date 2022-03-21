@@ -8,12 +8,14 @@ import numpy as np
 import ocr.network as network
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
+import matplotlib.pyplot as plt
 import tensorflow as tf
 import os
 
 DATASET_PATH = "../data/OCR/dataset/"
 IMAGES_PATH = DATASET_PATH + "emnist_imgs.npy"
 LABELS_PATH = DATASET_PATH + "emnist_labels.npy"
+DEBUG = False
 
 def generate_dataset():
     """
@@ -40,7 +42,7 @@ def generate_dataset():
         data.append((img, lbl))
 
     # add spaces
-    for i in range(11000):
+    for i in range(100000):
         data.append((np.zeros((28, 28, 1), dtype=np.uint8), 62))
 
     np.random.shuffle(data)
@@ -53,8 +55,12 @@ def generate_dataset():
             return network.CHARACTERS_INDEX[chr(ord('0') + l)]
         elif l < 10 + 26:
             return network.CHARACTERS_INDEX[chr(ord('A') + l - 10)]
-        else:
+        elif l < 10 + 2 * 26:
             return network.CHARACTERS_INDEX[chr(ord('a') + l - 10 - 26)]
+        elif l == 62:
+            return network.CHARACTERS_INDEX[' ']
+        else:
+            raise Exception()
 
     # convert from emnist format to own format
     labels = [convert_label(i) for i in labels]
@@ -89,6 +95,22 @@ def train_model():
     # normalize
     x_train = x_train / 255.0
     x_test = x_test / 255.0
+
+    if DEBUG:
+        fig, ax = plt.subplots(nrows=10, ncols=10)
+        for i in range(100):
+            ax[i // 10][i % 10].imshow(x_train[i])
+
+        plt.show()
+
+        for i in range(10):
+            for j in range(10):
+                print(network.CHARACTERS[y_train[i * 10 + j]], end='')
+            print('')
+
+        print(f"Max value: {np.max(x_train[0])}")
+        print(f"Average: {np.average(x_train[0])}")
+
 
     # one-hot encode
     y_test_raw = y_test

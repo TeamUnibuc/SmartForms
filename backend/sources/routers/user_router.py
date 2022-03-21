@@ -50,10 +50,10 @@ async def login(request: Request):
 
 @router.route('/auth')
 async def auth(request: Request):
+    print("Got here!!\n\n")
     # Perform Google OAuth
     token = await oauth.google.authorize_access_token(request)
-    user = await oauth.google.parse_id_token(request, token)
-
+    user = token['userinfo']
     # Save the user
     request.session['user'] = dict(user)
 

@@ -1,6 +1,5 @@
 import logging
-from shutil import Error
-from typing import Any, List, Tuple
+from typing import List, Tuple
 import cv2 as cv
 import pdf2image
 import matplotlib.pyplot as plt
@@ -12,7 +11,7 @@ import ocr
 import io
 from PIL import Image
 
-DEBUG = False
+DEBUG = True
 
 def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.ndarray:
     """
@@ -59,14 +58,34 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
 def find_maching_template(picture: np.ndarray) -> smart_forms_types.PdfForm:
     """
         Searches for the QR code and finds the ID.
+        We first search in the entire image.
     """
-    qrCodeDetector = cv.QRCodeDetector()
-    formId, points, _ = qrCodeDetector.detectAndDecode(picture)
-    if len(points) != 1:
-        raise Exception("Invalid number of QR codes found!")
-    print(f"Found form: {formId}")
+    def get_form_id_from_image(picture: np.ndarray) -> str:
+        qrCodeDetector = cv.QRCodeDetector()
+        form_id, points, _ = qrCodeDetector.detectAndDecode(picture)
+        
+        if points is None or len(points) != 1:
+            # didn't find form_id
+            return ''
+        return form_id
 
-    form_dict = [i for i in database.get_collection(database.FORMS).find({ "formId": formId })]
+    form_id = get_form_id_from_image(picture)
+
+    while form_id == '' and picture.shape[0] > 500:
+        # we try to extract the QR code.
+        # if the image has a resolution too high, then we won't be able
+        # to find it, so we scale it down.
+
+        picture = cv.resize(picture, dsize=(0, 0), fx=0.8, fy=0.8)
+        form_id = get_form_id_from_image(picture)
+
+
+    form_dict = [i for i in database.get_collection(database.FORMS).find({ "formId": form_id })]
+
+    # unable to find form
+    if len(form_dict) == 0:
+        raise Exception(f"Unable to find form {form_id} on mongo cloud!")
+
     form = smart_forms_types.pdf_form_from_dict(form_dict[0])
     return form
 
@@ -90,7 +109,14 @@ def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types
             
             cv.rectangle(fixed_picture, (x, y), (x+dx, y+dy), (0, 255, 255), thickness=2)
 
-            sq_img = fixed_picture[y:y+dy, x:x+dx]
+            # This offset makes sure we don't include any borders in the square character.
+            # TODO: if we switch to our own dataset, then maybe excluding the border won't
+            # be required.
+            SQUARES_OFFSET = 10
+            sq_img = fixed_picture[
+                y + SQUARES_OFFSET : y + dy - SQUARES_OFFSET,
+                x + SQUARES_OFFSET : x + dx - SQUARES_OFFSET
+            ]
             question_content.append(sq_img)
         
         if DEBUG:
