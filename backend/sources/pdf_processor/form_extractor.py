@@ -11,7 +11,7 @@ import ocr
 import io
 from PIL import Image
 
-DEBUG = True
+DEBUG = False
 
 def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.ndarray:
     """
