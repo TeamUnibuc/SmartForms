@@ -52,22 +52,6 @@ async def login(request: Request):
 
 @router.route('/auth')
 async def auth(request: Request):
-    try:
-        token = await oauth.google.authorize_access_token(request)
-    except OAuthError as error:
-        return HTMLResponse(f'<h1>{error.error}</h1>')
-    user = token.get('userinfo')
-    if user:
-        user = dict(user)
-    else:
-        user = await oauth.google.parse_id_token(request, token)
-        user = dict(user)
-
-    request.session['user'] = user
-    return RedirectResponse(url='/api/user')
-
-@router.route('/auth')
-async def auth(request: Request):
     # Perform Google OAuth
     token = await oauth.google.authorize_access_token(request)
 
