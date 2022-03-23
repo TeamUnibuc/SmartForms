@@ -1,5 +1,6 @@
 from asyncio.log import logger
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
+from pydantic import BaseModel
 from starlette.config import Config
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
@@ -13,7 +14,7 @@ from authlib.integrations.starlette_client import OAuth, OAuthError
 
 router = APIRouter(
     prefix="/api/user",
-    tags=["login"]
+    tags=["user"]
 )
 
 config = Config("../.env")
@@ -78,3 +79,40 @@ async def logout(request: Request):
     request.session.pop('user', None)
 
     return RedirectResponse(url='/api/user')
+
+
+
+
+class GetUserDetailsReturnModel(BaseModel):
+    # url of the profile picture
+    picture: str
+    email: str
+    name: str
+    given_name: str
+    family_name: str
+
+@router.get(
+    "/details",
+    responses = {
+        200: {
+            "model": GetUserDetailsReturnModel,
+            "description": "Ok."
+        },
+        400: {
+            "description": "Not signed in."
+        }
+    }
+)
+async def get_user_details(request: Request):
+    """
+        Returns details from the user.
+        If the user is not signed in, then the status 400 is returned instead.
+    """
+    user = request.session.get('user')
+    
+    # the user is not signed in
+    if user is None:
+        return Response(status_code=400)
+    
+    # user is a superset of the return values, so we can just return all of it instead
+    return user
