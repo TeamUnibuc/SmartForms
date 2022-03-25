@@ -29,7 +29,7 @@ export default function EditForm(): JSX.Element
 
   return <>
     <Grid container columnSpacing={1}>
-      <Grid item xs={5}>
+      <Grid item xs={4}>
         <p>Ceva text</p>
       </Grid>
 
@@ -37,7 +37,7 @@ export default function EditForm(): JSX.Element
         <Button variant="contained" onClick={generatePdf}>Generate PDF</Button>
       </Grid>
 
-      <Grid item xs={5}>
+      <Grid item xs={6}>
         <PdfDisplay pdfb64={pdfData}/>
       </Grid>
     </Grid>
