@@ -17,7 +17,7 @@ yarn install --check-file
 echo "========  Building for production"
 # Build the frontend
 cd ../frontend
-rm -rf build
+rm -rf dist
 yarn build
 
 # Serve the new backend
