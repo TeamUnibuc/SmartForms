@@ -23,6 +23,7 @@ python-dotenv
 tensorflow
 sklearn
 tensorflow-datasets
+tqdm
 
 # Vision framework
 opencv-python
