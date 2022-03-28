@@ -7,7 +7,7 @@ interface FormMultipleChoiceQuestion
   choices: Choice[],
 }
 
-interface FormTextQuestion
+export interface FormTextQuestion
 {
   title: string,
   description: string,

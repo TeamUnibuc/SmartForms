@@ -27,7 +27,7 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
         MARKER_PDF_OFFSET,
         MARKER_PDF_OFFSET,
         w=BORDER_IMAGE_SIZE,
-        h=BORDER_IMAGE_SIZE   
+        h=BORDER_IMAGE_SIZE
     )
     pdf.image(
         BORDER_DOWN_LEFT_IMAGE_LOCATION,
@@ -43,19 +43,22 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
         w=BORDER_IMAGE_SIZE,
         h=BORDER_IMAGE_SIZE
     )
-    
+
     # upper-right (QR code)
-    temp_file = tempfile.NamedTemporaryFile(suffix='.png')
+    filename = None
+    with tempfile.NamedTemporaryFile(suffix='.png') as temp_file:
+        filename = temp_file.name
+    print("Logging temp filename: ", filename)
     qr_code_maker = qrcode.QRCode(
         border=0
     )
     qr_code_maker.add_data(data)
     qr_code_maker.make(fit=True)
     qr_code = qr_code_maker.make_image()
-    qr_code.save(temp_file.name)
+    qr_code.save(filename)
 
     pdf.image(
-        temp_file.name,
+        filename,
         PDF_W - MARKER_PDF_OFFSET - QR_CODE_SIZE,
         MARKER_PDF_OFFSET,
         QR_CODE_SIZE,
@@ -66,7 +69,7 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
 
 def _add_title_to_pdf(pdf: fpdf.FPDF, title: str):
     """Adds a title to our PDF file
-    
+
     Arguments:
         pdf -- our PDF file
         title -- the title we have to add to the PDF
@@ -91,7 +94,7 @@ def _add_answer_squares(pdf: fpdf.FPDF, x: int, y: int, count: int) -> List[pdf_
 
 def _add_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: str, answer_length: int) -> Tuple[int, List[pdf_form.Square]]:
     """Adds a question to the PDF
-    
+
     Arguments:
         pdf -- pdf file we are playing with
         starting_height -- height of the question in the page
@@ -102,7 +105,7 @@ def _add_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: 
     Returns:
         int -- starting height for the next question
     """
-    
+
     # offset between different items of the form
     current_height = starting_height
 
@@ -145,17 +148,17 @@ def create_form_from_description(description: smart_forms_types.FormDescription)
     # set an id if not existent
     if description.formId == '':
         description.formId = "form-#" + str(random.randint(10**10, 2*10**10))
-    
+
     form = pdf_form.PdfForm()
     form.description = description
     form.pdf_file = _create_pdf_with_borders(description.formId)
     form.answer_squares_location = []
-    
+
     # set title
     _add_title_to_pdf(form.pdf_file, description.title)
 
     current_height = PDF_INITIAL_QUESTION_HEIGHT
-    
+
     for question in description.questions:
         # for now we only process text questions
         # TODO: non-text questions
@@ -170,7 +173,7 @@ def create_form_from_description(description: smart_forms_types.FormDescription)
             form.answer_squares_location.append(answer_squares)
         else:
             raise NotImplementedError("Multiple description not implemented yet!")
-    
+
         if current_height > PDF_MAXIMAL_QUESTION_HEIGHT:
             raise Error("There are too many questions on the form!")
 
