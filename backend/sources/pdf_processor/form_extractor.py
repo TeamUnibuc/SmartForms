@@ -21,12 +21,12 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
     # NOT apply a threshold on the final image
     # i.e. return a copy of the image WITHOUT a threshold
     # as it reduces the quality of the image
-    
+
     def preprocess(img):
         if len(img.shape) == 3 and img.shape[2] == 3:
             img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         _, img = cv.threshold(img, 100, 255, cv.THRESH_BINARY)
-        return img 
+        return img
     picture = preprocess(picture)
     template = preprocess(template)
 
@@ -63,7 +63,7 @@ def find_maching_template(picture: np.ndarray) -> smart_forms_types.PdfForm:
     def get_form_id_from_image(picture: np.ndarray) -> str:
         qrCodeDetector = cv.QRCodeDetector()
         form_id, points, _ = qrCodeDetector.detectAndDecode(picture)
-        
+
         if points is None or len(points) != 1:
             # didn't find form_id
             return ''
@@ -98,7 +98,7 @@ def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types
     squares_content = []
     multiplier_h = fixed_picture.shape[0] / constants.PDF_H
     multiplier_w = fixed_picture.shape[1] / constants.PDF_W
-            
+
     for squares in form.answer_squares_location:
         question_content = []
         for square in squares:
@@ -106,7 +106,7 @@ def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types
             y = int(multiplier_w * square.y)
             dx = int(multiplier_h * square.width)
             dy = int(multiplier_w * square.width)
-            
+
             cv.rectangle(fixed_picture, (x, y), (x+dx, y+dy), (0, 255, 255), thickness=2)
 
             # This offset makes sure we don't include any borders in the square character.
@@ -118,7 +118,7 @@ def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types
                 x + SQUARES_OFFSET : x + dx - SQUARES_OFFSET
             ]
             question_content.append(sq_img)
-        
+
         if DEBUG:
             plt.imshow(fixed_picture)
             plt.show()
@@ -140,7 +140,7 @@ def extract_answer_from_form(file: bytes, filename: str) -> Tuple[smart_forms_ty
     """
         Processes a file, extracting the content of its answer squares.
         The file has to be an image or a pdf.
-    
+
         TODO: Support zip files.
     """
     if filename[-4:] == ".pdf": # pdf file
@@ -153,7 +153,7 @@ def extract_answer_from_form(file: bytes, filename: str) -> Tuple[smart_forms_ty
 
     # convert to grayscale
     image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    
+
     # find form.
     form = find_maching_template(image)
     fixed_image = change_image_perspective(image, pdf_to_numpy(form.extract_raw_pdf_bytes()))
