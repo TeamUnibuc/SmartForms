@@ -1,4 +1,5 @@
 from locale import Error
+import logging
 from typing import List, Tuple
 import fpdf
 import qrcode
@@ -48,7 +49,7 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     filename = None
     with tempfile.NamedTemporaryFile(suffix='.png') as temp_file:
         filename = temp_file.name
-    print("Logging temp filename: ", filename)
+    logging.debug(f"Logging temp filename: {filename}")
     qr_code_maker = qrcode.QRCode(
         border=0
     )
@@ -58,13 +59,12 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     qr_code.save(filename)
 
     pdf.image(
-        filename,
+        temp_file.name,
         PDF_W - MARKER_PDF_OFFSET - QR_CODE_SIZE,
         MARKER_PDF_OFFSET,
         QR_CODE_SIZE,
         QR_CODE_SIZE
     )
-    temp_file.close()
     return pdf
 
 def _add_title_to_pdf(pdf: fpdf.FPDF, title: str):

@@ -100,7 +100,7 @@ async def get_forms_list(params: ListFormReceiveModel):
     """
 
     db = database.get_collection(database.FORMS)
-    
+
     forms = [smart_forms_types.pdf_form_from_dict(i).description for i in db.find(skip=params.offset, limit=params.count)]
     nr_forms = db.count_documents({})
 
@@ -133,10 +133,10 @@ async def get_form_description(formId: str):
 
     if len(forms) > 1:
         raise Exception("Found multiple forms with same Id!")
-    
+
     if len(forms) == 0:
         raise Exception("No form with the given Id was found!")
-    
+
     return forms[0]
 
 
