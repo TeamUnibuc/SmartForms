@@ -1,11 +1,18 @@
+import { useContext } from 'react'
 import { Document, Page } from 'react-pdf'
+import { QuestionList } from '~/contexts/QuestionList'
 
 export default function PdfDisplay(props: {pdfb64?: string}): JSX.Element
 {
-  const embed_string = `data:application/pdf;base64,${props.pdfb64}`
+  const qlContext = useContext(QuestionList)
+  const {pdfString} = qlContext.pdfData
+
+  const embed_string = `data:application/pdf;base64,${pdfString}`
+
+  console.log(`R - pdfDisplay: ${pdfString.length}`)
 
   return <>
-     {props.pdfb64 ? (
+     {pdfString.length > 0 ? (
         <div>
           <embed src={embed_string} type="application/pdf" width="100%" height="900px"></embed>
 

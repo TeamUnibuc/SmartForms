@@ -14,7 +14,7 @@ export interface FormTextQuestion
   maxAnswerLength: number,
 }
 
-type Question = FormMultipleChoiceQuestion | FormTextQuestion;
+export type Question = FormMultipleChoiceQuestion | FormTextQuestion;
 
 export interface FormDescription
 {
