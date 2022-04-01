@@ -5,6 +5,7 @@ from starlette.config import Config
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
+import os
 
 # authentication logic
 # taken mostly from
@@ -47,7 +48,11 @@ async def home(request: Request):
 @router.get('/login')
 async def login(request: Request):
     # Redirect Google OAuth back to our application
-    redirect_uri = request.url_for('auth')
+    
+    redirect_uri = os.getenv("LOGIN_REDIRECT_URL")
+    # request.url_for('auth')
+
+    # print(f"redirect URL: {redirect_uri}")
 
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
