@@ -52,11 +52,9 @@ async def login(request: Request):
     redirect_uri = os.getenv("LOGIN_REDIRECT_URL")
     # request.url_for('auth')
 
-    # print(f"redirect URL: {redirect_uri}")
-
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
-@router.route('/auth')
+@router.get('/auth')
 async def auth(request: Request):
     # Perform Google OAuth
     token = await oauth.google.authorize_access_token(request)
