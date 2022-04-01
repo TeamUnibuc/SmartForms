@@ -42,7 +42,7 @@ async def home(request: Request):
             '<a href="/api/user/logout">logout</a>'
         )
         return HTMLResponse(html)
-    return HTMLResponse('<a href="/api/user/login">login</a>')
+    return HTMLResponse('<a href="/api/user/login/">login</a>')
 
 
 @router.get('/login')
@@ -51,7 +51,6 @@ async def login(request: Request):
     
     redirect_uri = os.getenv("LOGIN_REDIRECT_URL")
     # request.url_for('auth')
-
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 @router.get('/auth')
@@ -73,7 +72,7 @@ async def auth(request: Request):
     # Save the user
     request.session['user'] = dict(user)
 
-    return RedirectResponse(url='/api/user')
+    return RedirectResponse(url='/api/user/')
 
 
 @router.get('/logout')
@@ -81,7 +80,7 @@ async def logout(request: Request):
     # Remove the user
     request.session.pop('user', None)
 
-    return RedirectResponse(url='/api/user')
+    return RedirectResponse(url='/api/user/')
 
 
 

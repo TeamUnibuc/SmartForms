@@ -33,5 +33,5 @@ rm backend_err.log
 rm backend_out.log
 
 echo "========  Serving"
-cd ../backend
-nohup python sources/main.py 2> backend_err.log 1> backend_out.log & disown
+cd ../backend/sources
+nohup python main.py 2> backend_err.log 1> backend_out.log & disown
