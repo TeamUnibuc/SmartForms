@@ -57,6 +57,12 @@ const QuestionListProvider: React.FC = (props) =>
   </QuestionList.Provider>
 }
 
+const useQLQuestions = () =>
+{
+
+}
+
+
 const QuestionListConsumer = QuestionList.Consumer
 
 export {QuestionListProvider, QuestionListConsumer, QuestionList}
