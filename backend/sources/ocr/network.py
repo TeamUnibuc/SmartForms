@@ -76,7 +76,7 @@ class Network:
         images is 3d, where the first dim is the number of images.
         """
         self.model.eval()
-        predictions = self.model(th.tensor(images).to(DEVICE))
+        predictions = self.model(th.tensor(images, dtype=th.float32).to(DEVICE))
         predictions = np.argmax(predictions.detach().cpu().numpy(), axis=1)
 
         results = [CHARACTERS[i] for i in predictions]

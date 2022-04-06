@@ -22,14 +22,14 @@ def predict_characters(imgs: np.ndarray) -> List[str]:
         2-3 dim - image dimensions
     """
 
-    imgs = [cv.resize(i, (IMAGE_SIZE, IMAGE_SIZE)).reshape(IMAGE_SIZE, IMAGE_SIZE, 1) for i in imgs]
+    imgs = [cv.resize(i, (IMAGE_SIZE, IMAGE_SIZE)).reshape(1, IMAGE_SIZE, IMAGE_SIZE) for i in imgs]
     imgs = np.stack(imgs)
 
     # sanity check
     for i in imgs:
-        if i.shape != (IMAGE_SIZE, IMAGE_SIZE, 1):
+        if i.shape != (1, IMAGE_SIZE, IMAGE_SIZE):
             raise Exception(
-                f"Invalid size passed. Expected ({IMAGE_SIZE}, {IMAGE_SIZE}, 1), received {i.shape}"
+                f"Invalid size passed. Expected (1, {IMAGE_SIZE}, {IMAGE_SIZE}), received {i.shape}"
             )
 
     # Normalize to be the same format as training data
