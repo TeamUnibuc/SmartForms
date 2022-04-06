@@ -46,6 +46,5 @@ def predict_characters(imgs: np.ndarray) -> List[str]:
 
         plt.show()
 
-    network = ocr.network.Network.get_instance()
-    return network.predict(imgs)
+    return network.Network.get_instance().predict(imgs)
 
