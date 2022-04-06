@@ -4,6 +4,8 @@ Starts a FastAPI server.
 """
 
 from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI
 import uvicorn
 import routers
@@ -25,7 +27,6 @@ def init_state():
     """
     global app
 
-    load_dotenv()
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     app = FastAPI(

@@ -72,7 +72,7 @@ async def auth(request: Request):
     # Save the user
     request.session['user'] = dict(user)
 
-    return RedirectResponse(url='/api/user/')
+    return RedirectResponse(url='/')
 
 
 @router.get('/logout')
@@ -80,9 +80,7 @@ async def logout(request: Request):
     # Remove the user
     request.session.pop('user', None)
 
-    return RedirectResponse(url='/api/user/')
-
-
+    return RedirectResponse(url='/')
 
 
 class GetUserDetailsReturnModel(BaseModel):

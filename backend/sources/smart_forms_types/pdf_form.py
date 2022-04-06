@@ -46,6 +46,7 @@ class PdfForm:
     def to_dict(self) -> dict:
         return {
             "formId": self.description.formId,
+            "authorEmail": self.description.authorEmail,
             "content": pickle.dumps(self)
         }
 

@@ -28,6 +28,7 @@ class FormDescription(BaseModel):
     questions: List[Union[FormMultipleChoiceQuestion, FormTextQuestion]]
     canBeFilledOnline: bool
     needsToBeSignedInToSubmit: bool
+    authorEmail: str = ""
 
 class FormAnswer(BaseModel):
     """
@@ -35,7 +36,7 @@ class FormAnswer(BaseModel):
     """
     answerId: str
     formId: str
-    userId: str
+    authorEmail: str
     answers: List[str]
 
     def to_dict(self) -> dict:
