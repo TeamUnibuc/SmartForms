@@ -11,7 +11,8 @@ import logging
 import sys
 import argparse
 import os
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse
+from fastapi.requests import Request
 from starlette.middleware.sessions import SessionMiddleware
 import ocr.train_network as train_network
 
@@ -27,10 +28,10 @@ def init_state():
     load_dotenv()
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-    app = FastAPI()
-
-    # disable (some of) tensorflow messages
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    app = FastAPI(
+        docs_url="/api/docs",
+        redoc_url="/api/redoc",
+    )
 
     # register a session middleware, for storing authentication
     # status and cookies
@@ -38,6 +39,22 @@ def init_state():
 
     for router in routers.routers:
         app.include_router(router)
+
+    # register a message on the root
+    @app.get('/')
+    async def home(request: Request):
+        user = request.session.get('user')
+        email = user['email'] if user is not None else 'Not signed in'
+        
+        html = (
+                f"<pre>Email: {email}</pre><br>" +
+                "<a href='/api/docs'>documentation</a><br>" +
+                ("<a href='/api/user/logout'>logout</a>"
+                if user is not None else
+                "<a href='/api/user/login/'>login</a>")
+            )
+        return HTMLResponse(html)
+
 
 def main():
     """
@@ -53,11 +70,8 @@ def main():
 
     if train:
         train_network.train_model()
+        return
 
-    # add a redirect for now, to ease the workflow
-    @app.get('/')
-    async def redirect_to_user():
-        return RedirectResponse("/api/user")
     uvicorn.run(
         app,
         host=os.environ['SERVER_HOST'],

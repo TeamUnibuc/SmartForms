@@ -11,6 +11,47 @@ import smart_forms_types
 import cv2 as cv
 import tempfile
 
+def _random_populate_with_squares(pdf: fpdf.FPDF, X, Y, SQUARE_SIZE, PARTITION: int):
+    """
+    Random populate the square with corners at (X, Y) and size SQUARE_SIZE with and
+    PARTITIONxPARTITION grid of small squares.
+    """
+    sq_offset = SQUARE_SIZE / PARTITION
+    for i in range(PARTITION):
+        for j in range(PARTITION):
+            if random.random() < 0.6:
+                pdf.rect(
+                    X + sq_offset * i,
+                    Y + sq_offset * j,
+                    w=sq_offset,
+                    h=sq_offset,
+                    style='F'
+                )
+
+def _make_corner(pdf: fpdf.FPDF, X, Y, SIZE, border: str):
+    """
+    Makes a border in the pdf file.
+    border is one of "up-left", "down-left", "down-right"
+    """
+    size = SIZE / 2
+    partition = 10
+
+    if border != "down-right":
+        _random_populate_with_squares(
+            pdf, X, Y, size, partition
+        )
+    if border != "down-left":
+        _random_populate_with_squares(
+            pdf, X + size, Y, size, partition
+        )
+    if border != "up-left":
+        _random_populate_with_squares(
+            pdf, X + size, Y + size, size, partition
+        )
+    _random_populate_with_squares(
+        pdf, X, Y + size, size, partition
+    )
+
 def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     """Creates an empty PDF form, with the
     appropriate markings.
@@ -23,27 +64,48 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     # set fill to black
     pdf.set_fill_color(0)
 
-    pdf.image(
-        BORDER_UP_LEFT_IMAGE_LOCATION,
+    _make_corner(
+        pdf,
         MARKER_PDF_OFFSET,
         MARKER_PDF_OFFSET,
-        w=BORDER_IMAGE_SIZE,
-        h=BORDER_IMAGE_SIZE
+        BORDER_IMAGE_SIZE,
+        "up-left"
     )
-    pdf.image(
-        BORDER_DOWN_LEFT_IMAGE_LOCATION,
+    _make_corner(
+        pdf,
         MARKER_PDF_OFFSET,
         PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
-        w=BORDER_IMAGE_SIZE,
-        h=BORDER_IMAGE_SIZE
+        BORDER_IMAGE_SIZE,
+        "down-left"
     )
-    pdf.image(
-        BORDER_DOWN_RIGHT_IMAGE_LOCATION,
+    _make_corner(
+        pdf,
         PDF_W - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
         PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
-        w=BORDER_IMAGE_SIZE,
-        h=BORDER_IMAGE_SIZE
+        BORDER_IMAGE_SIZE,
+        "down-right"
     )
+    # pdf.image(
+    #     BORDER_UP_LEFT_IMAGE_LOCATION,
+    #     MARKER_PDF_OFFSET,
+    #     MARKER_PDF_OFFSET,
+    #     w=BORDER_IMAGE_SIZE,
+    #     h=BORDER_IMAGE_SIZE
+    # )
+    # pdf.image(
+    #     BORDER_DOWN_LEFT_IMAGE_LOCATION,
+    #     MARKER_PDF_OFFSET,
+    #     PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
+    #     w=BORDER_IMAGE_SIZE,
+    #     h=BORDER_IMAGE_SIZE
+    # )
+    # pdf.image(
+    #     BORDER_DOWN_RIGHT_IMAGE_LOCATION,
+    #     PDF_W - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
+    #     PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
+    #     w=BORDER_IMAGE_SIZE,
+    #     h=BORDER_IMAGE_SIZE
+    # )
 
     # upper-right (QR code)
     filename = None

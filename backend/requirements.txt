@@ -20,10 +20,11 @@ itsdangerous
 python-dotenv
 
 # OCR NN
-tensorflow
 sklearn
-tensorflow-datasets
 tqdm
+torch
+torchvision
+torchaudio
 
 # Vision framework
 opencv-python

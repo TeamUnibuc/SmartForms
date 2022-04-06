@@ -1,2 +1,0 @@
-model_checkpoint_path: "ocr_model.bin"
-all_model_checkpoint_paths: "ocr_model.bin"

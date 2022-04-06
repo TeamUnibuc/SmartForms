@@ -7,15 +7,16 @@ from collections import defaultdict
 import numpy as np
 import ocr.network as network
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.utils import to_categorical
 import matplotlib.pyplot as plt
-import tensorflow as tf
 import os
+import torch as th
+import torch.nn as nn
+import logging
 
 DATASET_PATH = "../data/OCR/dataset/"
 IMAGES_PATH = DATASET_PATH + "emnist_imgs.npy"
 LABELS_PATH = DATASET_PATH + "emnist_labels.npy"
-DEBUG = False
+DEBUG = True
 
 def generate_dataset():
     """
@@ -77,10 +78,75 @@ def generate_dataset():
     np.save(IMAGES_PATH, imgs)
     np.save(LABELS_PATH, labels)
 
+def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: nn.CrossEntropyLoss,
+        train_dataloader: th.utils.data.DataLoader, test_dataloader: th.utils.data.DataLoader, epochs: int):
+    """
+    Run the algorithm a few epochs
+    """
+    for epoch_n in range(epochs):
+        print(f"Epoch #{epoch_n + 1}")
+
+        train_all_predictions = []
+        train_all_targets = []
+        train_loss = []
+
+        model.train()
+        for batch in tqdm(train_dataloader):
+            model.zero_grad()
+
+            inputs, targets = batch
+            inputs = inputs.to(network.DEVICE)
+            targets = targets.to(network.DEVICE)
+
+            # data augmentation
+            # TODO:
+
+            output = model(inputs)
+            loss = loss_fn(output, targets)
+            predictions = output.argmax(1)
+
+            loss.backward()
+            optimizer.step()
+            
+            train_loss.append(loss.detach().cpu().item())
+            train_all_targets.append(targets.detach().cpu())
+            train_all_predictions.append(predictions.detach().cpu())
+
+        train_all_predictions = th.cat(train_all_predictions)
+        train_all_targets = th.cat(train_all_targets)
+
+        val_acc = (train_all_predictions == train_all_targets).float().mean().numpy()
+        print(f"Train Accuracy: {val_acc}")
+        print(f"Train Loss: {np.mean(np.array(train_loss))}")
+
+        # validare
+        model.eval()
+        eval_all_predictions = []
+        eval_all_targets = []
+        for batch in test_dataloader:
+            inputs, targets = batch
+            inputs = inputs.to(network.DEVICE)
+            targets = targets.to(network.DEVICE)
+
+            with th.no_grad():
+                output = model(inputs)
+
+            predictions = output.argmax(1)
+            eval_all_targets.append(targets.detach().cpu())
+            eval_all_predictions.append(predictions.detach().cpu())
+
+        eval_all_predictions = th.cat(eval_all_predictions)
+        eval_all_targets = th.cat(eval_all_targets)
+
+        val_acc = (eval_all_predictions == eval_all_targets).float().mean().numpy()
+
+        print(f"Val Accuracy: {val_acc}")
+
 def train_model():
     """
         Trains the model on the dataset provided
     """
+    logging.info("Training model...")
     try:
         x = np.load(IMAGES_PATH)
         y = np.load(LABELS_PATH)
@@ -90,58 +156,66 @@ def train_model():
         x = np.load(IMAGES_PATH)
         y = np.load(LABELS_PATH)    
 
+    x = x.reshape((-1, 1, 28, 28))
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state=21)
 
     # normalize
     x_train = x_train / 255.0
     x_test = x_test / 255.0
 
+    x_train = th.tensor(x_train, dtype=th.float32)
+    y_train = th.tensor(y_train)
+    x_test = th.tensor(x_test, dtype=th.float32)
+    y_test = th.tensor(y_test)
+
     if DEBUG:
-        fig, ax = plt.subplots(nrows=10, ncols=10)
-        for i in range(100):
-            ax[i // 10][i % 10].imshow(x_train[i])
-
-        plt.show()
-
         for i in range(10):
             for j in range(10):
                 print(network.CHARACTERS[y_train[i * 10 + j]], end='')
             print('')
 
-        print(f"Max value: {np.max(x_train[0])}")
-        print(f"Average: {np.average(x_train[0])}")
+        print(f"Max value: {th.max(x_train[0])}")
+        print(f"Average: {th.mean(x_train[0])}")
 
+        fig, ax = plt.subplots(nrows=10, ncols=10)
+        for i in range(100):
+            ax[i // 10][i % 10].imshow(x_train[i][0])
 
-    # one-hot encode
-    y_test_raw = y_test
-    y_train = to_categorical(y_train, num_classes=len(network.CHARACTERS))
-    y_test = to_categorical(y_test, num_classes=len(network.CHARACTERS))
+        plt.show()
 
-    print(x_train.shape, y_train.shape, x_test.shape, y_test.shape)
+    model = network.Network.get_instance().model
 
-    net = network.Network.get_instance()
+    train_dataset = th.utils.data.TensorDataset(x_train, y_train)
+    train_dataloader = th.utils.data.DataLoader(train_dataset, batch_size=128, shuffle=True)
+
+    test_dataset = th.utils.data.TensorDataset(x_test, y_test)
+    test_dataloader = th.utils.data.DataLoader(test_dataset, batch_size=64, shuffle=False)
 
     print("Training model...")
-    net.model.fit(
-        x_train,
-        y_train,
-        validation_data=(x_test, y_test),
-        epochs=1,
-        batch_size=50,
-    )
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = th.optim.Adam(model.parameters(), lr=1e-3)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+
+    optimizer = th.optim.Adam(model.parameters(), lr=1e-4)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+
+    optimizer = th.optim.Adam(model.parameters(), lr=1e-5)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
 
     if not os.path.exists(network.DATA_FOLDER):
         os.makedirs(network.DATA_FOLDER)
 
-    net.model.save_weights(network.MODEL_LOCATION)
+    th.save(model.state_dict(), network.MODEL_LOCATION)
+    # net.model.save_weights(network.MODEL_LOCATION)
 
-    # Final evaluation of the model
-    scores = net.model.evaluate(x_test, y_test, verbose=0)
+    # # Final evaluation of the model
+    # scores = model.evaluate(x_test, y_test, verbose=0)
 
-    predictions = np.argmax(net.model.predict(x_test), axis=1)
-    confusion_matrix = tf.math.confusion_matrix(y_test_raw, predictions)
+    # predictions = np.argmax(net.model.predict(x_test), axis=1)
+    # confusion_matrix = tf.math.confusion_matrix(y_test_raw, predictions)
 
-    print("Confusion matrix:")
-    print(confusion_matrix)
+    # print("Confusion matrix:")
+    # print(confusion_matrix)
 
-    print("Validation error: %.2f%%" % (100-scores[1]*100))
+    # print("Validation error: %.2f%%" % (100-scores[1]*100))

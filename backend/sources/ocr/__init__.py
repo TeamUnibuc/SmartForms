@@ -7,13 +7,13 @@ Relies mostly on:
 
 from typing import List
 import numpy as np
-import ocr.network
+import ocr.network as network
 import cv2 as cv
 import matplotlib.pyplot as plt
 
 DEBUG = False
 # fixed to 28 as this is what most datasets offer
-IMAGE_SIZE = 28
+IMAGE_SIZE = network.IMAGE_SIZE
 
 def predict_characters(imgs: np.ndarray) -> List[str]:
     """
