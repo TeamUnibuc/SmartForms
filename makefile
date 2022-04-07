@@ -24,7 +24,7 @@ backend:
 	(cd backend/sources && python main.py)
 
 backend-tests:
-	(cd backend/sources && python -m unittest)
+	(cd backend/sources/tests && python -m unittest)
 
 frontend-packages:
 	(cd frontend && yarn)

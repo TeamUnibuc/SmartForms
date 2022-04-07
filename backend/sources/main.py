@@ -23,7 +23,7 @@ app: FastAPI = None
 
 def init_state():
     """
-        Loads .env, initializes logging and creates the webserver.
+        Initializes logging and creates the webserver.
     """
     global app
 

@@ -84,6 +84,9 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
     try:
         # TODO: have a nice error message if the generation fails due to the
         # form being too large.
+        # when creating a form, we manually set the formID to be empty, to avoid
+        # collisions.
+        form.formId = ""
         model = pdf_processor.create_form_from_description(form)
         database.get_collection(database.FORMS).insert_one(model.to_dict())
         resp = CreateFormReturnModel(

@@ -112,8 +112,7 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     with tempfile.NamedTemporaryFile(suffix='.png') as temp_file:
         filename = temp_file.name
     logging.debug(f"Logging temp filename: {filename}")
-    logging.info(f"Logging temp filename: {filename}")
-    logging.warning(f"Logging temp filename: {filename}")
+    
     qr_code_maker = qrcode.QRCode(
         border=0
     )

@@ -44,4 +44,4 @@ jobs:
         COOKIES_SECRET: ${{ secrets.COOKIES_SECRET }}
         USER_AUTHENTICATION_CHECKS_ENABLED: 'False'
       run: |
-        (cd backend/sources/ && python -m unittest)
+        (cd backend/sources/tests/ && python -m unittest)
