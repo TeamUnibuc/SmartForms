@@ -170,7 +170,8 @@ def extract_answer_from_form(file: bytes, filename: str) -> Tuple[smart_forms_ty
         answerId="",
         formId=form.description.formId,
         userId="",
-        answers=content
+        answers=content,
+        authorEmail=""
     )
 
     return (form, form_answer)
