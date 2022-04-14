@@ -23,6 +23,9 @@ default:
 backend:
 	(cd backend/sources && python main.py)
 
+backend-train:
+	(cd backend/sources && python main.py --train=True)
+
 backend-tests:
 	(cd backend/sources/tests && python -m unittest)
 

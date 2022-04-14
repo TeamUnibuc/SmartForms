@@ -9,9 +9,10 @@ from typing import List
 import numpy as np
 import ocr.network as network
 import cv2 as cv
+import cv2
 import matplotlib.pyplot as plt
 
-DEBUG = False
+DEBUG = True
 # fixed to 28 as this is what most datasets offer
 IMAGE_SIZE = network.IMAGE_SIZE
 
@@ -42,7 +43,7 @@ def predict_characters(imgs: np.ndarray) -> List[str]:
         print(f"Average value: {np.average(imgs[0])}")
         fig, ax = plt.subplots(nrows=5, ncols=5)
         for i in range(len(imgs)):
-            ax[i // 5][i % 5].imshow(imgs[i])
+            ax[i // 5][i % 5].imshow(imgs[i][0])
 
         plt.show()
 

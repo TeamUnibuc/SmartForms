@@ -11,13 +11,14 @@ import ocr
 import io
 from PIL import Image
 
-DEBUG = False
+DEBUG = True
 
 def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.ndarray:
     """
         Changes the perspective of the picture, to make it look like the template
     """
     # TODO:
+    # https://docs.opencv.org/3.4/dc/dc3/tutorial_py_matcher.html
     # NOT apply a threshold on the final image
     # i.e. return a copy of the image WITHOUT a threshold
     # as it reduces the quality of the image
@@ -27,6 +28,8 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
             img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         _, img = cv.threshold(img, 100, 255, cv.THRESH_BINARY)
         return img
+        
+    picture_not_processed = picture.copy()
     picture = preprocess(picture)
     template = preprocess(template)
 
@@ -35,8 +38,8 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
     kp2, des2 = orb.detectAndCompute(template, None)
 
     index_params = dict(algorithm=6,
-                        table_number=6,
-                        key_size=12,
+                        table_number=12,
+                        key_size=20,
                         multi_probe_level=2)
     search_params = {}
     flann = cv.FlannBasedMatcher(index_params, search_params)
@@ -52,6 +55,11 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
     dst_points = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
     m, mask = cv.findHomography(src_points, dst_points, cv.RANSAC, 5.0)
     corrected_img = cv.warpPerspective(picture, m, (template.shape[1], template.shape[0]))
+
+    if DEBUG:
+        print("Corected picture + template:")
+        plt.imshow((corrected_img + template) // 2)
+        plt.show()
 
     return corrected_img
 

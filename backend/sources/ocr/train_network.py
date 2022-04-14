@@ -2,8 +2,8 @@
 Trains the network on the EMNIST dataset.
 """
 
+import sklearn.metrics as metrics
 from tqdm import tqdm
-from collections import defaultdict
 import numpy as np
 import ocr.network as network
 from sklearn.model_selection import train_test_split
@@ -12,71 +12,13 @@ import os
 import torch as th
 import torch.nn as nn
 import logging
+import ocr.generate_dataset as generate_dataset
+import ocr.data_augmentation as data_augmentation
 
-DATASET_PATH = "../data/OCR/dataset/"
+DATASET_PATH = generate_dataset.DATASET_PATH
 IMAGES_PATH = DATASET_PATH + "emnist_imgs.npy"
 LABELS_PATH = DATASET_PATH + "emnist_labels.npy"
 DEBUG = True
-
-def generate_dataset():
-    """
-    Generates the dataset and places it in the data/OCR/dataset folder.
-    As this function should not be called regularely, it depends on
-    `tensorflow-datasets` which is NOT included in the requirements.txt
-    file. If you need to run it please run `pip3 install tensorflow-datasets`.
-    """
-    # we load it here so that the module doesn't crash if tensorflow-datasets
-    # is not installed.
-
-    print("Generating dataset...")
-
-    import tensorflow_datasets as t_d
-    ds = t_d.load('emnist', split='train', shuffle_files=True)
-
-    data = []
-    d = defaultdict(lambda: 0)
-
-    for i in tqdm(ds):
-        img = i["image"]
-        img = img.numpy().transpose((1, 0, 2))
-        lbl = i["label"]
-        data.append((img, lbl))
-
-    # add spaces
-    for i in range(100000):
-        data.append((np.zeros((28, 28, 1), dtype=np.uint8), 62))
-
-    np.random.shuffle(data)
-
-    imgs = [d[0] for d in data]
-    labels = [d[1] for d in data]
-
-    def convert_label(l):
-        if l < 10:
-            return network.CHARACTERS_INDEX[chr(ord('0') + l)]
-        elif l < 10 + 26:
-            return network.CHARACTERS_INDEX[chr(ord('A') + l - 10)]
-        elif l < 10 + 2 * 26:
-            return network.CHARACTERS_INDEX[chr(ord('a') + l - 10 - 26)]
-        elif l == 62:
-            return network.CHARACTERS_INDEX[' ']
-        else:
-            raise Exception()
-
-    # convert from emnist format to own format
-    labels = [convert_label(i) for i in labels]
-
-    data = None
-
-    imgs = np.stack(imgs)
-    imgs = imgs.reshape((-1, 28, 28))
-    labels = np.stack(labels)
-
-    print(f"Imgs shape:   {imgs.shape}")
-    print(f"Labels shape: {labels.shape}")
-
-    np.save(IMAGES_PATH, imgs)
-    np.save(LABELS_PATH, labels)
 
 def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: nn.CrossEntropyLoss,
         train_dataloader: th.utils.data.DataLoader, test_dataloader: th.utils.data.DataLoader, epochs: int):
@@ -95,11 +37,11 @@ def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: n
             model.zero_grad()
 
             inputs, targets = batch
+            # data augmentation
+            inputs = data_augmentation.data_augment(inputs)
+
             inputs = inputs.to(network.DEVICE)
             targets = targets.to(network.DEVICE)
-
-            # data augmentation
-            # TODO:
 
             output = model(inputs)
             loss = loss_fn(output, targets)
@@ -152,7 +94,7 @@ def train_model():
         y = np.load(LABELS_PATH)
     except:
         print("Dataset not available. Generating it...")
-        generate_dataset()
+        generate_dataset.generate_dataset()
         x = np.load(IMAGES_PATH)
         y = np.load(LABELS_PATH)    
 
@@ -178,18 +120,19 @@ def train_model():
         print(f"Average: {th.mean(x_train[0])}")
 
         fig, ax = plt.subplots(nrows=10, ncols=10)
+        imgs = data_augmentation.data_augment(x_train[:100])
         for i in range(100):
-            ax[i // 10][i % 10].imshow(x_train[i][0])
+            ax[i // 10][i % 10].imshow(imgs[i][0])
 
         plt.show()
 
     model = network.Network.get_instance().model
 
     train_dataset = th.utils.data.TensorDataset(x_train, y_train)
-    train_dataloader = th.utils.data.DataLoader(train_dataset, batch_size=128, shuffle=True)
+    train_dataloader = th.utils.data.DataLoader(train_dataset, batch_size=256, shuffle=True)
 
     test_dataset = th.utils.data.TensorDataset(x_test, y_test)
-    test_dataloader = th.utils.data.DataLoader(test_dataset, batch_size=64, shuffle=False)
+    test_dataloader = th.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=False)
 
     print("Training model...")
 
@@ -201,15 +144,48 @@ def train_model():
     train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
 
     optimizer = th.optim.Adam(model.parameters(), lr=1e-5)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 5)
 
     if not os.path.exists(network.DATA_FOLDER):
         os.makedirs(network.DATA_FOLDER)
 
     th.save(model.state_dict(), network.MODEL_LOCATION)
-    # net.model.save_weights(network.MODEL_LOCATION)
 
-    # # Final evaluation of the model
+    # Final evaluation of the model
+    labels = []
+    predictions = []
+
+    for batch in test_dataloader:
+        inputs, targets = batch
+        inputs = inputs.to(network.DEVICE)
+        targets = targets.to(network.DEVICE)
+
+        with th.no_grad():
+            output = model(inputs)
+
+        predicted = output.argmax(1)
+        labels.append(targets.detach().cpu())
+        predictions.append(predicted.detach().cpu())
+
+    labels = th.concat(labels).numpy()
+    predictions = th.concat(predictions).numpy()
+
+    accuracy = metrics.accuracy_score(labels, predictions)
+    logging.info(f"Final validation accuracy: {accuracy}")
+    conf_matrix = metrics.confusion_matrix(labels, predictions)
+    confusion = [(conf_matrix[i][j], network.CHARACTERS[i], network.CHARACTERS[j], i, j) for i in range(len(conf_matrix)) for j in range(len(conf_matrix)) if i != j]
+    confusion.sort()
+    confusion = confusion[::-1]
+
+    print("Biggest confusions:")
+    for nr_conf, a, b, id_a, id_b in confusion[:30]:
+        print(f" * '{a}' read as '{b}': {nr_conf}  -  '{a}' seen correctly: {conf_matrix[id_a][id_a]}, '{b}' seen correctly: {conf_matrix[id_b][id_b]}")
+    # conf_matrix = metrics.ConfusionMatrixDisplay.from_predictions(labels, predictions) # , display_labels=[i for i in network.CHARACTERS])
+
+    # plt.show()
+
+    # plt.matshow()
+    # print(matrix)
     # scores = model.evaluate(x_test, y_test, verbose=0)
 
     # predictions = np.argmax(net.model.predict(x_test), axis=1)
