@@ -155,7 +155,7 @@ def _add_answer_squares(pdf: fpdf.FPDF, x: int, y: int, count: int) -> List[pdf_
 
     return squares
 
-def _add_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: str, answer_length: int) -> Tuple[int, List[pdf_form.Square]]:
+def _add_text_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: str, answer_length: int) -> Tuple[int, List[pdf_form.Square]]:
     """Adds a question to the PDF
 
     Arguments:
@@ -207,6 +207,77 @@ def _add_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: 
     return (current_height, squares)
 
 
+
+def _add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: str, choices: List[str]) -> Tuple[int, List[pdf_form.Square]]:
+    """Adds a question to the PDF
+
+    Arguments:
+        pdf -- pdf file we are playing with
+        starting_height -- height of the question in the page
+        question -- actual question
+        details -- explanation of the question
+        choices -- choices for the question
+
+    Returns:
+        int -- starting height for the next question
+    """
+
+    # offset between different items of the form
+    current_height = starting_height
+
+    # display the question
+    pdf.set_font(QUESTION_TITLE_FONT, size=QUESTION_TITLE_FONT_SIZE)
+    # split into lines
+    title_lines = pdf.multi_cell(
+        PDF_QUESTION_TITLE_MAX_LENGTH,
+        PDF_QUESTION_BETWEEN_OFFSET,
+        question,
+        split_only=True
+    )
+    for title_line in title_lines:
+        pdf.text(PDF_QUESTION_TITLE_LEFT_PADDING, current_height, title_line)
+        current_height += PDF_QUESTION_BETWEEN_OFFSET
+    current_height += PDF_QUESTION_TITLE_AFTER_OFFSET
+
+    # display the details
+    pdf.set_font(QUESTION_DETAILS_FONT, style='I', size=QUESTION_DETAILS_FONT_SIZE)
+    details_lines = pdf.multi_cell(
+        PDF_DETAILS_MAX_LENGTH,
+        PDF_DETAILS_BETWEEN_OFFSET,
+        details,
+        split_only=True
+    )
+
+    for details_line in details_lines:
+        pdf.text(PDF_DETAILS_LEFT_PADDING, current_height, details_line)
+        current_height += PDF_DETAILS_BETWEEN_OFFSET
+    current_height += PDF_DETAILS_AFTER_OFFSET
+
+    # display the answer space
+    squares = []
+    for choice in choices:
+        [square] = _add_answer_squares(pdf, PDF_SQUARES_LEFT_PADDING, current_height, 1)
+        # write choice
+
+        # TODO:
+        pdf.set_font(QUESTION_TITLE_FONT, size=15)
+        # split into lines
+        choice_lines = pdf.multi_cell(
+            PDF_DETAILS_MAX_LENGTH,
+            PDF_DETAILS_BETWEEN_OFFSET,
+            choice,
+            split_only=True
+        )
+        for choice_line in choice_lines:
+            pdf.text(PDF_DETAILS_LEFT_PADDING + PDF_SQUARES_SIZE + 3, current_height + 6, choice_line)
+            current_height += PDF_DETAILS_BETWEEN_OFFSET
+
+        current_height += 5 
+        squares.append(square)
+
+    return (current_height, squares)
+
+
 def create_form_from_description(description: smart_forms_types.FormDescription) -> pdf_form.PdfForm:
     # set an id if not existent
     if description.formId == '':
@@ -226,7 +297,7 @@ def create_form_from_description(description: smart_forms_types.FormDescription)
         # for now we only process text questions
         # TODO: non-text questions
         if isinstance(question, smart_forms_types.FormTextQuestion):
-            current_height, answer_squares = _add_question(
+            current_height, answer_squares = _add_text_question(
                 form.pdf_file,
                 current_height,
                 question.title,
@@ -234,8 +305,15 @@ def create_form_from_description(description: smart_forms_types.FormDescription)
                 question.maxAnswerLength
             )
             form.answer_squares_location.append(answer_squares)
-        else:
-            raise NotImplementedError("Multiple description not implemented yet!")
+        elif isinstance(question, smart_forms_types.FormMultipleChoiceQuestion):
+            current_height, answer_squares = _add_multiple_choice_question(
+                form.pdf_file,
+                current_height,
+                question.title,
+                question.description,
+                question.choices
+            )
+            form.answer_squares_location.append(answer_squares)
 
         if current_height > PDF_MAXIMAL_QUESTION_HEIGHT:
             raise Error("There are too many questions on the form!")
