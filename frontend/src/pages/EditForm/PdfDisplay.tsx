@@ -1,11 +1,10 @@
-import { useContext } from 'react'
-import { Document, Page } from 'react-pdf'
-import { QuestionList } from '~/contexts/QuestionList'
+import React from 'react'
+
+import { useQLContextState } from '~/contexts/CoolContext'
 
 export default function PdfDisplay(props: {pdfb64?: string}): JSX.Element
 {
-  const qlContext = useContext(QuestionList)
-  const {pdfString} = qlContext.pdfData
+  const {pdfString} = useQLContextState()
 
   const embed_string = `data:application/pdf;base64,${pdfString}`
 

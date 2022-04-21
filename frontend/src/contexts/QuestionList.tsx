@@ -1,12 +1,12 @@
-import React, { FunctionComponent, useState } from 'react'
+import React, { useState } from 'react'
 import { Question } from '~/api/models'
 
 interface QLCType {
   qList: {
-    questions: Question[],
+    questions: (Question | undefined)[],
     setQuestion: (q_ind: number, q: Question) => void,
-    addQuestion: (q: Question) => void
-    delQuestion: () => void
+    addQuestion: (q: Question | undefined) => void
+    delQuestion: (index?: number) => void
   },
   pdfData: {
     pdfString: string,
@@ -31,7 +31,7 @@ const QuestionListProvider: React.FC = (props) =>
 {
   console.log("R - QL Provider")
 
-  const [questions, setQuestions] = useState<Question[]>([])
+  const [questions, setQuestions] = useState<(Question | undefined)[]>([])
   const [pdfString, setPdfString] = useState('')
 
   console.log("Init question array")
@@ -40,11 +40,17 @@ const QuestionListProvider: React.FC = (props) =>
     questions[q_ind] = q
     setQuestions(questions)
   }
-  const addQuestion = (newq: Question) => {
+  const addQuestion = (newq?: Question) => {
+    console.log("Adding question in context")
     questions.push(newq)
     setQuestions(questions)
   }
-  const delQuestion = () => {
+  const delQuestion = (index?: number) => {
+    if (index !== undefined && index >= 0 && index < questions.length) {
+      for (let i = index; i + 1 < questions.length; ++i) {
+        questions[i] = questions[i + 1];
+      }
+    }
     questions.pop()
     setQuestions(questions)
   }

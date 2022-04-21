@@ -1,14 +1,14 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
 import Button from "@mui/material/Button";
-import { QuestionList } from '~/contexts/QuestionList';
 import { FormPreview } from '~/api/form/preview';
 import { Question } from '~/api/models';
+import { useQLContextState, useQLContextUpdater } from '~/contexts/CoolContext';
 
 export default function GenerateButton(): JSX.Element
 {
-  const qlContext = useContext(QuestionList)
-  const {setPdfString} = qlContext.pdfData
+  const {qList} = useQLContextState()
+  const {sOps} = useQLContextUpdater()
 
   const generatePdf = async (formData: Question[]) => {
     console.log(JSON.stringify(formData))
@@ -20,14 +20,21 @@ export default function GenerateButton(): JSX.Element
       title: "First PDF"}
     )
     console.log("Setting pdfbase64 new data")
-    setPdfString(resp.formPdfBase64)
+    sOps.setPdfString(resp.formPdfBase64)
   }
 
   console.log("R - Button ")
 
+  const getCuratedQuestions = (): Question[] => {
+    const notundef = <T,>(x: T | undefined): x is T => {
+      return x !== undefined
+    };
+    return qList.questions.filter(notundef)
+  }
+
   return <Button
     variant="contained"
-    onClick={() => generatePdf(qlContext.qList.questions)}>
+    onClick={() => generatePdf(getCuratedQuestions())}>
 
   Generate PDF
 

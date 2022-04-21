@@ -1,6 +1,6 @@
 type Choice = string;
 
-interface FormMultipleChoiceQuestion
+export interface FormMultipleChoiceQuestion
 {
   title: string,
   description: string,
