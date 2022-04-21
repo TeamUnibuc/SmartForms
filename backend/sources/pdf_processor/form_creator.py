@@ -1,58 +1,66 @@
-from locale import Error
 import logging
 from typing import List, Tuple
 import fpdf
 import qrcode
 import random
 from .constants import *
-import os
 import smart_forms_types.pdf_form as pdf_form
 import smart_forms_types
 import cv2 as cv
 import tempfile
 
-def _random_populate_with_squares(pdf: fpdf.FPDF, X, Y, SQUARE_SIZE, PARTITION: int):
-    """
-    Random populate the square with corners at (X, Y) and size SQUARE_SIZE with and
-    PARTITIONxPARTITION grid of small squares.
-    """
-    sq_offset = SQUARE_SIZE / PARTITION
-    for i in range(PARTITION):
-        for j in range(PARTITION):
-            if random.random() < 0.6:
-                pdf.rect(
-                    X + sq_offset * i,
-                    Y + sq_offset * j,
-                    w=sq_offset,
-                    h=sq_offset,
-                    style='F'
-                )
 
-def _make_corner(pdf: fpdf.FPDF, X, Y, SIZE, border: str):
+def add_square_grid_corners(pdf: fpdf.FPDF):
     """
-    Makes a border in the pdf file.
-    border is one of "up-left", "down-left", "down-right"
+    Adds 3 borders (not up-right, which is the QR code) in the pdf file.
     """
-    size = SIZE / 2
-    partition = 10
 
-    if border != "down-right":
-        _random_populate_with_squares(
-            pdf, X, Y, size, partition
-        )
-    if border != "down-left":
-        _random_populate_with_squares(
-            pdf, X + size, Y, size, partition
-        )
-    if border != "up-left":
-        _random_populate_with_squares(
-            pdf, X + size, Y + size, size, partition
-        )
-    _random_populate_with_squares(
-        pdf, X, Y + size, size, partition
+    def random_populate_with_squares(X, Y, SQUARE_SIZE: float, PARTITION: int, consider):
+        """
+        Random populate the square with corners at (X, Y) and size SQUARE_SIZE with and
+        PARTITIONxPARTITION grid of small squares (black or white).
+        consider(i, j) tells if we have to try to add square (i, j)
+        """
+        sq_offset = SQUARE_SIZE / PARTITION
+        for i in range(PARTITION):
+            for j in range(PARTITION):
+                if consider(i, j) and random.random() < SQUARE_GRID_BLACK_SQUARE_PROBABILITY:
+                    pdf.rect(
+                        X + sq_offset * i,
+                        Y + sq_offset * j,
+                        w=sq_offset,
+                        h=sq_offset,
+                        style='F'
+                    )
+
+    # top left
+    random_populate_with_squares(
+        PDF_BORDER_OFFSET,
+        PDF_BORDER_OFFSET,
+        BORDER_LONG_EDGE_PX,
+        BORDER_LONG_EDGE_SQUARE,
+        lambda x, y: x < BORDER_SHORT_EDGE_SQUARE or y < BORDER_SHORT_EDGE_SQUARE   
     )
 
-def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
+    # bottom left
+    random_populate_with_squares(
+        PDF_BORDER_OFFSET,
+        PDF_H - PDF_BORDER_OFFSET - BORDER_LONG_EDGE_PX,
+        BORDER_LONG_EDGE_PX,
+        BORDER_LONG_EDGE_SQUARE,
+        lambda x, y: x < BORDER_SHORT_EDGE_SQUARE or (BORDER_LONG_EDGE_SQUARE - y) < BORDER_SHORT_EDGE_SQUARE   
+    )
+
+    # bottom right
+    random_populate_with_squares(
+        PDF_W - PDF_BORDER_OFFSET - BORDER_LONG_EDGE_PX,
+        PDF_H - PDF_BORDER_OFFSET - BORDER_LONG_EDGE_PX,
+        BORDER_LONG_EDGE_PX,
+        BORDER_LONG_EDGE_SQUARE,
+        lambda x, y: (BORDER_LONG_EDGE_SQUARE - x) < BORDER_SHORT_EDGE_SQUARE or (BORDER_LONG_EDGE_SQUARE - y) < BORDER_SHORT_EDGE_SQUARE   
+    )
+
+def create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     """Creates an empty PDF form, with the
     appropriate markings.
     """
@@ -64,50 +72,11 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     # set fill to black
     pdf.set_fill_color(0)
 
-    _make_corner(
-        pdf,
-        MARKER_PDF_OFFSET,
-        MARKER_PDF_OFFSET,
-        BORDER_IMAGE_SIZE,
-        "up-left"
-    )
-    _make_corner(
-        pdf,
-        MARKER_PDF_OFFSET,
-        PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
-        BORDER_IMAGE_SIZE,
-        "down-left"
-    )
-    _make_corner(
-        pdf,
-        PDF_W - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
-        PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
-        BORDER_IMAGE_SIZE,
-        "down-right"
-    )
-    # pdf.image(
-    #     BORDER_UP_LEFT_IMAGE_LOCATION,
-    #     MARKER_PDF_OFFSET,
-    #     MARKER_PDF_OFFSET,
-    #     w=BORDER_IMAGE_SIZE,
-    #     h=BORDER_IMAGE_SIZE
-    # )
-    # pdf.image(
-    #     BORDER_DOWN_LEFT_IMAGE_LOCATION,
-    #     MARKER_PDF_OFFSET,
-    #     PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
-    #     w=BORDER_IMAGE_SIZE,
-    #     h=BORDER_IMAGE_SIZE
-    # )
-    # pdf.image(
-    #     BORDER_DOWN_RIGHT_IMAGE_LOCATION,
-    #     PDF_W - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
-    #     PDF_H - MARKER_PDF_OFFSET - BORDER_IMAGE_SIZE,
-    #     w=BORDER_IMAGE_SIZE,
-    #     h=BORDER_IMAGE_SIZE
-    # )
-
+    # add the 3 corners
+    add_square_grid_corners(pdf)
+    
     # upper-right (QR code)
+    # TODO: Check if this is ok (temp file leak)
     filename = None
     with tempfile.NamedTemporaryFile(suffix='.png') as temp_file:
         filename = temp_file.name
@@ -123,93 +92,166 @@ def _create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
 
     pdf.image(
         temp_file.name,
-        PDF_W - MARKER_PDF_OFFSET - QR_CODE_SIZE,
-        MARKER_PDF_OFFSET,
+        PDF_W - PDF_BORDER_OFFSET - QR_CODE_SIZE,
+        PDF_BORDER_OFFSET,
         QR_CODE_SIZE,
         QR_CODE_SIZE
     )
     return pdf
 
-def _add_title_to_pdf(pdf: fpdf.FPDF, title: str):
-    """Adds a title to our PDF file
-
-    Arguments:
-        pdf -- our PDF file
-        title -- the title we have to add to the PDF
+def add_text_to_pdf(
+    pdf: fpdf.FPDF, text: str, x_min, x_max, starting_y,
+    font, size, style, text_height, align='L') -> float:
     """
-    pdf.set_font(TITLE_FONT, size=TITLE_FONT_SIZE)
-    title_lines = pdf.multi_cell(MAX_PDF_TITLE_WIDTH, 45, title, split_only=True)
-    if len(title_lines) > 1:
-        raise Error("The title choosen is too long!")
+    Prints a multiline text to the pdf, starting at height starting_y.
+    text: text to print
+    font, size, style: font, size and styling given to fpdf
+    x_min, x_max: left-right intervals we can print to.
+    text_height, align: vertical size and alignment
+    returns: current height value (new starting_y)
+    """
+    # check http://www.fpdf.org/en/doc/multicell.htm
+    # set styling 
+    pdf.set_font(font, size=size, style=style)
 
-    pdf.text(PDF_TITLE_X_POSITION, PDF_TITLE_Y_POSITION, title)
+    # split into lines
+    lines = pdf.multi_cell(
+        w=x_max-x_min,
+        h=text_height,
+        txt=text,
+        align=align,
+        split_only=True
+    )
 
-def _add_answer_squares(pdf: fpdf.FPDF, x: int, y: int, count: int) -> List[pdf_form.Square]:
-    if PDF_SQUARES_MAX_LENGTH < count:
-        raise Error(f"Asked to add {count} squares, but max allowed is {PDF_SQUARES_MAX_LENGTH}!")
+    # render each line
+    for line in lines:
+        pdf.set_xy(x_min, starting_y)
+        pdf.cell(x_max - x_min, text_height, line, align=align)
+        starting_y += text_height
+    return starting_y
+
+def add_title_to_pdf(pdf: fpdf.FPDF, title: str):
+    """
+    Adds a title to our PDF file
+    pdf: our PDF file
+    title: the title we have to add to the PDF
+    Returns the height we can start puting questions at.
+    """
+    return add_text_to_pdf(
+        pdf,
+        title,
+        PDF_TITLE_X_POSITION, PDF_W - PDF_BORDER_OFFSET - QR_CODE_SIZE - 5,
+        PDF_TITLE_Y_POSITION,
+        TITLE_FONT, TITLE_FONT_SIZE, '', 13, 'C'
+    ) + 10
+
+def add_answer_squares(pdf: fpdf.FPDF, current_height, count: int) -> Tuple[float, List[pdf_form.Square]]:
+    """
+    Adds `count` answer squares to the PDF.
+    If we can't add them on a single line, they are split into multiple lines.
+    returns (current height, squares)
+    """
     squares = []
+    
+    x_act = PDF_ANSWER_SQUARE_X_MIN
+
+    # add each 
     for i in range(count):
-        pdf.rect(x, y, PDF_SQUARES_SIZE, PDF_SQUARES_SIZE)
-        squares.append(pdf_form.Square(x, y, PDF_SQUARES_SIZE))
-        x += PDF_SQUARES_SIZE + 1
+        # have to go to new line
+        if x_act + PDF_ANSWER_SQUARE_SIZE > PDF_ANSWER_SQUARE_X_MAX:
+            current_height += PDF_ANSWER_SQUARE_SIZE + 1
+            x_act = PDF_ANSWER_SQUARE_X_MIN
 
-    return squares
+        # add the square
+        pdf.rect(x_act, current_height, PDF_ANSWER_SQUARE_SIZE, PDF_ANSWER_SQUARE_SIZE)
+        squares.append(pdf_form.Square(x_act, current_height, PDF_ANSWER_SQUARE_SIZE))
+        x_act += PDF_ANSWER_SQUARE_SIZE + 1
 
-def _add_text_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: str, answer_length: int) -> Tuple[int, List[pdf_form.Square]]:
-    """Adds a question to the PDF
+    # new line
+    current_height += PDF_ANSWER_SQUARE_SIZE + 1
 
-    Arguments:
-        pdf -- pdf file we are playing with
-        starting_height -- height of the question in the page
-        question -- actual question
-        details -- explanation of the question
-        answer_length -- number of characters for the answer
+    return current_height, squares
 
-    Returns:
-        int -- starting height for the next question
+
+def add_question_description(pdf: fpdf.FPDF, starting_height: int, question: str, details: str) -> float:
+    """
+    Adds the title and the description of a question.
+    Used by both the text question and multiple choice question.
+    returns: Starting height of the next objects
     """
 
     # offset between different items of the form
     current_height = starting_height
 
-    # display the question
-    pdf.set_font(QUESTION_TITLE_FONT, size=QUESTION_TITLE_FONT_SIZE)
-    # split into lines
-    title_lines = pdf.multi_cell(
-        PDF_QUESTION_TITLE_MAX_LENGTH,
-        PDF_QUESTION_BETWEEN_OFFSET,
-        question,
-        split_only=True
+    # question title
+    current_height = add_text_to_pdf(
+        pdf,
+        text=question,
+        x_min=PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5,
+        x_max=PDF_W-(PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5),
+        starting_y=current_height,
+        font=QUESTION_TITLE_FONT,
+        size=QUESTION_TITLE_FONT_SIZE,
+        style='',
+        text_height=PDF_QUESTION_BETWEEN_OFFSET
     )
-    for title_line in title_lines:
-        pdf.text(PDF_QUESTION_TITLE_LEFT_PADDING, current_height, title_line)
-        current_height += PDF_QUESTION_BETWEEN_OFFSET
     current_height += PDF_QUESTION_TITLE_AFTER_OFFSET
 
-    # display the details
-    pdf.set_font(QUESTION_DETAILS_FONT, style='I', size=QUESTION_DETAILS_FONT_SIZE)
-    details_lines = pdf.multi_cell(
-        PDF_DETAILS_MAX_LENGTH,
-        PDF_DETAILS_BETWEEN_OFFSET,
-        details,
-        split_only=True
+    # question description
+    current_height = add_text_to_pdf(
+        pdf,
+        text=details,
+        x_min=PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5,
+        x_max=PDF_W-(PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5),
+        starting_y=current_height,
+        font=QUESTION_DETAILS_FONT,
+        size=QUESTION_DETAILS_FONT_SIZE,
+        style='I',
+        text_height=PDF_DETAILS_BETWEEN_OFFSET
     )
-
-    for details_line in details_lines:
-        pdf.text(PDF_DETAILS_LEFT_PADDING, current_height, details_line)
-        current_height += PDF_DETAILS_BETWEEN_OFFSET
     current_height += PDF_DETAILS_AFTER_OFFSET
 
+    return current_height
+
+def add_text_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: str, answer_length: int) -> Tuple[int, List[pdf_form.Square]]:
+    """
+    Adds a question to the PDF
+
+    Arguments:
+        pdf: pdf file we are playing with
+        starting_height: height of the question in the page
+        question: actual question
+        details: explanation of the question
+        answer_length: number of characters for the answer
+
+    Returns: starting height for the next question
+    """
+
+    # offset between different items of the form
+    current_height = starting_height
+
+    # add title and description
+    current_height = add_question_description(
+        pdf,
+        current_height,
+        question,
+        details
+    )
+
     # display the answer space
-    squares = _add_answer_squares(pdf, PDF_SQUARES_LEFT_PADDING, current_height, answer_length)
+    current_height, squares = add_answer_squares(
+        pdf,
+        current_height,
+        answer_length
+    )
     current_height += PDF_SQUARES_AFTER_OFFSET
 
-    return (current_height, squares)
+    return current_height, squares
 
 
 
-def _add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: str, choices: List[str]) -> Tuple[int, List[pdf_form.Square]]:
-    """Adds a question to the PDF
+def add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question: str, details: str, choices: List[str]) -> Tuple[int, List[pdf_form.Square]]:
+    """Adds a multiple choice question to the PDF
 
     Arguments:
         pdf -- pdf file we are playing with
@@ -225,54 +267,37 @@ def _add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question
     # offset between different items of the form
     current_height = starting_height
 
-    # display the question
-    pdf.set_font(QUESTION_TITLE_FONT, size=QUESTION_TITLE_FONT_SIZE)
-    # split into lines
-    title_lines = pdf.multi_cell(
-        PDF_QUESTION_TITLE_MAX_LENGTH,
-        PDF_QUESTION_BETWEEN_OFFSET,
+    # add title and description
+    current_height = add_question_description(
+        pdf,
+        current_height,
         question,
-        split_only=True
+        details
     )
-    for title_line in title_lines:
-        pdf.text(PDF_QUESTION_TITLE_LEFT_PADDING, current_height, title_line)
-        current_height += PDF_QUESTION_BETWEEN_OFFSET
-    current_height += PDF_QUESTION_TITLE_AFTER_OFFSET
-
-    # display the details
-    pdf.set_font(QUESTION_DETAILS_FONT, style='I', size=QUESTION_DETAILS_FONT_SIZE)
-    details_lines = pdf.multi_cell(
-        PDF_DETAILS_MAX_LENGTH,
-        PDF_DETAILS_BETWEEN_OFFSET,
-        details,
-        split_only=True
-    )
-
-    for details_line in details_lines:
-        pdf.text(PDF_DETAILS_LEFT_PADDING, current_height, details_line)
-        current_height += PDF_DETAILS_BETWEEN_OFFSET
-    current_height += PDF_DETAILS_AFTER_OFFSET
 
     # display the answer space
     squares = []
     for choice in choices:
-        [square] = _add_answer_squares(pdf, PDF_SQUARES_LEFT_PADDING, current_height, 1)
+        square_imposed_min_height, [square] = add_answer_squares(pdf, current_height, 1)
+
+        # move a litle bit down to center the text to the squares
+        current_height += 2
+
         # write choice
-
-        # TODO:
-        pdf.set_font(QUESTION_TITLE_FONT, size=15)
-        # split into lines
-        choice_lines = pdf.multi_cell(
-            PDF_DETAILS_MAX_LENGTH,
-            PDF_DETAILS_BETWEEN_OFFSET,
-            choice,
-            split_only=True
+        text_imposed_min_height = add_text_to_pdf(
+            pdf,
+            text=choice,
+            x_min=PDF_ANSWER_SQUARE_X_MIN + PDF_ANSWER_SQUARE_SIZE + 2,
+            x_max=PDF_W-(PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5),
+            starting_y=current_height,
+            font=QUESTION_MULTIPLE_CHOICE_OPTION_FONT,
+            size=QUESTION_MULTIPLE_CHOICE_OPTION_FONT_SIZE,
+            style='',
+            text_height=QUESTION_MULTIPLE_CHOICE_OPTION_BETWEEN_SIZE
         )
-        for choice_line in choice_lines:
-            pdf.text(PDF_DETAILS_LEFT_PADDING + PDF_SQUARES_SIZE + 3, current_height + 6, choice_line)
-            current_height += PDF_DETAILS_BETWEEN_OFFSET
 
-        current_height += 5 
+        # we have to move down by at least one square
+        current_height = max(square_imposed_min_height, text_imposed_min_height)
         squares.append(square)
 
     return (current_height, squares)
@@ -281,23 +306,21 @@ def _add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question
 def create_form_from_description(description: smart_forms_types.FormDescription) -> pdf_form.PdfForm:
     # set an id if not existent
     if description.formId == '':
-        description.formId = "form-#" + str(random.randint(10**10, 2*10**10))
+        description.formId = "https://smartforms.ml/view_form/form-#" + str(random.randint(10**10, 2*10**10))
 
     form = pdf_form.PdfForm()
     form.description = description
-    form.pdf_file = _create_pdf_with_borders(description.formId)
+    form.pdf_file = create_pdf_with_borders(description.formId)
     form.answer_squares_location = []
 
     # set title
-    _add_title_to_pdf(form.pdf_file, description.title)
-
-    current_height = PDF_INITIAL_QUESTION_HEIGHT
+    current_height = add_title_to_pdf(form.pdf_file, description.title)
 
     for question in description.questions:
-        # for now we only process text questions
-        # TODO: non-text questions
+        # check if the question is a text question
+        # or a mutiple choice question
         if isinstance(question, smart_forms_types.FormTextQuestion):
-            current_height, answer_squares = _add_text_question(
+            current_height, answer_squares = add_text_question(
                 form.pdf_file,
                 current_height,
                 question.title,
@@ -306,7 +329,7 @@ def create_form_from_description(description: smart_forms_types.FormDescription)
             )
             form.answer_squares_location.append(answer_squares)
         elif isinstance(question, smart_forms_types.FormMultipleChoiceQuestion):
-            current_height, answer_squares = _add_multiple_choice_question(
+            current_height, answer_squares = add_multiple_choice_question(
                 form.pdf_file,
                 current_height,
                 question.title,
@@ -315,7 +338,7 @@ def create_form_from_description(description: smart_forms_types.FormDescription)
             )
             form.answer_squares_location.append(answer_squares)
 
-        if current_height > PDF_MAXIMAL_QUESTION_HEIGHT:
-            raise Error("There are too many questions on the form!")
+        if current_height > PDF_MAXIMAL_PAGE_HEIGHT:
+            raise Exception("There are too many questions on the form!")
 
     return form
