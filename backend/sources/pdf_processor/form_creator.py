@@ -60,6 +60,24 @@ def add_square_grid_corners(pdf: fpdf.FPDF):
         lambda x, y: (BORDER_LONG_EDGE_SQUARE - x) < BORDER_SHORT_EDGE_SQUARE or (BORDER_LONG_EDGE_SQUARE - y) < BORDER_SHORT_EDGE_SQUARE   
     )
 
+    # left margin
+    random_populate_with_squares(
+        PDF_BORDER_OFFSET,
+        (PDF_H - BORDER_LONG_EDGE_PX) / 2,
+        BORDER_LONG_EDGE_PX,
+        BORDER_LONG_EDGE_SQUARE,
+        lambda x, y: x < BORDER_SHORT_EDGE_SQUARE
+    )
+    
+    # right margin
+    random_populate_with_squares(
+        PDF_W - PDF_BORDER_OFFSET - BORDER_SHORT_EDGE_PX,
+        (PDF_H - BORDER_LONG_EDGE_PX) / 2,
+        BORDER_LONG_EDGE_PX,
+        BORDER_LONG_EDGE_SQUARE,
+        lambda x, y: x < BORDER_SHORT_EDGE_SQUARE
+    )
+
 def create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     """Creates an empty PDF form, with the
     appropriate markings.
