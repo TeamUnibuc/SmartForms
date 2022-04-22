@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, Container, createTheme, CssBaseline, Grid } from '@mui/material';
+import { Box, Container, createTheme, CssBaseline, Grid, ThemeOptions } from '@mui/material';
 import { StylesProvider, ThemeProvider } from '@mui/styles';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
 
@@ -8,12 +8,25 @@ import Footer from '~/components/Footer';
 import Header from '~/components/Header';
 import { Home, EditForm, List } from '~/pages'
 
-// Daca vrem sa adaugam culori la theme, aici trebuie sa facem asta
-const darkTheme = createTheme({
+export const themeOptions: ThemeOptions = {
   palette: {
     mode: 'dark',
+    primary: {
+      main: '#5893df',
+    },
+    secondary: {
+      main: '#2ec5d3',
+    },
+    background: {
+      default: '#192231',
+      paper: '#24344d',
+    },
   },
-});
+};
+
+// Daca vrem sa adaugam culori la theme, aici trebuie sa facem asta
+const darkTheme = createTheme(themeOptions);
+
 
 function App(): JSX.Element {
   if (import.meta.env.DEV) {
@@ -22,13 +35,12 @@ function App(): JSX.Element {
   }
 
   return (
-    <StylesProvider injectFirst>
-      <ThemeProvider theme={darkTheme}>
-        <>
-        <CssBaseline />
+    // <StylesProvider injectFirst>
+    <>
         <Router basename={import.meta.env.BASE_URL}>
         {/* <SnackProvider> */}
         {/* <UserStatusProvider> */}
+      <ThemeProvider theme={darkTheme}>
 
           {/* <Snackbar /> */}
 
@@ -56,12 +68,12 @@ function App(): JSX.Element {
 
           </Grid>
 
+      </ThemeProvider>
         {/* </UserStatusProvider> */}
         {/* </SnackProvider> */}
         </Router>
-        </>
-      </ThemeProvider>
-    </StylesProvider>
+    </>
+    // </StylesProvider>
   );
 }
 
