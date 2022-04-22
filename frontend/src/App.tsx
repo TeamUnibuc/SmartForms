@@ -1,23 +1,19 @@
 import React from 'react';
-import { StylesProvider } from '@material-ui/styles';
+
+import { Box, Container, createTheme, CssBaseline, Grid } from '@mui/material';
+import { StylesProvider, ThemeProvider } from '@mui/styles';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
 
 import Footer from '~/components/Footer';
 import Header from '~/components/Header';
 import { Home, EditForm, List } from '~/pages'
 
-import { Grid, Box, Container, CssBaseline } from '@material-ui/core'
-import { ThemeProvider } from '@material-ui/styles'
-import { createTheme } from '@material-ui/core/styles';
-
 // Daca vrem sa adaugam culori la theme, aici trebuie sa facem asta
-const theme = createTheme({
+const darkTheme = createTheme({
   palette: {
-    background:{
-      default: '#CDDDDD'
-    }
-  }
-})
+    mode: 'dark',
+  },
+});
 
 function App(): JSX.Element {
   if (import.meta.env.DEV) {
@@ -27,7 +23,8 @@ function App(): JSX.Element {
 
   return (
     <StylesProvider injectFirst>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={darkTheme}>
+        <>
         <CssBaseline />
         <Router basename={import.meta.env.BASE_URL}>
         {/* <SnackProvider> */}
@@ -62,6 +59,7 @@ function App(): JSX.Element {
         {/* </UserStatusProvider> */}
         {/* </SnackProvider> */}
         </Router>
+        </>
       </ThemeProvider>
     </StylesProvider>
   );

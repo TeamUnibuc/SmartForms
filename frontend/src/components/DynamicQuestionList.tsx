@@ -1,6 +1,6 @@
+import { Divider } from "@mui/material";
 import React from "react"
 
-import { Divider } from "@material-ui/core";
 import { useQLContextState } from "~/contexts/CoolContext";
 import TQ from "./TextQuestion/TQ";
 import TQAdd from "./TextQuestion/TQAdd";

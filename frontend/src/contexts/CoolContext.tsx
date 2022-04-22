@@ -67,22 +67,25 @@ const QLContextProvider: React.FC = (props) => {
 
   // }
 
+  const myUpdate = (data: QLStateType) => {
+    setQl({
+      qList: {questions: [...data.qList.questions]},
+      pdfString: data.pdfString
+    })
+  }
+
   const CtxUpdaterDef: QLUpdaterType = {
     qOps: {
       addQuestion: (newq?: Question) => {
         console.log("Adding question in context")
         ql.qList.questions.push(newq)
-        setQl(emptyState)
-        console.log("after empty")
-        setQl(ql)
-        console.log("after actual")
+        myUpdate(ql)
       },
 
       setQuestion: (q_ind: number, q: Question) => {
         console.log(`Array lens: ${ql.qList.questions.length}`)
         ql.qList.questions[q_ind] = q
-        setQl(emptyState)
-        setQl(ql)
+        myUpdate(ql)
       },
 
       delQuestion: (index?: number) => {
@@ -92,15 +95,13 @@ const QLContextProvider: React.FC = (props) => {
           }
         }
         ql.qList.questions.pop()
-        setQl(emptyState)
-        setQl(ql)
+        myUpdate(ql)
       }
     },
     sOps: {
       setPdfString: (q: string) => {
         ql.pdfString = q
-        setQl(emptyState)
-        setQl(ql)
+        myUpdate(ql)
       }
     }
   }

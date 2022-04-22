@@ -54,7 +54,7 @@ export default function TQText(props: ComponentProps): JSX.Element
     myUpdateQ(newq)
   }
 
-  return <Card variant="outlined">
+  return <>
     <CardContent>
       <TextField required defaultValue={question.title}
         id="first-question-title" label="Question title"
@@ -69,10 +69,5 @@ export default function TQText(props: ComponentProps): JSX.Element
         variant="filled" margin="normal" type='number'
         onChange={changeQuestionLength}/>
     </CardContent>
-    <CardActions>
-      <IconButton aria-label="delete" size="small" onClick={delQuestion}>
-        {/* <DeleteIcon fontSize="inherit"/> */}
-      </IconButton>
-    </CardActions>
-  </Card>
+  </>
 }

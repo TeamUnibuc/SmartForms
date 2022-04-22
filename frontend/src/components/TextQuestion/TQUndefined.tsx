@@ -1,7 +1,6 @@
+import { Button, CardActions, CardContent, Typography } from "@mui/material";
 import React from "react";
 
-import { Button, CardActions, CardContent, Typography } from "@material-ui/core";
-import { Card } from "@mui/material";
 import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext";
 
 interface ComponentProps
@@ -35,7 +34,7 @@ export default function TQUndefined(props: ComponentProps): JSX.Element
     })
   }
 
-  return <Card variant="outlined" sx={{m: 1}}>
+  return <>
     <CardContent>
       <Typography>
         Add a new question. It can be either a text question or multiple hoice.
@@ -49,5 +48,5 @@ export default function TQUndefined(props: ComponentProps): JSX.Element
         Add Multiple Choice Question
       </Button>
     </CardActions>
-  </Card>
+  </>
 }
