@@ -6,6 +6,7 @@ import { FormTextQuestion, Question } from '~/api/models'
 import TQMultipleChoice from './TQMultipleChoice'
 import TQText from './TQText'
 import TQUndefined from './TQUndefined'
+import { useQLContextUpdater } from '~/contexts/CoolContext';
 
 function TextQuestion(props:
     {q_ind: number,
@@ -13,6 +14,8 @@ function TextQuestion(props:
     }): JSX.Element
 {
   console.log(`Rendering TQ: ${props.q_ind}`)
+
+  const {qOps} = useQLContextUpdater()
 
   let {q_ind, q_content} = props
   const question = q_content
@@ -27,10 +30,14 @@ function TextQuestion(props:
       return <TQMultipleChoice q_ind={q_ind}/>
   }
 
+  const delQuestion = () => {
+    qOps.delQuestion(props.q_ind)
+  }
+
   return <Card variant="outlined" sx={{p: 1, m: 1}}>
     {getActualCard()}
     <CardActions>
-      <IconButton>
+      <IconButton onClick={delQuestion}>
         <DeleteIcon></DeleteIcon>
       </IconButton>
     </CardActions>
