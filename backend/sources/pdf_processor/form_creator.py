@@ -161,7 +161,7 @@ def add_title_to_pdf(pdf: fpdf.FPDF, title: str):
         PDF_TITLE_X_POSITION, PDF_W - PDF_BORDER_OFFSET - QR_CODE_SIZE - 5,
         PDF_TITLE_Y_POSITION,
         TITLE_FONT, TITLE_FONT_SIZE, '', 13, 'C'
-    ) + 10
+    ) + 5
 
 def add_answer_squares(pdf: fpdf.FPDF, current_height, count: int) -> Tuple[float, List[pdf_form.Square]]:
     """
@@ -318,6 +318,8 @@ def add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question:
         current_height = max(square_imposed_min_height, text_imposed_min_height)
         squares.append(square)
 
+    current_height += PDF_SQUARES_AFTER_OFFSET
+
     return (current_height, squares)
 
 
@@ -356,6 +358,7 @@ def create_form_from_description(description: smart_forms_types.FormDescription)
             )
             form.answer_squares_location.append(answer_squares)
 
+        # TODO: Handle multiple pages
         if current_height > PDF_MAXIMAL_PAGE_HEIGHT:
             raise Exception("There are too many questions on the form!")
 
