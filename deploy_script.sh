@@ -18,7 +18,7 @@ echo "========  Building for production"
 # Build the frontend
 cd ../frontend
 rm -rf dist
-yarn build
+npx vite build
 
 # Serve the new backend
 # Kill the old backend process
