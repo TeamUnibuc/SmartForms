@@ -29,7 +29,12 @@ const LightTheme = createTheme(LightThemeOptions)
 
 const ThemeIncluder: React.FC = (props) =>
 {
-  const [isDarkTheme, setIsDarkTheme] = useState(false)
+  const themeFromStorage = () => {
+    return localStorage.getItem("isDarkTheme") == "true"
+
+  }
+
+  const [isDarkTheme, setIsDarkTheme] = useState(themeFromStorage())
 
   return <ThemeProvider theme={isDarkTheme ? DarkTheme : LightTheme}>
     <CssBaseline />

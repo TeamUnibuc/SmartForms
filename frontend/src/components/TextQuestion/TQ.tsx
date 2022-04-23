@@ -34,13 +34,8 @@ function TextQuestion(props:
     qOps.delQuestion(props.q_ind)
   }
 
-  return <Card variant="outlined" sx={{p: 1, m: 1}}>
+  return <Card variant="outlined" sx={{m: 1}}>
     {getActualCard()}
-    <CardActions>
-      <IconButton onClick={delQuestion}>
-        <DeleteIcon></DeleteIcon>
-      </IconButton>
-    </CardActions>
   </Card>
 }
 

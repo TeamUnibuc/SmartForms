@@ -8,6 +8,18 @@ interface ComponentProps
   q_ind: number
 }
 
+const TQAddText = (props: {action: () => {}}) => {
+  return <Button onClick={props.action}>
+    Add Text Question
+  </Button>
+}
+
+const TQAddMultiple = (props: {action: () => {}}) => {
+  return <Button onClick={props.action}>
+    Add Multiple Choice Question
+  </Button>
+}
+
 export default function TQUndefined(props: ComponentProps): JSX.Element
 {
   const {qList} = useQLContextState()

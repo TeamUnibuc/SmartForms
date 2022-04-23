@@ -10,7 +10,13 @@ interface HeaderProps
 export default function Header(props: HeaderProps): JSX.Element
 {
   const switchClicked = () => {
-    props.themeChanger(!props.isDarkTheme)
+    const newVal = !props.isDarkTheme
+    props.themeChanger(newVal)
+
+    if (newVal)
+      localStorage.setItem("isDarkTheme", "true")
+    else
+      localStorage.setItem("isDarkTheme", "false")
   }
 
   return <>

@@ -26,6 +26,6 @@ export default function DynamicQuestionList(): JSX.Element
   return <>
     {getCompList()}
     <Divider orientation="horizontal"/>
-    <TQAdd />
+    <TQAdd/>
   </>
 }
