@@ -78,17 +78,16 @@ def add_square_grid_corners(pdf: fpdf.FPDF):
         lambda x, y: x < BORDER_SHORT_EDGE_SQUARE
     )
 
-def create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
+def add_pdf_with_borders_to_page(pdf: fpdf.FPDF, qr_code_content: str = '') -> fpdf.FPDF:
     """Creates an empty PDF form, with the
     appropriate markings.
     """
     # Default settings (A4, mm)
     # A4 size: 210 x 297 mm
-    pdf = fpdf.FPDF()
-    pdf.add_page()
+    # pdf.add_page()
 
-    # set fill to black
-    pdf.set_fill_color(0)
+    # # set fill to black
+    # pdf.set_fill_color(0)
 
     # add the 3 corners
     add_square_grid_corners(pdf)
@@ -103,7 +102,7 @@ def create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
     qr_code_maker = qrcode.QRCode(
         border=0
     )
-    qr_code_maker.add_data(data)
+    qr_code_maker.add_data(qr_code_content)
     qr_code_maker.make(fit=True)
     qr_code = qr_code_maker.make_image()
     qr_code.save(filename)
@@ -115,7 +114,21 @@ def create_pdf_with_borders(data: str = '') -> fpdf.FPDF:
         QR_CODE_SIZE,
         QR_CODE_SIZE
     )
-    return pdf
+
+def add_page_if_required(pdf: fpdf.FPDF, current_height) -> float:
+    """
+    Adds a new page to the PDF document if the bottom of the page is reached.
+    Returns the new height (unchanged if no additional pages are required).
+    """
+    # need to add new page
+    if current_height > PDF_MAXIMAL_PAGE_HEIGHT:
+        pdf.add_page()
+        # WARNING:
+        # TODO:
+        # this can create infinite recursion if the title itself is too long.
+        # we should impose a maximal length on the title.
+        return add_title_to_pdf(pdf, f"Page #{len(pdf.pages)}")
+    return current_height
 
 def add_text_to_pdf(
     pdf: fpdf.FPDF, text: str, x_min, x_max, starting_y,
@@ -143,8 +156,17 @@ def add_text_to_pdf(
 
     # render each line
     for line in lines:
+        # add a new page if required.
+        starting_y = add_page_if_required(pdf, starting_y)
+
+        # reset the font, in case a new page was added.
+        pdf.set_font(font, size=size, style=style)
+
+        # se position and add text
         pdf.set_xy(x_min, starting_y)
         pdf.cell(x_max - x_min, text_height, line, align=align)
+
+        # increase height
         starting_y += text_height
     return starting_y
 
@@ -180,9 +202,12 @@ def add_answer_squares(pdf: fpdf.FPDF, current_height, count: int) -> Tuple[floa
             current_height += PDF_ANSWER_SQUARE_SIZE + 1
             x_act = PDF_ANSWER_SQUARE_X_MIN
 
+        # add page if required
+        current_height = add_page_if_required(pdf, current_height)
+
         # add the square
         pdf.rect(x_act, current_height, PDF_ANSWER_SQUARE_SIZE, PDF_ANSWER_SQUARE_SIZE)
-        squares.append(pdf_form.Square(x_act, current_height, PDF_ANSWER_SQUARE_SIZE))
+        squares.append(pdf_form.Square(x_act, current_height, PDF_ANSWER_SQUARE_SIZE, len(pdf.pages)))
         x_act += PDF_ANSWER_SQUARE_SIZE + 1
 
     # new line
@@ -296,10 +321,20 @@ def add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question:
     # display the answer space
     squares = []
     for choice in choices:
+        TEXT_OFFSET_FROM_SQUARES = 2
+
+        # add a new page if required by text
+        new_current_height = add_page_if_required(pdf, current_height+TEXT_OFFSET_FROM_SQUARES)
+        # height decresed => we added a new page
+        # => we will do everything on the new page
+        if new_current_height < current_height:
+            current_height = new_current_height
+
         square_imposed_min_height, [square] = add_answer_squares(pdf, current_height, 1)
+        pages_after_adding_square = len(pdf.pages)
 
         # move a litle bit down to center the text to the squares
-        current_height += 2
+        current_height += TEXT_OFFSET_FROM_SQUARES
 
         # write choice
         text_imposed_min_height = add_text_to_pdf(
@@ -313,9 +348,15 @@ def add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question:
             style='',
             text_height=QUESTION_MULTIPLE_CHOICE_OPTION_BETWEEN_SIZE
         )
+        pages_after_adding_text = len(pdf.pages)
 
-        # we have to move down by at least one square
-        current_height = max(square_imposed_min_height, text_imposed_min_height)
+        # if we have more pages after text, relevant height is given by the text
+        if pages_after_adding_square != pages_after_adding_text:
+            current_height = text_imposed_min_height
+        else:
+            # we have to move down by at least one square
+            current_height = max(square_imposed_min_height, text_imposed_min_height)
+        
         squares.append(square)
 
     current_height += PDF_SQUARES_AFTER_OFFSET
@@ -326,11 +367,13 @@ def add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question:
 def create_form_from_description(description: smart_forms_types.FormDescription) -> pdf_form.PdfForm:
     # set an id if not existent
     if description.formId == '':
-        description.formId = "https://smartforms.ml/view_form/form-#" + str(random.randint(10**10, 2*10**10))
+        description.formId = "https://smartforms.ml/view/" + str(random.randint(10**9, 10**10-1))
 
     form = pdf_form.PdfForm()
     form.description = description
-    form.pdf_file = create_pdf_with_borders(description.formId)
+    form.pdf_file = fpdf.FPDF()
+    form.pdf_file.add_page()
+
     form.answer_squares_location = []
 
     # set title
@@ -358,8 +401,17 @@ def create_form_from_description(description: smart_forms_types.FormDescription)
             )
             form.answer_squares_location.append(answer_squares)
 
-        # TODO: Handle multiple pages
-        if current_height > PDF_MAXIMAL_PAGE_HEIGHT:
-            raise Exception("There are too many questions on the form!")
+        # # TODO: Handle multiple pages
+        # if current_height > PDF_MAXIMAL_PAGE_HEIGHT:
+        #     raise Exception("There are too many questions on the form!")
+
+    # add borders
+    # indexed from 1
+    for page_nr in range(1, len(form.pdf_file.pages) + 1):
+        form.pdf_file.page = page_nr
+        form_id_on_page = description.formId
+        if page_nr > 1:
+            form_id_on_page += f"?page={page_nr}"
+        add_pdf_with_borders_to_page(form.pdf_file, form_id_on_page)
 
     return form
