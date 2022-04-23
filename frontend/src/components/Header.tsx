@@ -1,8 +1,19 @@
+import { Switch } from "@mui/material"
 import React from "react"
 
-export default function Header(): JSX.Element
+interface HeaderProps
 {
+  themeChanger: React.Dispatch<React.SetStateAction<boolean>>
+  isDarkTheme: boolean
+}
+
+export default function Header(props: HeaderProps): JSX.Element
+{
+  const switchClicked = () => {
+    props.themeChanger(!props.isDarkTheme)
+  }
+
   return <>
-    <p> Header componet, ar trebui sa stii daca esti logat/delogat aici </p>
+    <Switch checked={props.isDarkTheme} onChange={switchClicked} />
   </>
 }

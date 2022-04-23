@@ -1,79 +1,49 @@
 import React from 'react';
 
-import { Box, Container, createTheme, CssBaseline, Grid, ThemeOptions } from '@mui/material';
-import { StylesProvider, ThemeProvider } from '@mui/styles';
+import { Container, Grid } from '@mui/material';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
 
 import Footer from '~/components/Footer';
 import Header from '~/components/Header';
 import { Home, EditForm, List } from '~/pages'
 
-export const themeOptions: ThemeOptions = {
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#5893df',
-    },
-    secondary: {
-      main: '#2ec5d3',
-    },
-    background: {
-      default: '#192231',
-      paper: '#24344d',
-    },
-  },
-};
+interface AppProps
+{
+  themeChanger: React.Dispatch<React.SetStateAction<boolean>>
+  isDarkTheme: boolean
+}
 
-// Daca vrem sa adaugam culori la theme, aici trebuie sa facem asta
-const darkTheme = createTheme(themeOptions);
-
-
-function App(): JSX.Element {
+function App(props: AppProps): JSX.Element {
   if (import.meta.env.DEV) {
     console.log("Printing all env variables")
     console.log(import.meta.env)
   }
 
   return (
-    // <StylesProvider injectFirst>
-    <>
-        <Router basename={import.meta.env.BASE_URL}>
-        {/* <SnackProvider> */}
-        {/* <UserStatusProvider> */}
-      <ThemeProvider theme={darkTheme}>
+    <Grid container>
 
-          {/* <Snackbar /> */}
+      <Grid item xs={12}>
+        <Header {...props} />
+      </Grid>
 
-          <Grid container>
+      <Grid item xs={12}>
+      <Router basename={import.meta.env.BASE_URL}>
 
-            <Grid item xs={12}>
-              <Header />
-            </Grid>
+          <Container style={{display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1, width: '100%'}}>
 
-            <Grid item xs={12}>
-              <Box pt={2} paddingBottom="100px">
-                <Container style={{display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1, width: '100%'}}>
+          <Routes>
+              <Route key="Home" path="/" element={<Home />}/>
+              <Route key="EditForm" path="/edit-form" element={<EditForm />} />
+              <Route key="List" path="/list" element={<List />} />
+          </Routes>
 
-                  <Routes>
-                    <Route key="Home" path="/" element={<Home />}/>
-                    <Route key="EditForm" path="/edit-form" element={<EditForm />} />
-                    <Route key="List" path="/list" element={<List />} />
-                  </Routes>
+            <Footer />
+          </Container>
 
-                  <Footer />
-                </Container>
+      </Router>
+      </Grid>
 
-              </Box>
-            </Grid>
-
-          </Grid>
-
-      </ThemeProvider>
-        {/* </UserStatusProvider> */}
-        {/* </SnackProvider> */}
-        </Router>
-    </>
-    // </StylesProvider>
+    </Grid>
   );
 }
 
