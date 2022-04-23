@@ -26,10 +26,6 @@ export default function TQText(props: ComponentProps): JSX.Element
     qList.questions[q_ind] as FormTextQuestion
   )
 
-  const updateQuestion = (q_ind: number, q: Question) => {
-    qOps.setQuestion(q_ind, q)
-  }
-
   const delQuestion = () => {
     qOps.delQuestion(q_ind);
   }
@@ -37,7 +33,7 @@ export default function TQText(props: ComponentProps): JSX.Element
   const myUpdateQ = (q: FormTextQuestion) => {
     console.log("Updating a question")
     setQuestion(q)
-    qOps.setQuestion(q_ind - 1, q)
+    qOps.setQuestion(q_ind, q)
   }
 
   const changeQuestionTitle = (e: ChangeEvent<HTMLInputElement>)  => {
@@ -56,7 +52,6 @@ export default function TQText(props: ComponentProps): JSX.Element
   }
 
   return <>
-
     <CardContent>
     <Grid container>
       <Grid item xs={10}>
