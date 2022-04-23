@@ -6,6 +6,7 @@ import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
 import Footer from '~/components/Footer';
 import Header from '~/components/Header';
 import { Home, EditForm, List } from '~/pages'
+import { UserContextProvider } from './contexts/UserContext';
 
 interface AppProps
 {
@@ -20,6 +21,7 @@ function App(props: AppProps): JSX.Element {
   }
 
   return (
+  <UserContextProvider>
     <Grid container>
 
       <Grid item xs={12}>
@@ -44,6 +46,7 @@ function App(props: AppProps): JSX.Element {
       </Grid>
 
     </Grid>
+  </UserContextProvider>
   );
 }
 

@@ -3,7 +3,6 @@ import React from 'react'
 import Grid from '@mui/material/Grid';
 import PdfDisplay from './PdfDisplay';
 
-import { QuestionListProvider } from '~/contexts/QuestionList';
 import GenerateButton from '~/components/GenerateButton';
 import DynamicQuestionList from '~/components/DynamicQuestionList';
 import { QLContextProvider } from '~/contexts/CoolContext';
@@ -11,9 +10,8 @@ import { QLContextProvider } from '~/contexts/CoolContext';
 export default function EditForm(): JSX.Element
 {
   return <>
-    <QuestionListProvider>
+    <QLContextProvider>
       <Grid container columnSpacing={1}>
-        <QLContextProvider>
           <Grid item xs={4}>
               <DynamicQuestionList />
           </Grid>
@@ -25,8 +23,7 @@ export default function EditForm(): JSX.Element
           <Grid item xs={6}>
             <PdfDisplay />
           </Grid>
-        </QLContextProvider>
       </Grid>
-    </QuestionListProvider>
+    </QLContextProvider>
   </>
 }
