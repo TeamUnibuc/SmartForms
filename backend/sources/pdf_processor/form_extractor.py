@@ -1,5 +1,5 @@
 import logging
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 import cv2 as cv
 import pdf2image
 import matplotlib.pyplot as plt
@@ -62,6 +62,24 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
         plt.show()
 
     return corrected_img
+
+def extract_qr_code_content_from_image(picture: np.ndarray) -> str:
+    """
+    Extracts the QR code content from an image.
+    Returns: the QR code, if readable, '' if nothing is found.
+    """
+    while picture.shape[0] > 500:
+        # we try to extract the QR code.
+        # if the image has a resolution too high, then we won't be able
+        # to find it, so we scale it down.
+        qrCodeDetector = cv.QRCodeDetector()
+        form_id, points, _ = qrCodeDetector.detectAndDecode(picture)
+
+        if points is not None and len(points) == 1:
+            return form_id
+        picture = cv.resize(picture, dsize=(0, 0), fx=0.8, fy=0.8)
+
+    return ''
 
 def find_maching_template(picture: np.ndarray) -> smart_forms_types.PdfForm:
     """
@@ -144,42 +162,44 @@ def pdf_to_numpy(file: bytes) -> np.array:
     image = np.array(image)
     return image
 
-def extract_answer_from_form(file: bytes, filename: str) -> Tuple[smart_forms_types.PdfForm, smart_forms_types.FormAnswer]:
+def extract_answer_from_form(
+            pdf_form: smart_forms_types.PdfForm,
+            page_to_img: Dict[int, np.ndarray]) -> List[smart_forms_types.FormAnswer]:
     """
-        Processes a file, extracting the content of its answer squares.
-        The file has to be an image or a pdf.
-
-        TODO: Support zip files.
+    Extracts as much as possible from the content of a single form, whose pages
+    are saved in page_to_img (note that not all pages must be present).
     """
-    if filename[-4:] == ".pdf": # pdf file
-        image = pdf_to_numpy(file)
-        # TODO: Handle multiple pages
-    else: # try to read as image
-        image = np.array(Image.open(io.BytesIO(file)))
-
-    logging.debug(f"Image shape: {image.shape}")
-
     # convert to grayscale
-    image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    # TODO: Check if bgr or rbg
+    page_to_img_gray = {
+        i: cv.cvtColor(page_to_img[i], cv.COLOR_BGR2GRAY) for i in page_to_img
+    }
+    
+    template_imgs = pdf2image.convert_from_bytes(pdf_form.extract_raw_pdf_bytes)
+    template_imgs = [np.array(i) for i in template_imgs]
 
-    # find form.
-    form = find_maching_template(image)
-    fixed_image = change_image_perspective(image, pdf_to_numpy(form.extract_raw_pdf_bytes()))
+    page_to_img_fixed = {
+        i: change_image_perspective(
+            page_to_img_gray[i],
+            template_imgs[i]
+        ) for i in page_to_img_gray
+    }
 
-    if DEBUG:
-        print("Fixed image:", flush=True)
-        plt.imshow(fixed_image)
-        plt.show()
+    # TODO:
+    # if DEBUG:
+    #     print("Fixed image:", flush=True)
+    #     plt.imshow(fixed_image)
+    #     plt.show()
 
-    content = extract_content_from_form(fixed_image, form)
-    content = ["".join(i) for i in content]
+    # content = extract_content_from_form(fixed_image, form)
+    # content = ["".join(i) for i in content]
 
-    form_answer = smart_forms_types.FormAnswer(
-        answerId="",
-        formId=form.description.formId,
-        userId="",
-        answers=content,
-        authorEmail=""
-    )
+    # form_answer = smart_forms_types.FormAnswer(
+    #     answerId="",
+    #     formId=form.description.formId,
+    #     userId="",
+    #     answers=content,
+    #     authorEmail=""
+    # )
 
     return (form, form_answer)
