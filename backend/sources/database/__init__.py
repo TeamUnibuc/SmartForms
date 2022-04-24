@@ -1,6 +1,7 @@
 import logging
 import pymongo
 import os
+import smart_forms_types
 
 class Database:
     __instance__ = None
@@ -33,3 +34,17 @@ ENTRIES = "Entries"
 
 def get_collection(collection: str):
     return get_database().database.get_collection(collection)
+
+def get_form_by_id(form_id: str) -> smart_forms_types.PdfForm:
+    """
+    Returns a form description for a given id.
+    Throws an exception if no form is found.
+    """
+    form_dict = [i for i in get_collection(FORMS).find({ "formId": form_id })]
+
+    # unable to find form
+    if len(form_dict) == 0:
+        raise Exception(f"Unable to find form {form_id} on mongo cloud!")
+
+    form = smart_forms_types.pdf_form_from_dict(form_dict[0])
+    return form

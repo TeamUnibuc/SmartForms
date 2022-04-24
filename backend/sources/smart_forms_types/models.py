@@ -1,7 +1,7 @@
+from enum import Enum
 from typing import List, Optional, Union
 from pydantic import BaseModel
 import pickle
-
 class FormTextQuestion(BaseModel):
     """
         Stores a single text question.
@@ -9,6 +9,8 @@ class FormTextQuestion(BaseModel):
     title: str
     description: str
     maxAnswerLength: int
+    # TODO: Consider this in OCR
+    allowedCharacters: Optional[str] = ""
 
 class FormMultipleChoiceQuestion(BaseModel):
     """
@@ -23,18 +25,18 @@ class FormDescription(BaseModel):
         Stores a single form.
     """
     title: str
-    formId: str = ""
-    description: str
+    formId: Optional[str] = ""
+    description: Optional[str] = "Description of the form..."
     questions: List[Union[FormMultipleChoiceQuestion, FormTextQuestion]]
     canBeFilledOnline: bool
     needsToBeSignedInToSubmit: bool
-    authorEmail: str = ""
+    authorEmail: Optional[str] = ""
 
 class FormAnswer(BaseModel):
     """
         Stores a single answer to a form.
     """
-    answerId: str
+    answerId: Optional[str] = ""
     formId: str
     authorEmail: str
     answers: List[str]

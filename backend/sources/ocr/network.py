@@ -62,9 +62,9 @@ class Network:
             nn.Linear(1024, len(CHARACTERS))
         )
 
-        # try to load model
+        # try to load model        
         try:
-            self.model.load_state_dict(th.load(MODEL_LOCATION))
+            self.model.load_state_dict(th.load(MODEL_LOCATION, map_location=DEVICE))
             logging.info("Loaded model weights from disk.")
         except:
             logging.info("Model not found on disk.")

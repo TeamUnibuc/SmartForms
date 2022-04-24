@@ -13,7 +13,7 @@ router = APIRouter(
     "/",
     responses = {
         200: {
-            "model": List[Union[smart_forms_types.FormAnswer, str]],
+            "model": List[smart_forms_types.FormAnswer],
             "description": "Ok. Each item is an answer, if found," +\
                     "or a string if an error occured for that particular form."
         },
@@ -22,13 +22,19 @@ router = APIRouter(
         }
     }
 )
-async def extract_answer(files: List[UploadFile] = File(...)):
+async def extract_answer(fileUploads: List[UploadFile] = File(...)):
     """
         Extracts data from a form.
-        For now, only accepted types are .pdf and .jpg
+        Conditions:
+            1. All image files attached must make EXACTLY ONE form.
+            2. Each PDF must be EXACLY ONE form.
+            3. In each zip, in each folder of the zip (including /), the same rules apply.
     """
-    answers = []
-    for file in files:
-        _, answer = pdf_processor.extract_answer_from_form(file.file.read(), file.filename)
-        answers.append(answer)
-    return answers
+    files = [
+        (file.file.read(), file.filename) for file in fileUploads
+    ]
+
+    # TODO:
+    # maybe we should add the answers in the DB here
+    answer = pdf_processor.extract_answers_from_files(files)
+    return answer

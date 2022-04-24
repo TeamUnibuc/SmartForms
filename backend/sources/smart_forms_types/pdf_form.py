@@ -14,11 +14,14 @@ class Square:
     width: float
     x: float
     y: float
+    # page the square is in, indexed from 0
+    page: int
 
-    def __init__(self, x, y, width):
+    def __init__(self, x, y, width, page):
         self.width = width
         self.x = x
         self.y = y
+        self.page = page
 class PdfForm:
     """
         Internal representation of a pdf form.
