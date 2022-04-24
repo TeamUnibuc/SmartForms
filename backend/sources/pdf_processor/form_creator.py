@@ -207,7 +207,7 @@ def add_answer_squares(pdf: fpdf.FPDF, current_height, count: int) -> Tuple[floa
 
         # add the square
         pdf.rect(x_act, current_height, PDF_ANSWER_SQUARE_SIZE, PDF_ANSWER_SQUARE_SIZE)
-        squares.append(pdf_form.Square(x_act, current_height, PDF_ANSWER_SQUARE_SIZE, len(pdf.pages)))
+        squares.append(pdf_form.Square(x_act, current_height, PDF_ANSWER_SQUARE_SIZE, len(pdf.pages) - 1))
         x_act += PDF_ANSWER_SQUARE_SIZE + 1
 
     # new line

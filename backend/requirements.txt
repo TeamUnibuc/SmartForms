@@ -31,6 +31,7 @@ opencv-python
 fpdf
 qrcode
 pdf2image
+pyzbar
 
 # required for oauth authentication
 authlib

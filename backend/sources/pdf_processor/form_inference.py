@@ -5,7 +5,7 @@ from typing import Dict, Tuple, List
 import logging
 from PIL import Image
 import cv2 as cv
-from backend.sources import database
+import database
 import smart_forms_types
 import zipfile
 import io
@@ -128,6 +128,6 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[smart_for
             image = np.array(image)
             images.append(image)
 
-    answers.append(extract_answer_from_images())
+    answers.append(extract_answer_from_images(images))
 
     return answers
