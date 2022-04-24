@@ -32,6 +32,7 @@ fpdf
 qrcode
 pdf2image
 pyzbar
+pyzbar[scripts]
 
 # required for oauth authentication
 authlib
