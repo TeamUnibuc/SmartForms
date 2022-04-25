@@ -1,4 +1,5 @@
 from asyncio.log import logger
+from typing import Optional
 from fastapi import APIRouter, Response
 from pydantic import BaseModel
 from starlette.config import Config
@@ -6,6 +7,8 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
 import os
+
+from torch import is_signed
 
 # authentication logic
 # taken mostly from
@@ -84,12 +87,14 @@ async def logout(request: Request):
 
 
 class GetUserDetailsReturnModel(BaseModel):
+    # if the used is or not signed in
+    is_signed_in: bool
     # url of the profile picture
-    picture: str
-    email: str
-    name: str
-    given_name: str
-    family_name: str
+    picture: Optional[str]
+    email: Optional[str]
+    name: Optional[str]
+    given_name: Optional[str]
+    family_name: Optional[str]
 
 @router.get(
     "/details",
@@ -97,22 +102,26 @@ class GetUserDetailsReturnModel(BaseModel):
         200: {
             "model": GetUserDetailsReturnModel,
             "description": "Ok."
-        },
-        400: {
-            "description": "Not signed in."
         }
     }
 )
 async def get_user_details(request: Request):
     """
         Returns details from the user.
-        If the user is not signed in, then the status 400 is returned instead.
+        If the user is not signed in, then is_signed_in is false, and no other fields are returned.
     """
     user = request.session.get('user')
     
     # the user is not signed in
     if user is None:
-        return Response(status_code=400)
+        return GetUserDetailsReturnModel(is_signed_in=False)
     
     # user is a superset of the return values, so we can just return all of it instead
-    return user
+    return GetUserDetailsReturnModel(
+        is_signed_in=True,
+        picture=user["picture"],
+        email=user["email"],
+        name=user["name"],
+        given_name=user["given_name"],
+        family_name=user["family_name"]
+    )
