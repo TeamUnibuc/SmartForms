@@ -4,7 +4,6 @@ import fpdf
 import qrcode
 import random
 
-from typer import style
 from .constants import *
 import smart_forms_types.pdf_form as pdf_form
 import smart_forms_types
