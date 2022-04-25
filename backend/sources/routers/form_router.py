@@ -41,7 +41,8 @@ async def get_form_preview(request: Request, form: smart_forms_types.FormDescrip
         return Response("User isn't signed in.", status_code=202)
 
     try:
-        model = pdf_processor.create_form_from_description(form)
+        form.formId="https://smartforms.ml/"
+        model = pdf_processor.create_form_from_description(form, True)
         ret = PreviewFormReturnModel(
             formPdfBase64=model.extract_base_64_encoded_pdf()
         )
@@ -87,7 +88,7 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
         # when creating a form, we manually set the formID to be empty, to avoid
         # collisions.
         form.formId = ""
-        model = pdf_processor.create_form_from_description(form)
+        model = pdf_processor.create_form_from_description(form, False)
         database.get_collection(database.FORMS).insert_one(model.to_dict())
         resp = CreateFormReturnModel(
             formId=model.description.formId,
