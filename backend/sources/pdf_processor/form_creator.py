@@ -256,37 +256,39 @@ def add_question_description(pdf: fpdf.FPDF, starting_height: int, question: str
     # offset between different items of the form
     current_height = starting_height
 
-    # question title
-    current_height = add_text_to_pdf(
-        pdf,
-        text=question,
-        x_min=PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5,
-        x_max=PDF_W-(PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5),
-        starting_y=current_height,
-        font=QUESTION_TITLE_FONT,
-        size=QUESTION_TITLE_FONT_SIZE,
-        style='',
-        text_height=PDF_QUESTION_BETWEEN_OFFSET,
-        align='L',
-        params=params
-    )
-    current_height += PDF_QUESTION_TITLE_AFTER_OFFSET
+    if question != "":
+        # question title
+        current_height = add_text_to_pdf(
+            pdf,
+            text=question,
+            x_min=PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5,
+            x_max=PDF_W-(PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5),
+            starting_y=current_height,
+            font=QUESTION_TITLE_FONT,
+            size=QUESTION_TITLE_FONT_SIZE,
+            style='',
+            text_height=PDF_QUESTION_BETWEEN_OFFSET,
+            align='L',
+            params=params
+        )
+        current_height += PDF_QUESTION_TITLE_AFTER_OFFSET
 
-    # question description
-    current_height = add_text_to_pdf(
-        pdf,
-        text=details,
-        x_min=PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5,
-        x_max=PDF_W-(PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5),
-        starting_y=current_height,
-        font=QUESTION_DETAILS_FONT,
-        size=QUESTION_DETAILS_FONT_SIZE,
-        style='I',
-        text_height=PDF_DETAILS_BETWEEN_OFFSET,
-        align='L',
-        params=params
-    )
-    current_height += PDF_DETAILS_AFTER_OFFSET
+    if details != "":
+        # question description
+        current_height = add_text_to_pdf(
+            pdf,
+            text=details,
+            x_min=PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5,
+            x_max=PDF_W-(PDF_BORDER_OFFSET+BORDER_SHORT_EDGE_PX+5),
+            starting_y=current_height,
+            font=QUESTION_DETAILS_FONT,
+            size=QUESTION_DETAILS_FONT_SIZE,
+            style='I',
+            text_height=PDF_DETAILS_BETWEEN_OFFSET,
+            align='L',
+            params=params
+        )
+        current_height += PDF_DETAILS_AFTER_OFFSET
 
     return current_height
 
