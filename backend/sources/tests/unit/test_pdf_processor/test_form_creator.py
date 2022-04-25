@@ -32,7 +32,7 @@ class TestFormCreator(unittest.TestCase):
             authorEmail=True
         )
 
-        pdf_form = pdf_processor.create_form_from_description(form_description)
+        pdf_form = pdf_processor.create_form_from_description(form_description, True)
         self.assertEqual(pdf_form.description, form_description)
         self.assertTrue(len(pdf_form.extract_base_64_encoded_pdf()) > 0)
 
@@ -62,7 +62,7 @@ class TestFormCreator(unittest.TestCase):
             authorEmail=True
         )
 
-        pdf_form = pdf_processor.create_form_from_description(form_description)
+        pdf_form = pdf_processor.create_form_from_description(form_description, False)
         self.assertEqual(pdf_form.description, form_description)
         self.assertTrue(len(pdf_form.extract_base_64_encoded_pdf()) > 0)
         self.assertEqual(len(pdf_form.answer_squares_location), 2)
