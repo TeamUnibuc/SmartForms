@@ -1,42 +1,15 @@
 name: Deploy
 
 on:
-  push:
-    branches: [ main ]
+  pull_request:
+    types: [closed]
+    branches:
+      - master
 
 jobs:
-  build-test:
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-20.04
-            label: Linux-64
-            prefix: /usr/share/miniconda3/envs/my-env
-
-    name: Build & Test - ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Prepare environment
-        uses: ./.github/actions/Prep-Env
-
-      - name: Cheeck Conda Env
-        run: |
-          conda info
-
-      - name: Build
-        uses: ./.github/actions/Build
-
-      - name: Test
-        uses: ./.github/actions/Test
-
   deploy:
+    if: github.event.pull_request.merged
+
     defaults:
       run:
         shell: bash -l {0}
@@ -53,17 +26,20 @@ jobs:
 
     steps:
       - name: Checkout
+        # if: github.event.pull_request.merged
         uses: actions/checkout@v2
         with:
           ref: main
           fetch-depth: 0
 
       - name: Add Known Hosts
+        # if: github.event.pull_request.merged
         run: |
           mkdir -p /home/runner/.ssh
           ssh-keyscan smartforms.ml >> /home/runner/.ssh/known_hosts
 
       - name: Add SSH Key & Push
+        # if: github.event.pull_request.merged
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/deployer
           chmod 600 /home/runner/.ssh/deployer
