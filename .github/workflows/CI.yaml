@@ -3,6 +3,7 @@ name: CI
 on:
   pull_request:
     branches: [ main ]
+    types: [ opened, synchronize ]
 
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
@@ -19,8 +20,6 @@ jobs:
           - os: ubuntu-20.04
             label: Linux-64
             prefix: /usr/share/miniconda3/envs/my-env
-
-    environment: CI
     
     name: Build & Test - ${{ matrix.label }}
     runs-on: ${{ matrix.os }}

@@ -1,4 +1,4 @@
-name: Deploy
+name: RPI-Deploy
 
 on:
   pull_request:
@@ -8,17 +8,15 @@ on:
 
 jobs:
   deploy:
+    name: Deploy to production
     if: github.event.pull_request.merged
 
     defaults:
       run:
         shell: bash -l {0}
-
-    name: Deploy to production
-
-    needs: build-test
  
     environment: Production
+    
     runs-on: ubuntu-20.04
 
     env:
