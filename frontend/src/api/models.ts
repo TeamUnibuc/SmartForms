@@ -1,5 +1,21 @@
 type Choice = string;
 
+export interface TextAnswer
+{
+  content: string
+}
+
+export interface MultipleChoiceAnswer
+{
+  content: string
+  index: number
+}
+
+export interface FormAnswers
+{
+  answers: (TextAnswer | MultipleChoiceAnswer)[]
+}
+
 export interface FormMultipleChoiceQuestion
 {
   title: string,

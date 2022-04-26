@@ -13,8 +13,8 @@ interface HeaderProps
   isDarkTheme: boolean
 }
 
-const navMenuLinks = ['/list', '/edit-form']
-const pages = ['List', 'Create Form'];
+const navMenuLinks = ['/list', '/edit-form', '/submit-form']
+const pages = ['List', 'Create Form', 'Submit Form'];
 const settings = ['Logout'];
 
 const Header = (props: HeaderProps): JSX.Element =>
@@ -43,9 +43,6 @@ const Header = (props: HeaderProps): JSX.Element =>
 
     const handleCloseNavMenu = (event: React.MouseEvent<HTMLElement>) => {
       setAnchorElNav(null);
-      const content = event.currentTarget.textContent
-      // if (content == 'List')
-
     };
 
     const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
