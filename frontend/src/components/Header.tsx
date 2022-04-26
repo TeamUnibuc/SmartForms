@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-import { AppBar, Avatar, Box, Button, Container, IconButton, Menu, MenuItem, Switch, Toolbar, Tooltip, Typography } from "@mui/material"
+import { AppBar, Avatar, Box, Button, Container, IconButton, Link, Menu, MenuItem, Switch, Toolbar, Tooltip, Typography } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import HighlightIcon from '@mui/icons-material/Highlight';
@@ -13,9 +13,9 @@ interface HeaderProps
   isDarkTheme: boolean
 }
 
-
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Logout'];
+const navMenuLinks = ['/list', '/edit-form']
+const pages = ['List', 'Create Form'];
+const settings = ['Logout'];
 
 const Header = (props: HeaderProps): JSX.Element =>
 {
@@ -41,15 +41,18 @@ const Header = (props: HeaderProps): JSX.Element =>
       setAnchorElUser(event.currentTarget);
     };
 
-    const handleCloseNavMenu = () => {
+    const handleCloseNavMenu = (event: React.MouseEvent<HTMLElement>) => {
       setAnchorElNav(null);
+      const content = event.currentTarget.textContent
+      // if (content == 'List')
+
     };
 
     const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorElUser(null);
       const content = event.currentTarget.textContent
       if (content == "Logout")
         return window.open('/api/user/logout', '_self')
-      setAnchorElUser(null);
     };
 
     const loginButtonPress = () => {
@@ -66,7 +69,7 @@ const Header = (props: HeaderProps): JSX.Element =>
               component="div"
               sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
             >
-              LOGO
+              Smart Forms
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -117,11 +120,12 @@ const Header = (props: HeaderProps): JSX.Element =>
 
 
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
+              {pages.map((page, i) => (
                 <Button
                   key={page}
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
+                  href={navMenuLinks[i]}
                 >
                   {page}
                 </Button>
