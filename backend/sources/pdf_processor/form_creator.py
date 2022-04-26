@@ -58,7 +58,7 @@ def add_square_grid_corners(pdf: fpdf.FPDF):
         PDF_H - PDF_BORDER_OFFSET - BORDER_LONG_EDGE_PX,
         BORDER_LONG_EDGE_PX,
         BORDER_LONG_EDGE_SQUARE,
-        lambda x, y: x < BORDER_SHORT_EDGE_SQUARE or (BORDER_LONG_EDGE_SQUARE - y) < BORDER_SHORT_EDGE_SQUARE   
+        lambda x, y: x < BORDER_SHORT_EDGE_SQUARE or (BORDER_LONG_EDGE_SQUARE - y) <= BORDER_SHORT_EDGE_SQUARE   
     )
 
     # bottom right
@@ -67,7 +67,7 @@ def add_square_grid_corners(pdf: fpdf.FPDF):
         PDF_H - PDF_BORDER_OFFSET - BORDER_LONG_EDGE_PX,
         BORDER_LONG_EDGE_PX,
         BORDER_LONG_EDGE_SQUARE,
-        lambda x, y: (BORDER_LONG_EDGE_SQUARE - x) < BORDER_SHORT_EDGE_SQUARE or (BORDER_LONG_EDGE_SQUARE - y) < BORDER_SHORT_EDGE_SQUARE   
+        lambda x, y: (BORDER_LONG_EDGE_SQUARE - x) <= BORDER_SHORT_EDGE_SQUARE or (BORDER_LONG_EDGE_SQUARE - y) <= BORDER_SHORT_EDGE_SQUARE   
     )
 
     # left margin
@@ -96,9 +96,6 @@ def add_borders_to_page(pdf: fpdf.FPDF, qr_code_content: str = '') -> fpdf.FPDF:
     # Default settings (A4, mm)
     # A4 size: 210 x 297 mm
     # pdf.add_page()
-
-    # # set fill to black
-    # pdf.set_fill_color(0)
 
     # add the 3 corners
     add_square_grid_corners(pdf)
@@ -415,22 +412,23 @@ def create_form_from_description(description: smart_forms_types.FormDescription,
     form = pdf_form.PdfForm()
     form.description = description
     form.pdf_file = fpdf.FPDF()
+    pdf = form.pdf_file
+
+    # disable line breaks
+    pdf.set_auto_page_break(False)
 
     # force a new page
     # TODO: get rid of 10**10
-    add_page_if_required(form.pdf_file, 10**10, params)
+    current_height = add_page_if_required(pdf, 10**10, params)
 
     form.answer_squares_location = []
-
-    # set title
-    current_height = add_title_to_pdf(form.pdf_file, description.title, params)
 
     for question in description.questions:
         # check if the question is a text question
         # or a mutiple choice question
         if isinstance(question, smart_forms_types.FormTextQuestion):
             current_height, answer_squares = add_text_question(
-                form.pdf_file,
+                pdf,
                 current_height,
                 question.title,
                 question.description,
@@ -440,7 +438,7 @@ def create_form_from_description(description: smart_forms_types.FormDescription,
             form.answer_squares_location.append(answer_squares)
         elif isinstance(question, smart_forms_types.FormMultipleChoiceQuestion):
             current_height, answer_squares = add_multiple_choice_question(
-                form.pdf_file,
+                pdf,
                 current_height,
                 question.title,
                 question.description,
@@ -449,17 +447,39 @@ def create_form_from_description(description: smart_forms_types.FormDescription,
             )
             form.answer_squares_location.append(answer_squares)
 
-        # # TODO: Handle multiple pages
-        # if current_height > PDF_MAXIMAL_PAGE_HEIGHT:
-        #     raise Exception("There are too many questions on the form!")
-
+    
     # add borders
     # indexed from 1
-    for page_nr in range(1, len(form.pdf_file.pages) + 1):
-        form.pdf_file.page = page_nr
+
+    for page_nr in range(1, len(pdf.pages) + 1):
+        pdf.page = page_nr
         form_id_on_page = description.formId
+
+        # if the page is not the first, then its ID will contain the page nr.
         if page_nr > 1:
             form_id_on_page += f"?page={page_nr}"
-        add_borders_to_page(form.pdf_file, form_id_on_page)
+        add_borders_to_page(pdf, form_id_on_page)
+
+        # if there are more than one page, display it
+        if len(pdf.pages) > 1:
+            page_info = f"Page {page_nr}/{len(pdf.pages)}"
+            # TODO: change font
+            # FPDF doesn't support changing pages (what we do with
+            # pdf.page=xxx), so we have to force flush the settings
+            # of the font.
+            pdf.set_font(QUESTION_DETAILS_FONT, size=21, style="I")
+            pdf.set_font(QUESTION_DETAILS_FONT, size=20, style="I")
+
+            pdf.set_xy(
+                PDF_BORDER_OFFSET + BORDER_LONG_EDGE_PX + 5,
+                PDF_H - PDF_BORDER_OFFSET - BORDER_SHORT_EDGE_PX + 1.5
+            )
+
+            pdf.cell(
+                PDF_W - 2 * PDF_BORDER_OFFSET - 2 * BORDER_LONG_EDGE_PX - 2 * 5,
+                10,
+                txt=page_info,
+                align="R"
+            )
 
     return form
