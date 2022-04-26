@@ -1,9 +1,10 @@
 import React, { ChangeEvent, useState } from "react"
 
 import ClearIcon from '@mui/icons-material/Clear';
+import AddIcon from '@mui/icons-material/Add';
 import { FormMultipleChoiceQuestion } from "~/api/models";
 import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext";
-import { CardContent, Grid, IconButton, TextField } from "@mui/material";
+import { Box, CardContent, Grid, IconButton, TextField } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface ComponentProps
@@ -13,6 +14,8 @@ interface ComponentProps
 
 export default function TQMultipleChoice(props: ComponentProps): JSX.Element
 {
+  console.log("Render TQMultiple")
+
   const q_ind = props.q_ind;
   const {qList} = useQLContextState()
   const {qOps} = useQLContextUpdater()
@@ -21,13 +24,17 @@ export default function TQMultipleChoice(props: ComponentProps): JSX.Element
     qList.questions[q_ind] as FormMultipleChoiceQuestion
   )
 
+  console.log("State has questions: ")
+  console.log(question)
+
   const delQuestion = () => {
     qOps.delQuestion(q_ind);
   }
 
   const myUpdateQ = (q: FormMultipleChoiceQuestion) => {
     console.log("Updating a question")
-    setQuestion(q)
+    const newestuff = {...q, title: q.title}
+    setQuestion(newestuff)
     qOps.setQuestion(q_ind, q)
   }
 
@@ -39,6 +46,24 @@ export default function TQMultipleChoice(props: ComponentProps): JSX.Element
   const changeChoice = (index: number) => {
     const updater = (e: ChangeEvent<HTMLInputElement>) => {
       question.choices[index] = e.target.value
+      const wtf = {...question, title: question.title}
+      myUpdateQ(wtf)
+    }
+
+    return updater
+  }
+
+  const deleteChoice = (index: number) => {
+    const updater = () => {
+      console.log("Before:")
+      console.log(question.choices)
+      for (let i = index; i + 1 < question.choices.length; ++i){
+        question.choices[i] = question.choices[i + 1]
+        console.log(i)
+      }
+      question.choices.pop()
+      console.log("after")
+      console.log(question.choices)
       myUpdateQ(question)
     }
 
@@ -47,18 +72,43 @@ export default function TQMultipleChoice(props: ComponentProps): JSX.Element
 
   const QuestionList = () => {
     const lista = question.choices.map((choice, i) => {
-      return (
-        <TextField defaultValue={choice}
+      console.log(`Reredering option ${i} with: ${choice}`)
+      return (<Box key={q_ind + "-" + i}>
+        <TextField value={choice}
           id="first-question-content" label="Question description"
           variant="filled" margin="normal"
           onChange={changeChoice(i)}
-          sx={{p: 0}}
-      />)
+          sx={{p: 0, marginTop: 0.5}}
+        />
+        <IconButton onClick={deleteChoice(i)}
+          style={{height: "100%", marginTop: "0.5em"}}>
+          <ClearIcon />
+      </IconButton>
+    </Box>)
     })
 
     return <>
       {lista}
     </>
+  }
+
+  const DeleteIconsList = () => {
+    const lista = question.choices.map((choice, i) => {
+      return (
+        <IconButton onClick={deleteChoice(i)}
+         sx={{height: "73px"}} key={q_ind + "--" + i}>
+          <ClearIcon />
+        </IconButton>
+      )
+    })
+
+    return <>{lista}</>
+  }
+
+  const addChoice = () => {
+    const newindex = question.choices.length
+    question.choices[newindex] = `Option ${newindex + 1}`
+    myUpdateQ(question)
   }
 
   return <>
@@ -71,11 +121,25 @@ export default function TQMultipleChoice(props: ComponentProps): JSX.Element
           onChange={changeQuestionTitle}
           sx={{m: 0}}/>
 
-        {QuestionList()}
-        </Grid>
+
+      </Grid>
       <Grid item xs={2}>
-        <IconButton onClick={delQuestion}>
-          <DeleteIcon></DeleteIcon>
+        <IconButton onClick={delQuestion}
+         sx={{marginBottom: "20px"}}>
+          <DeleteIcon />
+        </IconButton>
+
+      </Grid>
+
+      <Grid item xs={12}>
+        {QuestionList()}
+        {/* {DeleteIconsList()} */}
+
+      </Grid>
+
+      <Grid item>
+        <IconButton onClick={addChoice}>
+          <AddIcon />
         </IconButton>
       </Grid>
     </Grid>
