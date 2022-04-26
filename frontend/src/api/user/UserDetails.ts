@@ -1,4 +1,5 @@
 export interface UserDetails {
+  is_signed_in: boolean
   email: string
   full_name: string
   given_name: string

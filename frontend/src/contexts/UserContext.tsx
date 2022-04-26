@@ -62,13 +62,16 @@ const UserContextProvider: React.FC = (props) => {
       console.log("Result from user details: ")
       console.log(rez)
 
-      if (rez !== undefined) {
+      if (rez === undefined) {
+        setUser({
+          authenticated: undefined
+        })
+      } else if (rez.is_signed_in === true) {
         setUser({
           authenticated: true,
           data: rez
         })
-      }
-      else {
+      } else {
         setUser({
           authenticated: false
         })
