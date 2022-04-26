@@ -1,5 +1,7 @@
 # SmartForms
 
+![Deployment](https://github.com/TeamUnibuc/SmartForms/actions/workflows/RPI-Deploy.yaml//badge.svg)
+
 ## About
 
 This project aims to help managing simple forms, allowing:
