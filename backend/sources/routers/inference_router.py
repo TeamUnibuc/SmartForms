@@ -13,7 +13,7 @@ router = APIRouter(
     "/",
     responses = {
         200: {
-            "model": List[smart_forms_types.FormAnswer],
+            "model": List[Union[smart_forms_types.FormAnswer, str]],
             "description": "Ok. Each item is an answer, if found," +\
                     "or a string if an error occured for that particular form."
         },
@@ -30,6 +30,7 @@ async def extract_answer(fileUploads: List[UploadFile] = File(...)):
             2. Each PDF must be EXACLY ONE form.
             3. In each zip, in each folder of the zip (including /), the same rules apply.
     """
+    # TODO: Add them to the DB
     files = [
         (file.file.read(), file.filename) for file in fileUploads
     ]
