@@ -6,142 +6,228 @@ import main
 import time
 import random
 import unittest
-# from main import init_state
+import smart_forms_types
+from main import init_state
 
 from fastapi.testclient import TestClient
 
-class TestEntryRouter(unittest.TestCase):
-    # def setUpClass() -> None:
-    #     init_state()
-        
-    def test_root_endpoint(self):
-        self.assertEqual(1, 1)
+def get_generic_form_description():
+    """
+    returns a generic description used for testing
+    contains 2 questions. First is a text question, second is a multiple choice question
+    """
+    return smart_forms_types.FormDescription(
+        title="form_title",
+        formId="formId",
+        description="Description",
+        questions=[
+            smart_forms_types.FormTextQuestion(
+                title="question_title",
+                description="question description",
+                maxAnswerLength=12
+            ),
+            smart_forms_types.FormMultipleChoiceQuestion(
+                title="question2_title",
+                description="question 2 description",
+                choices = ["Yes", "No", "Maybe"]
+            )
+        ],
+        canBeFilledOnline=True,
+        needsToBeSignedInToSubmit=False,
+    )
 
+def get_generic_answer():
+    """
+    returns a generic smart_forms_types.FormAnswer object
+    """
+    return smart_forms_types.FormAnswer(
+        formId="form_id",
+        answers=["012345678912", "XXX"]
+    )
 
-# TODO:
-# keeping this here for having a template
-        # client = TestClient(fastapi_engine.app)
-        # response = client.get("/")
-        # self.assertEqual(response.status_code, 200)
+class TestEntryRouterNotAuthenticated(unittest.TestCase):
+    formId: str
 
-    # def test_get_recipe(self):
-    #     client = TestClient(fastapi_engine.app)
-    #     response = client.get("/view-available-recipes")
-    #     self.assertEqual(response.status_code, 200)
-    #     continut = response.json()
-    #     self.assertTrue("recipes" in continut)
+    def setUpClass() -> None:
+        init_state()
+        main.routers.AUTHENTICATION_CHECKS = False
+        # create a form we can add entries to
+        # we pick a new id each time to not have
+        # redefinition conflicts
+        TestEntryRouterNotAuthenticated.formId = f"testForm-#{random.randint(10**10, 10**11)}"
+        client = TestClient(main.app)
+        description = get_generic_form_description()
+        description.formId = TestEntryRouterNotAuthenticated.formId
+        response = client.post(
+            "/api/form/create", 
+            json=description.dict()
+        )
+        if response.status_code != 200:
+            print(f"Unable to create form, received {response.status_code}.")
+            print(f"Message: {response.content}")
+            print("Tests will fail.")
+    
+    def setUp(self):
+        # instantiate a client
+        self.client = TestClient(main.app)
 
-    # def test_add_recipe_invalid_request(self):
-    #     client = TestClient(fastapi_engine.app)
-    #     req = {
-    #         "some-invalid-request": "idk"
-    #     }
-    #     response = client.post("/view-available-recipes", json=req)
-    #     self.assertNotEqual(response.status_code, 200)
+    def test_submit_new_entry(self):
+        """
+        Try to submit a valid new entry, and check we get back
+        an ID.
+        """
+        entry = get_generic_answer()
+        response = self.client.post(
+            "/api/entry/create",
+            json=entry.dict()
+        )
 
-    # def test_add_recipe_valid_request(self):
-    #     client = TestClient(fastapi_engine.app)
-    #     recipe = {
-    #         "drink_name": "normal_coffee_" + str(random.randint(1, 10**10)),
-    #         "drink_description": "",
-    #         "coffee_mg": 10,
-    #         "milk_mg": 10,
-    #         "water_mg": 10,
-    #         "sugar_mg": 10,
-    #         "milk_foam": False 
-    #     }
-    #     response = client.post("/add-new-recipe", json=recipe)
-    #     self.assertEqual(response.status_code, 200)
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
 
-    # def test_add_recipe_existing_name(self):
-    #     client = TestClient(fastapi_engine.app)
-    #     recipe = {
-    #         "drink_name": "normal_coffee_" + str(random.randint(1, 10**10)),
-    #         "drink_description": "",
-    #         "coffee_mg": 10,
-    #         "milk_mg": 10,
-    #         "water_mg": 10,
-    #         "sugar_mg": 10,
-    #         "milk_foam": False 
-    #     }
-    #     response = client.post("/add-new-recipe", json=recipe)
-    #     self.assertEqual(response.status_code, 200)
-    #     response = client.post("/add-new-recipe", json=recipe)
-    #     self.assertTrue("status" in response.json() and response.json()["status"] == "FAIL")
+        # we should get a valid id
+        self.assertIsNotNone(response.content)
+        self.assertTrue(response.content.startswith(b"entry-"))
 
-    # def test_delete_recipe_inexisting_name(self):
-    #     client = TestClient(fastapi_engine.app)
+    def test_submit_new_entry_and_retrieve_it(self):
+        """
+        Try like in test_submit_new_entry to make a new entry
+        and then try to retrieve it
+        """
+        entry = get_generic_answer()
+        response = self.client.post(
+            "/api/entry/create",
+            json=entry.dict()
+        )
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
+        # we should get a valid id
+        self.assertIsNotNone(response.content)
+        self.assertTrue(response.content.startswith(b"entry-"))
+        returned_id = str(response.content, encoding="utf-8")
 
-    #     response = client.post("/delete-recipe", params={"recipe_name": "inexistent_coffee"})
-    #     self.assertTrue("status" in response.json() and response.json()["status"] == "FAIL")
+        response = self.client.get(
+            f"/api/entry/view-entry/{returned_id}"
+        )
+
+        # we should get back our entry
+        self.assertEqual(response.status_code, 200)
+        entry = smart_forms_types.FormAnswer(
+            **response.json()
+        )
+        self.assertEqual(entry.answerId, returned_id)
+
+    def test_submit_new_entry_and_delete_it(self):
+        """
+        Try like in test_submit_new_entry to make a new entry
+        and then try to retrieve it
+        """
+        entry = get_generic_answer()
+        response = self.client.post(
+            "/api/entry/create",
+            json=entry.dict()
+        )
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
+        # we should get a valid id
+        self.assertIsNotNone(response.content)
+        self.assertTrue(response.content.startswith(b"entry-"))
+        returned_id = str(response.content, encoding="utf-8")
+
+        response = self.client.delete(
+            f"/api/entry/delete/{returned_id}"
+        )
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
+
+        # try to get the deleted form
+        response = self.client.get(
+            f"/api/entry/view-entry/{returned_id}"
+        )
+        # we should get 400
+        self.assertEqual(response.status_code, 400)
 
     
-    # def test_delete_existing_name(self):
-    #     client = TestClient(fastapi_engine.app)
-    #     recipe = {
-    #         "drink_name": "normal_coffee_" + str(random.randint(1, 10**10)),
-    #         "drink_description": "",
-    #         "coffee_mg": 10,
-    #         "milk_mg": 10,
-    #         "water_mg": 10,
-    #         "sugar_mg": 10,
-    #         "milk_foam": False 
-    #     }
-    #     response = client.post("/add-new-recipe", json=recipe)
-    #     self.assertEqual(response.status_code, 200)
-    #     response = client.post("/delete-recipe", params={"recipe_name": recipe["drink_name"]})
-    #     self.assertTrue("status" in response.json() and response.json()["status"] == "OK")
+    def test_submit_new_entry_and_edit_it(self):
+        """
+        Try like in test_submit_new_entry to make a new entry
+        and then try to retrieve it
+        """
+        entry = get_generic_answer()
+        entry.answers[0] = 'x' + entry.answers[0][1:]
+        response = self.client.post(
+            "/api/entry/create",
+            json=entry.dict()
+        )
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
+        # we should get a valid id
+        self.assertIsNotNone(response.content)
+        self.assertTrue(response.content.startswith(b"entry-"))
+        returned_id = str(response.content, encoding="utf-8")
 
+        # update the entry
+        entry.answerId = returned_id
+        entry.answers[0] = 'y' + entry.answers[0][1:]
+        response = self.client.post(
+            f"/api/entry/edit",
+            json=entry.dict()
+        )
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
 
-    # def test_view_order_history(self):
-    #     client = TestClient(fastapi_engine.app)
-        
-    #     response = client.get("/view-order-history")
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTrue("orders" in response.json())
-    
+        # try to get the updated form
+        response = self.client.get(
+            f"/api/entry/view-entry/{returned_id}"
+        )
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
 
-    # def test_view_popular_drinks(self):
-    #     client = TestClient(fastapi_engine.app)
-        
-    #     response = client.get("/view-popular-drinks")
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTrue("drinks" in response.json())
-    
+        # we should get back our modified entry
+        self.assertEqual(response.status_code, 200)
+        entry = smart_forms_types.FormAnswer(
+            **response.json()
+        )
+        self.assertEqual(entry.answers[0][0], 'y')
 
-    # def test_view_machines_status(self):
-    #     old_heartbeat_value = storage.coffee_machines_last_heartbeat
-    #     old_levels_values = storage.coffee_machines_levels
-
-    #     storage.coffee_machines_last_heartbeat = {
-    #         'machine1': 1234
-    #     }
-    #     storage.coffee_machines_levels = {
-    #         'machine1': mqtt_messages.MachineLevels()
-    #     }
-
-    #     client = TestClient(fastapi_engine.app)
-        
-    #     response = client.get("/view-machines-status")
-
-    #     storage.coffee_machines_last_heartbeat = old_heartbeat_value
-    #     storage.coffee_machines_levels = old_levels_values
-
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTrue("machines" in response.json())
 
     
-    # def test_request_new_drink(self):
-    #     client = TestClient(fastapi_engine.app)
-    #     drink_name = "normal_coffee_" + str(random.randint(1, 10**10))
-    #     new_drink_json = {
-    #         "recipient_machine_id": "machine1",
-    #         "coffee_name": drink_name
-    #     }
+    def test_view_entries(self):
+        """
+        Try like in test_submit_new_entry to make a new entry
+        and then try to retrieve it
+        """
+        entry = get_generic_answer()
+        entry.formId = TestEntryRouterNotAuthenticated.formId
+        
+        response = self.client.post(
+            "/api/entry/create",
+            json=entry.dict()
+        )
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
+        # we should get a valid id
+        self.assertIsNotNone(response.content)
+        self.assertTrue(response.content.startswith(b"entry-"))
+        returned_id = str(response.content, encoding="utf-8")
 
-    #     response = client.post("/request-new-drink", json=new_drink_json)
-    #     self.assertEqual(response.status_code, 200)
+        response = self.client.post(
+            f"/api/entry/view-form-entries",
+            json={
+                "formId": TestEntryRouterNotAuthenticated.formId,
+                "offset": 0,
+                "count": 100
+            }
+        )
 
+        # we should get 200
+        self.assertEqual(response.status_code, 200)
+        entries = response.json()
+
+        self.assertGreaterEqual(entries["totalFormsCount"], 1)
+        entry = [i for i in entries["entries"] if i["answerId"] == returned_id]
+
+        self.assertNotEqual(entry, [])
 
 if __name__ == '__main__':
     unittest.main()

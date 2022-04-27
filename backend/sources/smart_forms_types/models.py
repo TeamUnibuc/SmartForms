@@ -38,14 +38,16 @@ class FormAnswer(BaseModel):
     """
     answerId: Optional[str] = ""
     formId: str
-    authorEmail: str
+    # author email is generated based on the
+    # signed user, if signed in.
+    authorEmail: Optional[str] = ""
     answers: List[str]
 
     def to_dict(self) -> dict:
         return {
             "formId": self.formId,
             "answerId": self.answerId,
-            "userId": self.userId,
+            "authorEmail": self.authorEmail,
             "content": pickle.dumps(self)
         }
 
