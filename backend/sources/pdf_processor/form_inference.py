@@ -11,6 +11,7 @@ import zipfile
 import io
 import pdf_processor.form_extractor as form_extractor
 
+# TODO: Remove this
 def pdf_to_numpy(file: bytes) -> np.array:
     """
     converts a pdf binary to a numpy array
