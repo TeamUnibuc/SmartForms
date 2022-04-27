@@ -38,3 +38,6 @@ pyzbar[scripts]
 authlib
 itsdangerous
 httpx
+
+# testing framework
+PyPDF2
