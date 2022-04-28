@@ -46,5 +46,6 @@ jobs:
         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         COOKIES_SECRET: ${{ secrets.COOKIES_SECRET }}
         USER_AUTHENTICATION_CHECKS_ENABLED: 'False'
+        FORM_ID_PREFIX: "https://smartforms.ml/form/"
       run: |
         (cd backend/sources/tests/ && python -m unittest)

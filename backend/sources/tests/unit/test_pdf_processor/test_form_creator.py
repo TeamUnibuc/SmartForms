@@ -179,7 +179,7 @@ class TestFormCreator(unittest.TestCase):
         for page_nr, page in enumerate(pages):
             qr_codes = pyzbar.decode(page)
             # extactly one QR code should be found, which is our id
-            page_id = description.formId
+            page_id = os.environ["FORM_ID_PREFIX"] + description.formId
             if page_nr > 0:
                 page_id += f"?page={page_nr + 1}"
 

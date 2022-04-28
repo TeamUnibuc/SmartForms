@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import List, Tuple
 import fpdf
 import qrcode
@@ -405,7 +406,7 @@ def add_multiple_choice_question(pdf: fpdf.FPDF, starting_height: int, question:
 def create_form_from_description(description: smart_forms_types.FormDescription, is_preview: bool) -> pdf_form.PdfForm:
     # set an id if not existent
     if description.formId == '':
-        description.formId = "https://smartforms.ml/view/" + str(random.randint(10**9, 10**10-1))
+        raise Exception("Form should have an ID")
 
     params = FormCreatorParameters(description.title, is_preview)
 
@@ -458,7 +459,10 @@ def create_form_from_description(description: smart_forms_types.FormDescription,
         # if the page is not the first, then its ID will contain the page nr.
         if page_nr > 1:
             form_id_on_page += f"?page={page_nr}"
-        add_borders_to_page(pdf, form_id_on_page)
+        add_borders_to_page(
+            pdf,
+            os.environ["FORM_ID_PREFIX"] + form_id_on_page
+        )
 
         # if there are more than one page, display it
         if len(pdf.pages) > 1:
