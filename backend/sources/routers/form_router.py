@@ -42,7 +42,7 @@ async def get_form_preview(request: Request, form: smart_forms_types.FormDescrip
         The created form has a watermark to inform the user it's just a preview.
     """
     if routers.AUTHENTICATION_CHECKS and request.session.get('user') is None:
-        return Response("User isn't signed in.", status_code=202)
+        return PlainTextResponse("User isn't signed in.", status_code=202)
 
     try:
         form.formId="https://smartforms.ml/"
@@ -52,7 +52,7 @@ async def get_form_preview(request: Request, form: smart_forms_types.FormDescrip
         )
         return ret
     except Exception as e:
-        return Response(repr(e), status_code=201)
+        return PlainTextResponse(repr(e), status_code=201)
 
 
 class CreateFormReturnModel(BaseModel):
@@ -83,7 +83,7 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
     # if checks are enabled, add the email to the form.
     if routers.AUTHENTICATION_CHECKS:
         if request.session.get("user") is None:
-            return Response("User isn't signed in.", status_code=202)
+            return PlainTextResponse("User isn't signed in.", status_code=202)
         else:
             form.authorEmail = request.session.get("user")["email"]
     try:
@@ -100,7 +100,7 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
         )
         return resp
     except Exception as e:
-        return Response(repr(e), status_code=201)
+        return PlainTextResponse(repr(e), status_code=201)
 
 
 class ListFormReceiveModel(BaseModel):
@@ -158,7 +158,6 @@ async def get_forms_list(request: Request, params: ListFormReceiveModel):
     )
 
 
-
 @router.get(
     "/description/{formId}",
     responses = {
@@ -169,6 +168,10 @@ async def get_forms_list(request: Request, params: ListFormReceiveModel):
         201: {
             "model": str,
             "description": "User is not signed in or authorised."
+        },
+        203: {
+            "model": str,
+            "description": "Form was not found."
         },
         400: {
             "model": str,
@@ -184,7 +187,7 @@ async def get_form_description(request: Request, formId: str):
     forms = [smart_forms_types.pdf_form_from_dict(i).description for i in db.find({"formId": formId})]
 
     if len(forms) == 0:
-        raise Exception("No form with the given Id was found!")
+        return PlainTextResponse("Form wasn't found.", 203)
 
     if routers.AUTHENTICATION_CHECKS:
         if request.session.get("user") is None and forms[0].needsToBeSignedInToSubmit:
@@ -206,6 +209,10 @@ async def get_form_description(request: Request, formId: str):
             "model": str,
             "description": "User is not signed in or authorised."
         },
+        203: {
+            "model": str,
+            "description": "Form wasn't found."
+        },
         400: {
             "description": "Invalid input. Error message."
         }
@@ -219,7 +226,7 @@ async def get_form_pdf(request: Request, formId: str):
     forms = [smart_forms_types.pdf_form_from_dict(i) for i in db.find({"formId": formId})]
 
     if len(forms) == 0:
-        raise Exception("No form with the given Id was found!")
+        return PlainTextResponse("Form wasn't found.", 203)
 
     if routers.AUTHENTICATION_CHECKS:
         if request.session.get("user") is None and forms[0].needsToBeSignedInToSubmit:
@@ -261,13 +268,13 @@ async def delete_form(request: Request, formId: str):
     forms = [smart_forms_types.pdf_form_from_dict(i) for i in db.find({"formId": formId})]
 
     if len(forms) == 0:
-        return Response("Form wasn't found.", status_code=203)
+        return PlainTextResponse("Form wasn't found.", status_code=203)
 
     if routers.AUTHENTICATION_CHECKS:
         if request.session.get("user") is None:
-            return Response("User isn't signed in.", status_code=201)
+            return PlainTextResponse("User isn't signed in.", status_code=201)
         elif forms[0].description.authorEmail != request.session.get("user")["email"]:
-            return Response("User isn't the owner of the form.", status_code=202)
+            return PlainTextResponse("User isn't the owner of the form.", status_code=202)
             
     db.delete_one({"formId": formId})
     return { "status": "ok" }
@@ -309,13 +316,13 @@ async def update_form_visibility(request: Request, params: UpdateFormReceiveMode
     forms = [smart_forms_types.pdf_form_from_dict(i) for i in db.find({"formId": formId})]
     
     if len(forms) == 0:
-        return Response("Form wasn't found.", status_code=203)
+        return PlainTextResponse("Form wasn't found.", status_code=203)
 
     if routers.AUTHENTICATION_CHECKS:
         if request.session.get("user") is None:
-            return Response("User isn't signed in.", status_code=201)
+            return PlainTextResponse("User isn't signed in.", status_code=201)
         elif forms[0].description.authorEmail != request.session.get("user")["email"]:
-            return Response("User isn't the owner of the form.", status_code=202)
+            return PlainTextResponse("User isn't the owner of the form.", status_code=202)
     
 
     form = forms[0]
