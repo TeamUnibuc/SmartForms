@@ -1,6 +1,7 @@
 from typing import List, Union
 from fastapi import APIRouter, File, UploadFile
 from pydantic import BaseModel
+from starlette.requests import Request
 import smart_forms_types
 import pdf_processor
 
@@ -10,7 +11,7 @@ router = APIRouter(
 )
 
 @router.post(
-    "/",
+    "/infer",
     responses = {
         200: {
             "model": List[Union[smart_forms_types.FormAnswer, str]],
@@ -22,7 +23,7 @@ router = APIRouter(
         }
     }
 )
-async def extract_answer(fileUploads: List[UploadFile] = File(...)):
+async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(...)):
     """
         Extracts data from a form.
         Conditions:

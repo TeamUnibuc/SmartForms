@@ -8,8 +8,6 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
 import os
 
-from torch import is_signed
-
 # authentication logic
 # taken mostly from
 # https://slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html
