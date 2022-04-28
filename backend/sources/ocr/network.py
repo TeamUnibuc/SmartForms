@@ -3,10 +3,12 @@ import numpy as np
 import torch as th
 import torch.nn as nn
 import logging
+import os
 
 IMAGE_SIZE = 28
 DEVICE = th.device("cuda") if th.cuda.is_available() else th.device("cpu")
-DATA_FOLDER = "../data/OCR/"
+# need absolute path to avoid problems with testing
+DATA_FOLDER = os.path.dirname(os.path.realpath(__file__)) + "/../../data/OCR/"
 MODEL_LOCATION = DATA_FOLDER + "ocr_model.pth"
 # all possible characters
 # we only train by default on 0-9a-zA-Z, but the rest of them

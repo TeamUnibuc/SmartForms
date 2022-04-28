@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Dict, List, Tuple, Union
 import cv2 as cv
 import pdf2image
@@ -65,7 +66,7 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
 
     return corrected_img
 
-def extract_qr_code_content_from_image(picture: np.ndarray) -> str:
+def extract_form_id_content_from_image(picture: np.ndarray) -> str:
     """
     Extracts the QR code content from an image.
     Returns: the QR code, if readable, '' if nothing is found.
@@ -81,96 +82,14 @@ def extract_qr_code_content_from_image(picture: np.ndarray) -> str:
     if len(qr_codes) == 0:
         return ''
     
-    # return qr code
-    return str(qr_codes[0].data, encoding='utf-8')
+    # extract qr code
+    content = str(qr_codes[0].data, encoding='utf-8')
 
+    # should start with the URL prefix
+    assert content.startswith(os.environ["FORM_ID_PREFIX"])
 
-    # while picture.shape[0] > 500:
-    #     # we try to extract the QR code.
-    #     # if the image has a resolution too high, then we won't be able
-    #     # to find it, so we scale it down.
-    #     qrCodeDetector = cv.QRCodeDetector()
-    #     form_id, points, _ = qrCodeDetector.detectAndDecode(picture)
-
-    #     if points is not None and len(points) == 1:
-    #         return form_id
-    #     picture = cv.resize(picture, dsize=(0, 0), fx=0.8, fy=0.8)
-
-    # return ''
-
-def find_maching_template(picture: np.ndarray) -> smart_forms_types.PdfForm:
-    """
-        Searches for the QR code and finds the ID.
-        We first search in the entire image.
-    """
-    def get_form_id_from_image(picture: np.ndarray) -> str:
-        qrCodeDetector = cv.QRCodeDetector()
-        form_id, points, _ = qrCodeDetector.detectAndDecode(picture)
-
-        if points is None or len(points) != 1:
-            # didn't find form_id
-            return ''
-        return form_id
-
-    form_id = get_form_id_from_image(picture)
-
-    while form_id == '' and picture.shape[0] > 500:
-        # we try to extract the QR code.
-        # if the image has a resolution too high, then we won't be able
-        # to find it, so we scale it down.
-
-        picture = cv.resize(picture, dsize=(0, 0), fx=0.8, fy=0.8)
-        form_id = get_form_id_from_image(picture)
-
-
-    form_dict = [i for i in database.get_collection(database.FORMS).find({ "formId": form_id })]
-
-    # unable to find form
-    if len(form_dict) == 0:
-        raise Exception(f"Unable to find form {form_id} on mongo cloud!")
-
-    form = smart_forms_types.pdf_form_from_dict(form_dict[0])
-    return form
-
-# def extract_content_from_form(fixed_picture: np.ndarray, form: smart_forms_types.PdfForm) -> List[List[str]]:
-#     """
-#         fixed_picture: image where we already fixed the perspective transform.
-#         Returns a list of squares.
-#     """
-
-#     squares_content = []
-#     multiplier_h = fixed_picture.shape[0] / constants.PDF_H
-#     multiplier_w = fixed_picture.shape[1] / constants.PDF_W
-
-#     for squares in form.answer_squares_location:
-#         question_content = []
-#         for square in squares:
-#             x = int(multiplier_h * square.x)
-#             y = int(multiplier_w * square.y)
-#             dx = int(multiplier_h * square.width)
-#             dy = int(multiplier_w * square.width)
-
-#             cv.rectangle(fixed_picture, (x, y), (x+dx, y+dy), (0, 255, 255), thickness=2)
-
-#             # This offset makes sure we don't include any borders in the square character.
-#             # TODO: if we switch to our own dataset, then maybe excluding the border won't
-#             # be required.
-#             SQUARES_OFFSET = 10
-#             sq_img = fixed_picture[
-#                 y + SQUARES_OFFSET : y + dy - SQUARES_OFFSET,
-#                 x + SQUARES_OFFSET : x + dx - SQUARES_OFFSET
-#             ]
-#             question_content.append(sq_img)
-
-#         if DEBUG:
-#             plt.imshow(fixed_picture)
-#             plt.show()
-
-#         squares_content.append(ocr.predict_characters(np.stack(question_content)))
-
-
-#     return squares_content
-
+    # remove the prefix from the ID
+    return content[len(os.environ["FORM_ID_PREFIX"]):]
 
 def extract_question_answer_from_form(
         fixed_pages: Dict[int, np.ndarray],

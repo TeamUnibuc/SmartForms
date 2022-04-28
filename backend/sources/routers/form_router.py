@@ -45,7 +45,7 @@ async def get_form_preview(request: Request, form: smart_forms_types.FormDescrip
         return PlainTextResponse("User isn't signed in.", status_code=202)
 
     try:
-        form.formId="https://smartforms.ml/"
+        form.formId = os.environ["FORM_ID_PREFIX"]
         model = pdf_processor.create_form_from_description(form, True)
         ret = PreviewFormReturnModel(
             formPdfBase64=model.extract_base_64_encoded_pdf()

@@ -11,15 +11,6 @@ import zipfile
 import io
 import pdf_processor.form_extractor as form_extractor
 
-# TODO: Remove this
-def pdf_to_numpy(file: bytes) -> np.array:
-    """
-    converts a pdf binary to a numpy array
-    """
-    image = pdf2image.convert_from_bytes(file)[0]
-    image = np.array(image)
-    return image
-
 def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> smart_forms_types.FormAnswer:
     """
     Extracts the content of a form within a PDF file.
@@ -43,7 +34,7 @@ def extract_answer_from_images(images: List[np.ndarray]) -> smart_forms_types.Fo
     form_id = ''
 
     for img in images:
-        id = form_extractor.extract_qr_code_content_from_image(img)
+        id = form_extractor.extract_form_id_content_from_image(img)
         if id == '':
             logging.debug("Unable to extract QR code content! Skipping file...")
         else:
