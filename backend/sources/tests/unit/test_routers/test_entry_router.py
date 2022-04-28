@@ -169,7 +169,7 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         # update the entry
         entry.answerId = returned_id
         entry.answers[0] = 'y' + entry.answers[0][1:]
-        response = self.client.post(
+        response = self.client.put(
             f"/api/entry/edit",
             json=entry.dict()
         )

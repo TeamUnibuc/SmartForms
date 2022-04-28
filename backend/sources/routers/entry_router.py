@@ -60,7 +60,7 @@ async def delete_entry(entryId: str):
     return PlainTextResponse("Ok")
 
 
-@router.post(
+@router.put(
     "/edit",
     responses = {
         200: {
