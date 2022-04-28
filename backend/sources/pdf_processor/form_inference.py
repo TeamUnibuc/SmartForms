@@ -1,7 +1,7 @@
 from collections import defaultdict
 import numpy as np
 import pdf2image
-from typing import Dict, Tuple, List
+from typing import Dict, Optional, Tuple, List
 import logging
 from PIL import Image
 import cv2 as cv
@@ -11,7 +11,7 @@ import zipfile
 import io
 import pdf_processor.form_extractor as form_extractor
 
-def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> smart_forms_types.FormAnswer:
+def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[smart_forms_types.FormAnswer]:
     """
     Extracts the content of a form within a PDF file.
     A SINGLE FORM CAN BE INCLUDED IN THE PDF FILE.
@@ -23,7 +23,7 @@ def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> smart_forms_typ
     # process pdf as list of images
     return extract_answer_from_images(images)
 
-def extract_answer_from_images(images: List[np.ndarray]) -> smart_forms_types.FormAnswer:
+def extract_answer_from_images(images: List[np.ndarray]) -> Optional[smart_forms_types.FormAnswer]:
     """
     Extracts a single answer, whose pages are in `images`.
     """
@@ -42,6 +42,9 @@ def extract_answer_from_images(images: List[np.ndarray]) -> smart_forms_types.Fo
             form_id = (id if id.find("?") == -1 else id[:id.find("?")])
 
     logging.debug(f"Found form #{form_id} from images.")
+
+    if form_id == '':
+        return None
 
     # retrieve form from database
     pdf_form = database.get_form_by_id(form_id)
@@ -120,6 +123,9 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[smart_for
             image = np.array(image)
             images.append(image)
 
-    answers.append(extract_answer_from_images(images))
+    # add the answer from the images, if it exists
+    answer_from_images = extract_answer_from_images(images)
+    if answer_from_images is not None:
+        answers.append(answer_from_images)
 
     return answers
