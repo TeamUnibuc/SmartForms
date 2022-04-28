@@ -12,7 +12,7 @@ export interface CheckProps
 export default function Check(props: CheckProps): JSX.Element
 {
   const [modelOpen, setModalOpen] = useState(false)
-
+  const [inferenceDone, setInferenceDone] = useState(false)
 
   const fnOpenModal = () => {
     if (modelOpen)

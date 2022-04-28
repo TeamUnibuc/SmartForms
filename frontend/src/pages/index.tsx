@@ -1,7 +1,7 @@
 import Home from './Home/Home'
 import EditForm from './EditForm/EditForm'
 import List from './List/List'
-import SubmitForm from './SubmitForm/SubmitForm'
+import SubmitForm from './SubmitCheck/SubmitCheck'
 import Check from './Check/Check'
 
 export {

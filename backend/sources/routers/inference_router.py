@@ -61,7 +61,7 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
         if form.description.needsToBeSignedInToSubmit and user_email == "":
             return False
 
-        # otherwise, we can submit it        
+        # otherwise, we can submit it
         return True
 
     files = [
@@ -75,7 +75,7 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
     for i in range(len(result)):
         if isinstance(result[i], smart_forms_types.FormAnswer) and not can_submit_answer_to_form(result[i].formId):
             result[i] = f"You are not authorized to submit an answer to the form {result[i].formId}"
-    
+
     # parsed result
     answers = [i for i in result if isinstance(i, smart_forms_types.FormAnswer)]
 
