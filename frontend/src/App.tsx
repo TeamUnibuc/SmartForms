@@ -1,12 +1,13 @@
 import React from 'react';
 
-import { Container, Grid } from '@mui/material';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
+import { Container, Grid } from '@mui/material';
 
-import Footer from '~/components/Footer';
-import Header from '~/components/Header';
-import { Home, EditForm, List, SubmitForm } from '~/pages'
-import { UserContextProvider } from './contexts/UserContext';
+import Footer from '~/components/General/Footer';
+import Header from '~/components/General/Header';
+import { Home, EditForm, List, SubmitForm, Check } from '~/pages'
+import { UserContextProvider } from '~/contexts/UserContext';
+import { CheckProps } from './pages/Check/Check';
 
 interface AppProps
 {
@@ -42,6 +43,8 @@ function App(props: AppProps): JSX.Element {
                      element={<List />} />
               <Route key="Submit" path="/submit-form"
                      element={<SubmitForm />}/>
+              <Route key="Check" path="/check"
+                     element={(props: CheckProps) => <Check {...props}/>} />
           </Routes>
 
             <Footer />

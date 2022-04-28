@@ -1,4 +1,4 @@
-import { FormAnswers, FormDescription } from "../models";
+import { FormAnswers } from "../models";
 
 interface RawFormAnswer
 {
@@ -11,22 +11,33 @@ interface RawFormAnswer
 type RawInferenceResponse = RawFormAnswer[]
 
 export const Submit = async(formData: any):
-                          Promise<FormAnswers[]> =>
+                      Promise<string | FormAnswers[]> =>
 {
-  const data = await fetch('/api/inference', {
-    method: "POST",
-    headers:{
-        'Content-Type': 'multipart/form-data'
-    },
-    body: formData
-  })
-  const content = await data.json() as RawInferenceResponse;
+  try {
+    const data = await fetch('/api/inference', {
+      method: "POST",
+      headers:{
+          'Content-Type': 'multipart/form-data'
+      },
+      body: formData
+    })
+    const content = await data.json() as RawInferenceResponse;
+    console.log(content)
 
-  console.log(content)
+    if (content.map === undefined || content.length === undefined)
+      throw new Error("Bad parsing")
 
-  return content.map(fa => {
-    return {answers: fa.answers.map(stuff => {
-      return {content: stuff}
-    })}
-  });
+    return content.map(fa => {
+      return {
+        formId: fa.formId,
+        answers: fa.answers.map(stuff => {
+          return {content: stuff}
+        })
+      }
+    });
+  } catch (e)
+  {
+    return "Error parsing document: " + (e as Error).message
+  }
+
 }

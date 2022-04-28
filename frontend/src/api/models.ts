@@ -13,6 +13,7 @@ export interface MultipleChoiceAnswer
 
 export interface FormAnswers
 {
+  formId: string
   answers: (TextAnswer | MultipleChoiceAnswer)[]
 }
 

@@ -3,8 +3,8 @@ import React from 'react'
 import Grid from '@mui/material/Grid';
 import PdfDisplay from './PdfDisplay';
 
-import GenerateButton from '~/components/GenerateButton';
-import DynamicQuestionList from '~/components/DynamicQuestionList';
+import GenerateButton from '~/components/EditForm/GenerateButton';
+import DynamicQuestionList from '~/components/EditForm/DynamicQuestionList';
 import { QLContextProvider } from '~/contexts/CoolContext';
 
 export default function EditForm(): JSX.Element
