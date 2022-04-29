@@ -1,5 +1,5 @@
-import { Inference as inference } from "./inference";
+import { Infer } from "./infer";
 
 export const Inference = {
-  inference
+  Infer
 }

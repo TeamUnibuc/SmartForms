@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
 
-import { Button, Card, CardActionArea, CardActions, CardContent, FormControl, FormHelperText, Input, InputLabel, Typography } from '@mui/material';
-import { InferenceResponse } from '~/api/inference/inference';
+import { Box, Button, Card, CardActionArea, CardActions, CardContent, Divider, FormControl, FormGroup, FormHelperText, Input, InputLabel, TextField, Typography } from '@mui/material';
+import { InferenceResponse } from '~/api/inference/infer';
 import API from '~/api'
 import { FormAnswers } from '~/api/models';
 
@@ -16,15 +16,14 @@ const SubmitComp = (props: SubmitCompProps) =>
   const {setInferenceDone, setAnswers} = props
 
   const doUpload = async (files: FileList) => {
-    const file = files[0]
-    console.log(files)
     console.log("Querying the god damn inferencee")
-    console.log(`I have file of  typ: ${file.type}`)
     let formData = new FormData();
     console.log("Appending")
-    formData.append(`file.${file.type}`, file);
+    for (const file of files) {
+      formData.append(`fileUploads`, file, file.name)
+    }
     console.log("Inference")
-    const answers = await API.Inference.inference(formData)
+    const answers = await API.Inference.Infer(formData)
     console.log(answers)
     setInferenceDone(true)
     setAnswers(answers)
@@ -34,6 +33,7 @@ const SubmitComp = (props: SubmitCompProps) =>
     // console.log(e)
     const files = e.target.files as FileList
     // console.log(`Set file: ${e.}`)
+    console.log(files)
     setFiles(files)
   }
 
@@ -42,19 +42,54 @@ const SubmitComp = (props: SubmitCompProps) =>
   }
 
   return <>
-    <FormControl>
-      {/* <InputLabel htmlFor="my-file">Image/PDF/ZIP</InputLabel> */}
-      <Input id="my-file" type="file" onChange={selectFile}/>
-      <FormHelperText id="my-helper-text">We'll never share your email.</FormHelperText>
-    </FormControl>
-    <Button onClick={sendButton}>Send</Button>
+  <Box>
+    <form action="/api/inference/infer" encType="multipart/form-data" method="post">
+    <input name="fileUploads" type="file" multiple />
+    <input type="submit" />
+    </form>
+  </Box>
 
-    {/* <Button onClick={handleSpecialSubmit}>Go To Submit Page</Button> */}
+
+
+    <FormControl variant="filled">
+      <Input id="my-file" type="file" name='fileUploads'
+        onChange={selectFile}
+        inputProps={{
+          multiple: true
+        }}/>
+      {/* <form action="/api/inference/infer" encType="multipart/form-data" method="post">
+        <TextField
+          id="outlined-basic"
+          label="Outlined"
+          variant="outlined"
+          type="file"
+          inputProps={{
+            multiple: true,
+            type: "file",
+            name: "fileUploads"
+          }}
+        />
+
+        <Input type="submit"/> */}
+
+
+      {/* </form> */}
+
+      <FormHelperText id="my-helper-text">
+          Placeholder text
+        </FormHelperText>
+
+    </FormControl>
+    <Divider />
+    <Button onClick={sendButton} variant="contained">
+      Send
+    </Button>
   </>
 }
 
 const CheckComp = (props: {answers: FormAnswers[]}) =>
 {
+  console.log(props.answers)
   const getLista = () => {
     return props.answers.map((ans, i) => {
       <Card key={i}>
