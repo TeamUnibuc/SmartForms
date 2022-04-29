@@ -16,7 +16,7 @@ DEBUG = False
 # fixed to 28 as this is what most datasets offer
 IMAGE_SIZE = network.IMAGE_SIZE
 
-def predict_characters(imgs: np.ndarray) -> List[str]:
+def predict_characters(imgs: np.ndarray, allowed_characters: str) -> List[str]:
     """
     imgs: 3d array, where:
         1st dim - number of images to predict
@@ -47,5 +47,5 @@ def predict_characters(imgs: np.ndarray) -> List[str]:
 
         plt.show()
 
-    return network.Network.get_instance().predict(imgs)
+    return network.Network.get_instance().predict(imgs, allowed_characters)
 

@@ -74,14 +74,37 @@ class Network:
         self.model.to(DEVICE)
         self.model.eval()
 
-    def predict(self, images: np.ndarray) -> List[str]:
+    def predict(self, images: np.ndarray, allowed_characters: str) -> List[str]:
         """
         Predict the most probable character for a given image.
         images is 3d, where the first dim is the number of images.
         """
+        # pass model in eval mode
         self.model.eval()
+        # compute predictions
         predictions = self.model(th.tensor(images, dtype=th.float32).to(DEVICE))
-        predictions = np.argmax(predictions.detach().cpu().numpy(), axis=1)
+        # convert to numpy
+        predictions = predictions.detach().cpu().numpy()
+        # sort according to probabilities
+        predictions = np.argsort(predictions, axis=1)
 
-        results = [CHARACTERS[i] for i in predictions]
+        results = []
+        allowed_characters_set = set(allowed_characters)
+
+        # for each question, get character most probable, out of allowed list
+        for prediction in predictions:
+            result = ""
+
+            # no characters specified. Just accept most probable char.
+            if len(allowed_characters_set) == 0:
+                result = CHARACTERS[prediction[0]]
+            else:
+                for pred in prediction:
+                    if CHARACTERS[pred] in allowed_characters_set:
+                        result = CHARACTERS[pred]
+                        break
+            
+            assert result != ""
+            results.append(result)
+            
         return results
