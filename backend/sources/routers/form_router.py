@@ -276,7 +276,10 @@ async def delete_form(request: Request, formId: str):
         elif forms[0].description.authorEmail != request.session.get("user")["email"]:
             return PlainTextResponse("User isn't the owner of the form.", status_code=202)
             
+    # delete the form and all of its answers
     db.delete_one({"formId": formId})
+    db_entries = database.get_collection(database.ENTRIES)
+    db_entries.delete_many({ "formId": formId })
     return { "status": "ok" }
 
 

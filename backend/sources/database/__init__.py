@@ -48,3 +48,17 @@ def get_form_by_id(form_id: str) -> smart_forms_types.PdfForm:
 
     form = smart_forms_types.pdf_form_from_dict(form_dict[0])
     return form
+
+def get_entry_by_id(entry_id: str) -> smart_forms_types.FormAnswer:
+    """
+    Returns a form description for a given id.
+    Throws an exception if no form is found.
+    """
+    entry_dict = get_collection(ENTRIES).find_one({ "answerId": entry_id })
+
+    # unable to find form
+    if entry_dict is None:
+        raise Exception(f"Unable to find entry {entry_id} on mongo cloud!")
+
+    entry = smart_forms_types.form_answer_from_dict(entry_dict)
+    return entry

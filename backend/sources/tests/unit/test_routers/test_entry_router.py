@@ -54,14 +54,16 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         # create a form we can add entries to
         # we pick a new id each time to not have
         # redefinition conflicts
-        TestEntryRouterNotAuthenticated.formId = f"testForm-#{random.randint(10**10, 10**11)}"
         client = TestClient(main.app)
         description = get_generic_form_description()
-        description.formId = TestEntryRouterNotAuthenticated.formId
+
         response = client.post(
             "/api/form/create", 
             json=description.dict()
         )
+
+        TestEntryRouterNotAuthenticated.formId = response.json()["formId"]
+
         if response.status_code != 200:
             print(f"Unable to create form, received {response.status_code}.")
             print(f"Message: {response.content}")
@@ -77,6 +79,8 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         an ID.
         """
         entry = get_generic_answer()
+        entry.formId = TestEntryRouterNotAuthenticated.formId
+
         response = self.client.post(
             "/api/entry/create",
             json=entry.dict()
@@ -95,6 +99,7 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         and then try to retrieve it
         """
         entry = get_generic_answer()
+        entry.formId = TestEntryRouterNotAuthenticated.formId
         response = self.client.post(
             "/api/entry/create",
             json=entry.dict()
@@ -123,6 +128,8 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         and then try to retrieve it
         """
         entry = get_generic_answer()
+        entry.formId = TestEntryRouterNotAuthenticated.formId
+
         response = self.client.post(
             "/api/entry/create",
             json=entry.dict()
@@ -154,6 +161,8 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         and then try to retrieve it
         """
         entry = get_generic_answer()
+        entry.formId = TestEntryRouterNotAuthenticated.formId
+
         entry.answers[0] = 'x' + entry.answers[0][1:]
         response = self.client.post(
             "/api/entry/create",
