@@ -148,7 +148,15 @@ def extract_question_answer_from_form(
 
     # convert square array to a ndarray, and perform OCR
     squares_content = np.stack(squares_content)
-    squares_predictions = ocr.predict_characters(squares_content)
+
+    # find allowed characters, depending on the type of question
+    # TODO:
+    allowed_characters = (
+        question.allowedCharacters
+        if isinstance(question, smart_forms_types.FormTextQuestion)
+        else " X*+"
+    )
+    squares_predictions = ocr.predict_characters(squares_content, allowed_characters)
 
     # compute the initial answer
     answer = ["?" for i in range(len(squares_location))]
