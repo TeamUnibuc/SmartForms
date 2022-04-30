@@ -9,3 +9,4 @@ dependencies:
   - nodejs=14
   - yarn>=1.22
   - make
+  - poppler
