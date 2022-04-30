@@ -5,7 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import HighlightIcon from '@mui/icons-material/Highlight';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-import { useUserState, useUserUpdater } from "~/contexts/UserContext";
+import { useUserState } from "~/contexts/UserContext";
 
 interface HeaderProps
 {
@@ -14,7 +14,7 @@ interface HeaderProps
 }
 
 const navMenuLinks = ['/list', '/edit-form', '/submit-form']
-const pages = ['List', 'Create Form', 'Submit Form'];
+const pages = ['ㅤListㅤ', 'ㅤCreate Formㅤ', 'ㅤSubmit Answersㅤ'];
 const settings = ['Logout'];
 
 const Header = (props: HeaderProps): JSX.Element =>
@@ -22,7 +22,6 @@ const Header = (props: HeaderProps): JSX.Element =>
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const user = useUserState()
-    const {doUpdate} = useUserUpdater()
 
     const switchClicked = () => {
       const newVal = !props.isDarkTheme
@@ -100,7 +99,9 @@ const Header = (props: HeaderProps): JSX.Element =>
               >
                 {pages.map((page) => (
                   <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
+                    <Typography textAlign="center">
+                      {page}
+                    </Typography>
                   </MenuItem>
                 ))}
               </Menu>
