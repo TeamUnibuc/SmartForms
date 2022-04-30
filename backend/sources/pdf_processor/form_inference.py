@@ -110,7 +110,7 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[smart_for
     # here we store all of the images in our current scope
     images: List[np.ndarray] = []
 
-    print("extracting files")
+    logging.info("extracting files")
     # process each file
     for file_content, filename in files:
         if filename.endswith(".pdf"):

@@ -28,9 +28,7 @@ def init_state():
     """
     global app
 
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-
-    logging.info("Hello")
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     app = FastAPI(
         docs_url="/api/docs",
