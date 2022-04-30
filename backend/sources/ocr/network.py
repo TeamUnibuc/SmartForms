@@ -86,7 +86,7 @@ class Network:
         # convert to numpy
         predictions = predictions.detach().cpu().numpy()
         # sort according to probabilities
-        predictions = np.argsort(predictions, axis=1)
+        predictions = np.argsort(predictions, axis=1)[:, ::-1]
 
         results = []
         allowed_characters_set = set(allowed_characters)
