@@ -16,6 +16,7 @@ import os
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 import ocr.train_network as train_network
 
 # FastAPI app serving the API.
@@ -27,11 +28,29 @@ def init_state():
     """
     global app
 
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+    logging.info("Hello")
 
     app = FastAPI(
         docs_url="/api/docs",
         redoc_url="/api/redoc",
+    )
+
+    # Add Origins for CORS policy
+    origins = [
+        "http://smartforms.ml",
+        "https://smartforms.ml",
+        "http://localhost",
+        "http://localhost:3000",
+    ]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     # register a session middleware, for storing authentication
@@ -46,7 +65,7 @@ def init_state():
     async def home(request: Request):
         user = request.session.get('user')
         email = user['email'] if user is not None else 'Not signed in'
-        
+
         html = (
                 f"<pre>Email: {email}</pre><br>" +
                 "<a href='/api/docs'>documentation</a><br>" +

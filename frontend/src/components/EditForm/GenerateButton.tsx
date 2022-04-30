@@ -1,7 +1,7 @@
 import React from 'react'
 
 import Button from "@mui/material/Button";
-import { FormPreview } from '~/api/form/preview';
+import API from '~/api'
 import { Question } from '~/api/models';
 import { useQLContextState, useQLContextUpdater } from '~/contexts/CoolContext';
 
@@ -12,7 +12,7 @@ export default function GenerateButton(): JSX.Element
 
   const generatePdf = async (formData: Question[]) => {
     console.log(JSON.stringify(formData))
-    const resp = await FormPreview({
+    const resp = await API.Form.FormPreview({
       canBeFilledOnline: true,
       needsToBeSignedInToSubmit: true,
       description: "useless description",

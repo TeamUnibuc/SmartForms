@@ -14,7 +14,7 @@ import App from './App'
 // index.js
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import ThemeIncluder from './components/ThemeIncluder';
+import ThemeIncluder from './components/General/ThemeIncluder';
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(

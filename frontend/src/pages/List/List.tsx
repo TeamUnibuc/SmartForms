@@ -17,6 +17,6 @@ export default function List(): JSX.Element
   }, [])
 
   return <>
-    <p>Number of total documents: {setNrDocs}</p>
+    <p>Number of total documents: {nrDocs}</p>
   </>
 }

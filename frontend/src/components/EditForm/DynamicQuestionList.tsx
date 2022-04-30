@@ -1,9 +1,9 @@
-import { Divider } from "@mui/material";
 import React from "react"
 
+import { Divider } from "@mui/material";
 import { useQLContextState } from "~/contexts/CoolContext";
-import TQ from "./TextQuestion/TQ";
-import TQAdd from "./TextQuestion/TQAdd";
+import TQ from "../TextQuestion/TQ";
+import TQAdd from "../TextQuestion/TQAdd";
 
 export default function DynamicQuestionList(): JSX.Element
 {

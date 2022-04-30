@@ -48,7 +48,7 @@ def extract_answer_from_images(images: List[np.ndarray]) -> Optional[smart_forms
 
     # retrieve form from database
     pdf_form = database.get_form_by_id(form_id)
-    
+
     # try to reconstruct images
     page_to_img = dict()
 
@@ -63,7 +63,7 @@ def extract_answer_from_images(images: List[np.ndarray]) -> Optional[smart_forms
     answer = form_extractor.extract_answer_from_form(pdf_form, page_to_img)
 
     return answer
-    
+
 
 def extract_answer_from_zip_file(zip_file: Tuple[bytes, str]) -> List[smart_forms_types.FormAnswer]:
     """
@@ -85,13 +85,13 @@ def extract_answer_from_zip_file(zip_file: Tuple[bytes, str]) -> List[smart_form
         filename_without_folder = filename[max(0, filename.rfind('/') + 1):]
         # folder name
         folder_name = filename[:len(filename) - len(filename_without_folder)]
-        
+
         # save the file in the apropriate directory
         files_per_folder[folder_name].append((file_content, filename))
-    
+
     # stores all of the answers from within the zip file
     answers = []
-    
+
     # process each folder independently
     for folder_name in files_per_folder:
         answers += extract_answers_from_files(files_per_folder[folder_name])
@@ -110,6 +110,7 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[smart_for
     # here we store all of the images in our current scope
     images: List[np.ndarray] = []
 
+    print("extracting files")
     # process each file
     for file_content, filename in files:
         if filename.endswith(".pdf"):
