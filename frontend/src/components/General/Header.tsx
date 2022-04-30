@@ -1,11 +1,12 @@
 import React, { useState } from "react"
 
-import { AppBar, Avatar, Box, Button, Container, IconButton, Link, Menu, MenuItem, Switch, Toolbar, Tooltip, Typography } from "@mui/material"
+import { AppBar, Avatar, Box, Button, Container, IconButton, Menu, MenuItem, Switch, Toolbar, Tooltip, Typography } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import HighlightIcon from '@mui/icons-material/Highlight';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import { useUserState } from "~/contexts/UserContext";
+import { Link } from "react-router-dom";
 
 interface HeaderProps
 {
@@ -115,18 +116,18 @@ const Header = (props: HeaderProps): JSX.Element =>
               LOGO
             </Typography>
 
-
-
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page, i) => (
+              {pages.map((page, i) => ( <>
                 <Button
+                  component={Link}
                   key={page}
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
-                  href={navMenuLinks[i]}
+                  to={navMenuLinks[i]}
                 >
                   {page}
                 </Button>
+              </>
               ))}
             </Box>
 
