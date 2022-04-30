@@ -18,22 +18,16 @@ const SubmitComp = (props: SubmitCompProps) =>
   const doUpload = async (files: FileList) => {
     console.log("Querying the god damn inferencee")
     let formData = new FormData();
-    console.log("Appending")
     for (const file of files) {
       formData.append(`fileUploads`, file, file.name)
     }
-    console.log("Inference")
     const answers = await API.Inference.Infer(formData)
-    console.log(answers)
     setInferenceDone(true)
     setAnswers(answers)
   }
 
   const selectFile = (e: any) => {
-    // console.log(e)
     const files = e.target.files as FileList
-    // console.log(`Set file: ${e.}`)
-    console.log(files)
     setFiles(files)
   }
 
@@ -127,6 +121,8 @@ export default function SubmitCheck(): JSX.Element
 {
   const [inferenceDone, setInferenceDone] = useState(false)
   const [answers, setAnswers] = useState<InferenceResponse>([])
+
+  console.log("Rendering SubmitCheck")
 
   if (!inferenceDone) {
     const submitProps = {

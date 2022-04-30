@@ -21,7 +21,6 @@ export const Infer = async(formData: any):
 
     })
     const content = await data.json() as RawInferenceResponse;
-    console.log(content)
 
     if (content.map === undefined || content.length === undefined)
       throw new Error("Bad parsing")
