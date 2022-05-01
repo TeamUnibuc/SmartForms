@@ -1,11 +1,12 @@
 import React, { useState } from "react"
 
-import { AppBar, Avatar, Box, Button, Container, IconButton, Link, Menu, MenuItem, Switch, Toolbar, Tooltip, Typography } from "@mui/material"
+import { AppBar, Avatar, Box, Button, Container, IconButton, Menu, MenuItem, Switch, Toolbar, Tooltip, Typography } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import HighlightIcon from '@mui/icons-material/Highlight';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-import { useUserState, useUserUpdater } from "~/contexts/UserContext";
+import { useUserState } from "~/contexts/UserContext";
+import { Link } from "react-router-dom";
 
 interface HeaderProps
 {
@@ -14,7 +15,7 @@ interface HeaderProps
 }
 
 const navMenuLinks = ['/list', '/edit-form', '/submit-form']
-const pages = ['List', 'Create Form', 'Submit Form'];
+const pages = ['ㅤListㅤ', 'ㅤCreate Formㅤ', 'ㅤSubmit Answersㅤ'];
 const settings = ['Logout'];
 
 const Header = (props: HeaderProps): JSX.Element =>
@@ -22,7 +23,6 @@ const Header = (props: HeaderProps): JSX.Element =>
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const user = useUserState()
-    const {doUpdate} = useUserUpdater()
 
     const switchClicked = () => {
       const newVal = !props.isDarkTheme
@@ -100,7 +100,9 @@ const Header = (props: HeaderProps): JSX.Element =>
               >
                 {pages.map((page) => (
                   <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
+                    <Typography textAlign="center">
+                      {page}
+                    </Typography>
                   </MenuItem>
                 ))}
               </Menu>
@@ -114,18 +116,18 @@ const Header = (props: HeaderProps): JSX.Element =>
               LOGO
             </Typography>
 
-
-
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page, i) => (
+              {pages.map((page, i) => ( <>
                 <Button
+                  component={Link}
                   key={page}
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
-                  href={navMenuLinks[i]}
+                  to={navMenuLinks[i]}
                 >
                   {page}
                 </Button>
+              </>
               ))}
             </Box>
 

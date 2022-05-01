@@ -1,9 +1,14 @@
 import React, { Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
 
-import { Box, Button, Card, CardActionArea, CardActions, CardContent, Container, Divider, FormControl, FormGroup, FormHelperText, Input, InputLabel, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, CardActionArea, CardActions, CardContent, Container, Divider, FormControl, FormGroup, FormHelperText, Input, InputLabel, Modal, TextField, Typography } from '@mui/material';
 import { InferenceResponse } from '~/api/inference/infer';
 import API from '~/api'
 import { FormAnswers, FormDescription } from '~/api/models';
+
+type ModalDataType = undefined | {
+  fAns: FormAnswers,
+  fDesc: FormDescription
+}
 
 interface SubmitCompProps {
   setInferenceDone: Dispatch<SetStateAction<boolean>>
@@ -36,33 +41,6 @@ const SubmitComp = (props: SubmitCompProps) =>
   }
 
   return <>
-    {/* Old options */}
-    {/* <Box>
-      <form action="/api/inference/infer" encType="multipart/form-data" method="post">
-      <input name="fileUploads" type="file" multiple />
-      <input type="submit" />
-      </form>
-    </Box>
-  */}
-
-    {/* <form action="/api/inference/infer" encType="multipart/form-data" method="post">
-      <TextField
-        id="outlined-basic"
-        label="Outlined"
-        variant="outlined"
-        type="file"
-        inputProps={{
-          multiple: true,
-          type: "file",
-          name: "fileUploads"
-        }}
-      />
-
-      <Input type="submit"/> */}
-
-
-    {/* </form> */}
-
   <FormControl variant="filled">
     <Input id="my-file" type="file" name='fileUploads'
       onChange={selectFile}
@@ -82,7 +60,11 @@ const SubmitComp = (props: SubmitCompProps) =>
   </>
 }
 
-const FormCardCheck = (props: {answer: FormAnswers, idx: number}) =>
+const FormCardCheck = (props: {
+    answer: FormAnswers,
+    idx: number,
+    openModal(): void,
+    setModalData(d: ModalDataType): void}) =>
 {
   const [formInfo, setFormInfo] = useState<undefined | FormDescription>()
   const [cardTitle, setCardTitle] = useState(props.answer.formId)
@@ -92,17 +74,27 @@ const FormCardCheck = (props: {answer: FormAnswers, idx: number}) =>
       return new Promise((resolve) => setTimeout(resolve, time));
     }
 
-    const myf = async () => {
+    const getInfo = async () => {
       const data = await API.Form.Description(props.answer.formId)
-      await sleep(900)
+      await sleep(600)
       setFormInfo(data)
       setCardTitle(data.title)
     }
 
-    myf()
+    getInfo()
   }, [])
 
-  return <Card style={{minWidth: "15em"}}>
+  const viewEditClick = () => {
+    if (formInfo) {
+      props.setModalData({
+        fAns: props.answer,
+        fDesc: formInfo
+      })
+      props.openModal()
+    }
+  }
+
+  return <Card style={{minWidth: "15em"}} sx={{m: 1}}>
     <CardActionArea>
       <CardContent>
       <Typography gutterBottom variant="h5" component="div">
@@ -119,7 +111,7 @@ const FormCardCheck = (props: {answer: FormAnswers, idx: number}) =>
     </CardActionArea>
     <CardActions>
       <Box textAlign='center' width='100%'>
-        <Button variant="outlined">
+        <Button variant="outlined" onClick={viewEditClick}>
           View / Edit
         </Button>
       </Box>
@@ -129,19 +121,66 @@ const FormCardCheck = (props: {answer: FormAnswers, idx: number}) =>
 
 const CheckComp = (props: {answers: FormAnswers[]}) =>
 {
-  console.log(props.answers)
+  const [open, setOpen] = useState(false);
+  const [modalData, setModalData] = useState<ModalDataType>(undefined)
+  const setModalOpen = () => setOpen(true);
+  const setModalClose = () => setOpen(false);
+
+  const tryOpenModal = () => {
+    if (open)
+      return
+    setModalOpen()
+  }
+
+  const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
 
   const getLista = () => {
     return props.answers.map((ans, i) => {
-      return <FormCardCheck answer={ans} key={i} idx={i}/>
+      return <FormCardCheck
+        answer={ans}
+        openModal={tryOpenModal} setModalData={d => setModalData(d)}
+        key={i} idx={i}/>
     })
   }
 
   return <Box>
-    <Container>
+    <Modal
+      open={open}
+      onClose={setModalClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+      {modalData === undefined ?
+        <Typography>Weird, this shouldnt happend</Typography>
+       : <>
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          {modalData.fDesc.title}
+        </Typography>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          {modalData.fAns.formId}
+        </Typography>
+       </>
+      }
+
+      </Box>
+    </Modal>
+
+    <Box sx={{display: 'flex'}}>
       {getLista()}
-    </Container>
+    </Box>
     <Divider sx={{m: 1}} orientation="horizontal"/>
+
     <Button variant="contained" color="success">
       Submit Answers
     </Button>
