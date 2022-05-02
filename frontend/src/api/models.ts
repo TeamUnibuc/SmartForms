@@ -11,12 +11,14 @@ export interface MultipleChoiceAnswer
   index: number
 }
 
+export type SingleQAnswer = TextAnswer | MultipleChoiceAnswer
+
 export interface FormAnswers
 {
   formId: string
   answerId: string
   authorEmail: string
-  answers: (TextAnswer | MultipleChoiceAnswer)[]
+  answers: SingleQAnswer[]
 }
 
 export interface FormMultipleChoiceQuestion

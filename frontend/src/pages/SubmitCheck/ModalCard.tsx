@@ -1,4 +1,6 @@
 import { Box, Dialog, DialogContent, DialogTitle, Modal, SxProps, Typography } from "@mui/material"
+import { SingleQAnswer } from "~/api/models"
+import EditableAnswers from "./EditableAnswers"
 
 import { ModalDataType } from "./FormCardCheck"
 
@@ -16,7 +18,7 @@ const ModalCard = ({data, open, setModalClose}: ModalCardProps) =>
     // top: '50%',
     // left: '50%',
     // transform: 'translate(-50%, -50%)',
-    // width: 400,
+    width: 400,
     bgcolor: 'background.paper',
     // border: '2px solid #000',
     boxShadow: 24,
@@ -54,7 +56,13 @@ const ModalCard = ({data, open, setModalClose}: ModalCardProps) =>
         {data.fAns.answers.length}
       </Typography>
 
-
+      <EditableAnswers
+        answers={data.fAns.answers}
+        questions={data.fDesc.questions}
+        updater={(answers: SingleQAnswer[]) =>
+            data.modalFnUpdater({...data.fAns, answers: answers})
+        }
+      />
 
     </Box>}
   </DialogContent>

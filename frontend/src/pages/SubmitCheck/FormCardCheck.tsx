@@ -4,15 +4,18 @@ import API from "~/api"
 import { FormAnswers, FormDescription } from "~/api/models"
 
 export type ModalDataType = undefined | {
-  fAns: FormAnswers,
+  fAns: FormAnswers
   fDesc: FormDescription
+  modalFnUpdater(ans: FormAnswers): void
 }
 
 const FormCardCheck = (props: {
     answer: FormAnswers,
     idx: number,
     openModal(): void,
-    setModalData(d: ModalDataType): void}) =>
+    setModalData(d: ModalDataType): void,
+    setNthAnswer(idx: number, ans: FormAnswers): void
+}) =>
 {
   const [formInfo, setFormInfo] = useState<undefined | FormDescription>()
   const [cardTitle, setCardTitle] = useState(props.answer.formId)
@@ -36,7 +39,10 @@ const FormCardCheck = (props: {
     if (formInfo) {
       props.setModalData({
         fAns: props.answer,
-        fDesc: formInfo
+        fDesc: formInfo,
+        modalFnUpdater: (content) => {
+          props.setNthAnswer(props.idx, content)
+        }
       })
       props.openModal()
     }

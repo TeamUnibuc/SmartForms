@@ -32,5 +32,5 @@ export default function SubmitCheck(): JSX.Element
   if (typeof answers === 'string')
     return <TryAgain tryAgain={() => setInferenceDone(false)}/>
 
-  return <CheckComp answers={answers}/>
+  return <CheckComp answers={answers} setAnswers={(x) => setAnswers(x)}/>
 }
