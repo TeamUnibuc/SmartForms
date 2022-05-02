@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import API from '~/api';
 import { FormDescription } from '~/api/models';
@@ -5,6 +6,7 @@ import CustomFormsDrawer from './CustomFormsDrawer';
 
 export default function List(): JSX.Element
 {
+  console.log("Render main List comp")
   const [forms, setForms] = useState<FormDescription[]>([])
 
   const GetForms = async () => {
@@ -18,7 +20,9 @@ export default function List(): JSX.Element
     GetForms()
   }, [])
 
-  return <>
-    <CustomFormsDrawer forms={forms} title={'some forms'}/>
-  </>
+  return <Box width='100%'>
+    <CustomFormsDrawer forms={forms} title={'MY FORMS'}/>
+
+    <CustomFormsDrawer forms={forms} title={'OTHER FORMS'}/>
+  </Box>
 }

@@ -117,28 +117,27 @@ const Header = (props: HeaderProps): JSX.Element =>
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page, i) => ( <>
+              {pages.map((page, i) => (
                 <Button
                   component={Link}
-                  key={page}
+                  key={i}
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
                   to={navMenuLinks[i]}
                 >
                   {page}
                 </Button>
-              </>
               ))}
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>
-              <MenuItem key={'switch'} sx={{p: 0}}>
+              <MenuItem key={'switch-1'} sx={{p: 0}}>
                 <HighlightIcon />
               </MenuItem>
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>
-              <MenuItem key={'switch'} sx={{p: 0}}>
+              <MenuItem key={'switch-2'} sx={{p: 0}}>
                 <Switch
                   checked={props.isDarkTheme}
                   onChange={switchClicked} />
@@ -146,12 +145,11 @@ const Header = (props: HeaderProps): JSX.Element =>
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>
-              <MenuItem key={'switch'} sx={{p: 0, marginRight: "2em"}}>
+              <MenuItem key={'switch-3'} sx={{p: 0, marginRight: "2em"}}>
                 <DarkModeIcon />
               </MenuItem>
             </Box>
 
-             {/* We dont know if the user is logged in or out */}
             {user.authenticated === undefined ?
 
               <AccountCircleRoundedIcon sx={{ fontSize: 40 }}/> :

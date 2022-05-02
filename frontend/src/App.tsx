@@ -31,7 +31,13 @@ function App(props: AppProps): JSX.Element {
 
       <Grid item xs={12}>
 
-        <Container style={{display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1, width: '100%'}}>
+        <Container style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          flexGrow: 1,
+          width: '100%',
+        }}>
 
         <Routes>
             <Route key="Home" path="/"
