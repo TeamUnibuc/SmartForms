@@ -12,7 +12,7 @@ import cv2 as cv
 import cv2
 import matplotlib.pyplot as plt
 
-DEBUG = False
+DEBUG = True
 # fixed to 28 as this is what most datasets offer
 IMAGE_SIZE = network.IMAGE_SIZE
 
@@ -24,7 +24,7 @@ def predict_characters(imgs: np.ndarray, allowed_characters: str) -> List[str]:
     """
 
     imgs = [cv.resize(i, (IMAGE_SIZE, IMAGE_SIZE)).reshape(1, IMAGE_SIZE, IMAGE_SIZE) for i in imgs]
-    imgs = np.stack(imgs)
+    imgs = np.stack(imgs).astype(np.float32)
 
     # sanity check
     for i in imgs:
@@ -41,9 +41,9 @@ def predict_characters(imgs: np.ndarray, allowed_characters: str) -> List[str]:
     if DEBUG:
         print(f"Max value: {np.max(imgs[0])}")
         print(f"Average value: {np.average(imgs[0])}")
-        fig, ax = plt.subplots(nrows=6, ncols=6)
-        for i in range(min(36, len(imgs))):
-            ax[i // 5][i % 5].imshow(imgs[i][0])
+        fig, ax = plt.subplots(nrows=10, ncols=10)
+        for i in range(min(100, len(imgs))):
+            ax[i // 10][i % 10].imshow(imgs[i][0])
 
         plt.show()
 

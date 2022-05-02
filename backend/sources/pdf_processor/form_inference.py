@@ -41,7 +41,7 @@ def extract_answer_from_images(images: List[np.ndarray]) -> Optional[smart_forms
             id_to_img[id] = img
             form_id = (id if id.find("?") == -1 else id[:id.find("?")])
 
-    logging.debug(f"Found form #{form_id} from images.")
+    logging.info(f"Found form #{form_id} from images.")
 
     if form_id == '':
         return None
@@ -49,6 +49,8 @@ def extract_answer_from_images(images: List[np.ndarray]) -> Optional[smart_forms
     # retrieve form from database
     pdf_form = database.get_form_by_id(form_id)
 
+    logging.info("Extracted pdf form from DB")
+    
     # try to reconstruct images
     page_to_img = dict()
 

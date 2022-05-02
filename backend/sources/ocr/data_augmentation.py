@@ -3,6 +3,7 @@ import cv2
 import torch as th
 import numpy as np
 import ocr.network as network
+from scipy.ndimage.filters import gaussian_filter
 
 def data_augment_single_image(img: np.ndarray) -> np.ndarray:
     """
@@ -44,6 +45,23 @@ def data_augment_single_image(img: np.ndarray) -> np.ndarray:
     translate_matrix = np.float32([[1, 0, x_offset], [0, 1, y_offset]])
     img = cv2.warpAffine(img, translate_matrix, (network.IMAGE_SIZE, network.IMAGE_SIZE))
 
+
+    # add noise to character
+    char_pixel = np.random.uniform(0.5, 1., (network.IMAGE_SIZE, network.IMAGE_SIZE))
+    char_pixel = gaussian_filter(char_pixel, sigma=5)
+    img = img * char_pixel
+
+    # add noise to background
+    background = np.random.uniform(0, 0.5, (network.IMAGE_SIZE, network.IMAGE_SIZE))
+    background = gaussian_filter(background, sigma=3)
+    img = np.maximum(img, background)
+
+    # # add salt and pepper
+    nr_broken_pixels = random.randint(0, 100)
+    indices = np.random.randint(0, network.IMAGE_SIZE - 1, (nr_broken_pixels, 2))
+    values = np.random.random((nr_broken_pixels,))
+    img[indices[:, 0], indices[:, 1]] = values
+
     return img.reshape((1, network.IMAGE_SIZE, network.IMAGE_SIZE))
 
 def data_augment(imgs: th.Tensor) -> th.Tensor:
@@ -52,6 +70,6 @@ def data_augment(imgs: th.Tensor) -> th.Tensor:
     and performs data augmentation on all the images.
     """
     return th.stack([
-        th.from_numpy(data_augment_single_image(i.numpy()))
+        th.from_numpy(data_augment_single_image(i.numpy())).type(th.float32)
         for i in imgs
     ])

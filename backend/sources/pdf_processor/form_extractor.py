@@ -14,7 +14,7 @@ from PIL import Image
 from pyzbar.pyzbar import decode
 
 
-DEBUG = False
+DEBUG = True
 
 def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.ndarray:
     """
@@ -33,6 +33,9 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
         return img
         
     picture_not_processed = picture.copy()
+    if len(picture_not_processed.shape) == 3 and picture_not_processed.shape[2] == 3:
+        picture_not_processed = cv.cvtColor(picture_not_processed, cv.COLOR_BGR2GRAY)
+
     picture = preprocess(picture)
     template = preprocess(template)
 
@@ -51,17 +54,20 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
     # As per Lowe's ratio test to filter good matches
     good_matches = []
     for m, n in matches:
-        if m.distance < 0.75 * n.distance:
+        if m.distance < 0.5 * n.distance:
             good_matches.append(m)
 
     src_points = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
     dst_points = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
     m, mask = cv.findHomography(src_points, dst_points, cv.RANSAC, 5.0)
-    corrected_img = cv.warpPerspective(picture, m, (template.shape[1], template.shape[0]))
+    corrected_img = cv.warpPerspective(picture_not_processed, m, (template.shape[1], template.shape[0]))
+    corrected_img_processed = cv.warpPerspective(picture, m, (template.shape[1], template.shape[0]))
 
     if DEBUG:
-        print("Corected picture + template:")
-        plt.imshow((corrected_img + template) // 2)
+        print("Corected picture - template:")
+        plt.imshow(np.abs(corrected_img - template))
+        plt.show()
+        plt.imshow(np.abs(corrected_img + corrected_img_processed) // 2)
         plt.show()
 
     return corrected_img
@@ -133,7 +139,7 @@ def extract_question_answer_from_form(
         # This offset makes sure we don't include any borders in the square character.
         # TODO: if we switch to our own dataset, then maybe excluding the border won't
         # be required.
-        SQUARES_OFFSET = 10
+        SQUARES_OFFSET = 12
         sq_img = fixed_page[
             y + SQUARES_OFFSET : y + dy - SQUARES_OFFSET,
             x + SQUARES_OFFSET : x + dx - SQUARES_OFFSET

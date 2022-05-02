@@ -32,6 +32,7 @@ def generate_dataset():
     print("Generating dataset...")
 
     import tensorflow_datasets as t_d
+    # TODO: can also get split=test
     ds = t_d.load('emnist', split='train', shuffle_files=True)
 
     data = []
@@ -76,5 +77,6 @@ def generate_dataset():
     print(f"Imgs shape:   {imgs.shape}")
     print(f"Labels shape: {labels.shape}")
 
+    os.makedirs(DATASET_PATH)
     np.save(IMAGES_PATH, imgs)
     np.save(LABELS_PATH, labels)
