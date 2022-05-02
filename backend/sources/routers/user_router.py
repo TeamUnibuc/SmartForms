@@ -47,15 +47,25 @@ async def home(request: Request):
 
 
 @router.get('/login')
-async def login(request: Request):
-    # Redirect Google OAuth back to our application
+async def login(request: Request, redirect_link: str = "/"):
+    """
+    Sends a request to google to authenticate the user, and saves
+    in the session what URL to redirect the user afterwards.
+    """
+    # Save in session where should i redirect user on frontend after login
+    request.session['redirect_link'] = redirect_link
     
-    redirect_uri = os.getenv("LOGIN_REDIRECT_URL")
-    # request.url_for('auth')
-    return await oauth.google.authorize_redirect(request, redirect_uri)
+    # Redirect Google OAuth back to our application
+    frontend_url = os.getenv("FRONTEND_URL")
+    redirect_url = frontend_url + "/api/user/auth"
+
+    return await oauth.google.authorize_redirect(request, redirect_url)
 
 @router.get('/auth')
 async def auth(request: Request):
+    """
+    Receives from google an OAuth token.
+    """
     # Perform Google OAuth
     token = await oauth.google.authorize_access_token(request)
 
@@ -67,13 +77,15 @@ async def auth(request: Request):
         user = token['userinfo']
     else:
         user = await oauth.google.parse_id_token(request, token)
-    
+
     logger.info(f"User logged in: {user['email']}")
-    
+
     # Save the user
     request.session['user'] = dict(user)
 
-    return RedirectResponse(url='/')
+    # redirect to the url specified by the frontend
+    redirect_link = request.session['redirect_link']
+    return RedirectResponse(url=redirect_link)
 
 
 @router.get('/logout')
@@ -109,11 +121,11 @@ async def get_user_details(request: Request):
         If the user is not signed in, then is_signed_in is false, and no other fields are returned.
     """
     user = request.session.get('user')
-    
+
     # the user is not signed in
     if user is None:
         return GetUserDetailsReturnModel(is_signed_in=False)
-    
+
     # user is a superset of the return values, so we can just return all of it instead
     return GetUserDetailsReturnModel(
         is_signed_in=True,

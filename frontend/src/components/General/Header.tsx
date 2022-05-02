@@ -53,7 +53,14 @@ const Header = (props: HeaderProps): JSX.Element =>
     };
 
     const loginButtonPress = () => {
-      return window.open('/api/user/login', '_self')
+      const pathname = window.location.pathname
+      let searchpart = window.location.search
+      if (searchpart[0] === '?')
+        searchpart = '/' + searchpart
+      else
+        searchpart = ''
+      const redirect_param = `redirect_link=${pathname + searchpart}`
+      return window.open(`/api/user/login?${redirect_param}`, '_self')
     }
 
     return (
