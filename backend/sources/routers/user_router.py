@@ -47,18 +47,25 @@ async def home(request: Request):
 
 
 @router.get('/login')
-async def login(request: Request):
+async def login(request: Request, redirect_link: str = "/"):
+    """
+    Sends a request to google to authenticate the user, and saves
+    in the session what URL to redirect the user afterwards.
+    """
     # Save in session where should i redirect user on frontend after login
-    request.session['redirect_link'] = request.query_params.get("redirect_link", "")
+    request.session['redirect_link'] = redirect_link
+    
     # Redirect Google OAuth back to our application
+    frontend_url = os.getenv("FRONTEND_URL")
+    redirect_url = frontend_url + "/api/user/auth"
 
-    backend_uri = os.getenv("BACKEND_URL")
-    redirect_uri = backend_uri + "/user/auth"
-    # request.url_for('auth')
-    return await oauth.google.authorize_redirect(request, redirect_uri)
+    return await oauth.google.authorize_redirect(request, redirect_url)
 
 @router.get('/auth')
 async def auth(request: Request):
+    """
+    Receives from google an OAuth token.
+    """
     # Perform Google OAuth
     token = await oauth.google.authorize_access_token(request)
 
@@ -79,7 +86,7 @@ async def auth(request: Request):
     frontend_uri = os.getenv("FRONTEND_URL")
     redirect_link = request.session['redirect_link']
 
-    return RedirectResponse(url=f"{frontend_uri}{redirect_link}")
+    return RedirectResponse(url=redirect_link)
 
 
 @router.get('/logout')
