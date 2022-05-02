@@ -1,4 +1,5 @@
 from asyncio.log import logger
+import logging
 from typing import Optional
 from fastapi import APIRouter, Response
 from pydantic import BaseModel
@@ -48,9 +49,12 @@ async def home(request: Request):
 
 @router.get('/login')
 async def login(request: Request):
+    # Save in session where should i redirect user on frontend after login
+    request.session['redirect_link'] = request.query_params.get("redirect_link", "")
     # Redirect Google OAuth back to our application
-    
-    redirect_uri = os.getenv("LOGIN_REDIRECT_URL")
+
+    backend_uri = os.getenv("BACKEND_URL")
+    redirect_uri = backend_uri + "/user/auth"
     # request.url_for('auth')
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
@@ -67,13 +71,16 @@ async def auth(request: Request):
         user = token['userinfo']
     else:
         user = await oauth.google.parse_id_token(request, token)
-    
+
     logger.info(f"User logged in: {user['email']}")
-    
+
     # Save the user
     request.session['user'] = dict(user)
 
-    return RedirectResponse(url='/')
+    frontend_uri = os.getenv("FRONTEND_URL")
+    redirect_link = request.session['redirect_link']
+
+    return RedirectResponse(url=f"{frontend_uri}{redirect_link}")
 
 
 @router.get('/logout')
@@ -109,11 +116,11 @@ async def get_user_details(request: Request):
         If the user is not signed in, then is_signed_in is false, and no other fields are returned.
     """
     user = request.session.get('user')
-    
+
     # the user is not signed in
     if user is None:
         return GetUserDetailsReturnModel(is_signed_in=False)
-    
+
     # user is a superset of the return values, so we can just return all of it instead
     return GetUserDetailsReturnModel(
         is_signed_in=True,
