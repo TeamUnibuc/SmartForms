@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { FormList } from '~/api/form/list';
+import API from '~/api';
+import { FormDescription } from '~/api/models';
+import CustomFormsDrawer from './CustomFormsDrawer';
 
 export default function List(): JSX.Element
 {
-  const [nrDocs, setNrDocs] = useState(0);
+  const [forms, setForms] = useState<FormDescription[]>([])
 
   const GetForms = async () => {
-    const data = await FormList({count: 1000, offset: 0})
+    const data = await API.Form.FormList({count: 10000, offset: 0})
     console.log("Received data:");
     console.log(data);
-    setNrDocs(data.forms.length);
+    setForms(data.forms)
   }
 
   useEffect(() => {
@@ -17,6 +19,6 @@ export default function List(): JSX.Element
   }, [])
 
   return <>
-    <p>Number of total documents: {nrDocs}</p>
+    <CustomFormsDrawer forms={forms} title={'some forms'}/>
   </>
 }
