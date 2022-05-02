@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useState } from "react"
 
-import { Box, Collapse, Fade, FormControlLabel, Grow, List, Switch } from "@mui/material"
+import { Box, Collapse, Grow, List } from "@mui/material"
 import { TransitionGroup } from 'react-transition-group';
 
 import { FormDescription } from "~/api/models"
@@ -15,28 +15,35 @@ interface CFDrawerProps
 
 const CustomFormsDrawer = ({forms, title}: CFDrawerProps) =>
 {
-  const [checked, setChecked] = React.useState(false);
+  const [checked, setChecked] = useState(false);
+  const [displayState, setDisplayState] = useState(false)
 
-  const handleChange = () => {
-    setChecked((prev) => !prev);
-  };
+  const transitionEnd = (e: any) => {
+    if (e.propertyName !== 'opacity') return
+
+    if (displayState && !checked)
+      setDisplayState(!displayState)
+  }
 
   return <Box style={{display: 'flex', justifyItems: 'center', alignContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
 
   <ArrowStateDrawer
     text={title}
     state={checked}
-    flipState={() => setChecked(!checked)}
+    flipState={() => {
+      if (!displayState && !checked)
+        setDisplayState(!displayState)
+      setChecked(!checked)
+    }}
   />
 
-  <Box sx={{p: 0}} >
-  <Grow in={checked}>
-    <List sx={{pb: 0}}>
+  <Box sx={{p: 0}} style={{display: displayState ? 'block' : 'none'}}>
+  <Grow in={checked} onTransitionEnd={transitionEnd}>
+    <List sx={{pb: 0}} >
       <TransitionGroup style={{display: 'flex'}}>
         {forms.map((item, idx) => (
           <Collapse key={idx}>
-            {!checked ? <></> :
-            <FormCard key={idx} formDesc={item} />}
+            <FormCard formDesc={item} />
           </Collapse>
         ))}
       </TransitionGroup>

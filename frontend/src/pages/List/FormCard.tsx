@@ -8,10 +8,8 @@ interface FormCardProps
 
 const FormCard = (props: FormCardProps) => {
   const fDesc = props.formDesc
-  console.log(fDesc)
-  console.log(`rendering form: ${fDesc.title} - ${fDesc.formId}`)
 
-  return <Card variant="outlined" sx={{m: 1}}>
+  return <Card  variant="outlined" sx={{m: 1, boxShadow: 5}}>
     <CardContent>
       <Typography variant="h5" component="div">
         {fDesc.title}
