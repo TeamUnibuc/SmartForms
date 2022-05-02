@@ -194,7 +194,7 @@ const Header = (props: HeaderProps): JSX.Element =>
               </Menu>
             </Box>
             : // User is NOT authenticateed
-              <Button variant="outlined" onClick={loginButtonPress}>
+              <Button variant="contained" color="secondary" onClick={loginButtonPress}>
                 Login
               </Button>
             )}
