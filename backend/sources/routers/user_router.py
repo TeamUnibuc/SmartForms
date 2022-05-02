@@ -83,9 +83,8 @@ async def auth(request: Request):
     # Save the user
     request.session['user'] = dict(user)
 
-    frontend_uri = os.getenv("FRONTEND_URL")
+    # redirect to the url specified by the frontend
     redirect_link = request.session['redirect_link']
-
     return RedirectResponse(url=redirect_link)
 
 
