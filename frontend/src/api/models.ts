@@ -14,6 +14,8 @@ export interface MultipleChoiceAnswer
 export interface FormAnswers
 {
   formId: string
+  answerId: string
+  authorEmail: string
   answers: (TextAnswer | MultipleChoiceAnswer)[]
 }
 
@@ -33,10 +35,12 @@ export interface FormTextQuestion
 
 export type Question = FormMultipleChoiceQuestion | FormTextQuestion;
 
+
+
 export interface FormDescription
 {
   title: string,
-  formID?: string,
+  formId: string,
   description: string,
   questions: Question[],
   canBeFilledOnline: boolean,
