@@ -1,5 +1,4 @@
 from asyncio.log import logger
-import logging
 from typing import Optional
 from fastapi import APIRouter, Response
 from pydantic import BaseModel
