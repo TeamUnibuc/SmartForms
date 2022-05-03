@@ -46,6 +46,7 @@ const CheckComp = (props: {
         data={modalData}
         open={open}
         setModalClose={setModalClose}
+        setModalData={d => setModalData(d)}
     />
 
     <Box sx={{display: 'flex'}}>

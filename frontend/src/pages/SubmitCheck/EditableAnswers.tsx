@@ -64,7 +64,7 @@ const EditableAnswers = ({answers, questions, updater}: EAProps) =>
   return <>
     {answers.map((ans, i) => {
       const q = questions[i]
-      return <Box>
+      return <Box key={i}>
         <Typography color="gray" variant="h5" sx={{mt: 3, mb: 1}}>
           #{i + 1}
         </Typography>
