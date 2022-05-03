@@ -40,7 +40,8 @@ const CustomFormsDrawer = ({forms, title}: CFDrawerProps) =>
   <Box sx={{p: 0}} style={{display: displayState ? 'block' : 'none'}}>
   <Grow in={checked} onTransitionEnd={transitionEnd}>
     <List sx={{pb: 0}} >
-      <TransitionGroup style={{display: 'flex'}}>
+      <TransitionGroup style={{display: 'flex', flexWrap: 'wrap',
+    justifyContent: 'space-between'}}>
         {forms.map((item, idx) => (
           <Collapse key={idx}>
             <FormCard formDesc={item} />
