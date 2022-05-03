@@ -28,6 +28,8 @@ export const Infer = async(formData: any):
     return content.map(fa => {
       return {
         formId: fa.formId,
+        answerId: fa.answerId,
+        authorEmail: fa.authorEmail,
         answers: fa.answers.map(stuff => {
           return {content: stuff}
         })
