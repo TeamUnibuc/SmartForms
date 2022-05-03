@@ -9,7 +9,7 @@ const CheckComp = (props: {
     setAnswers(anss: FormAnswers[]): void
 }) =>
 {
-  console.log("Original Answers")
+  console.log("Reendered Answers")
   console.log(props.answers)
 
   const [open, setOpen] = useState(false);
