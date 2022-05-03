@@ -36,7 +36,7 @@ export type Question = FormMultipleChoiceQuestion | FormTextQuestion;
 export interface FormDescription
 {
   title: string,
-  formID?: string,
+  formId: string,
   description: string,
   questions: Question[],
   canBeFilledOnline: boolean,

@@ -1,22 +1,28 @@
+import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { FormList } from '~/api/form/list';
+import API from '~/api';
+import { FormDescription } from '~/api/models';
+import CustomFormsDrawer from './CustomFormsDrawer';
 
 export default function List(): JSX.Element
 {
-  const [nrDocs, setNrDocs] = useState(0);
+  console.log("Render main List comp")
+  const [forms, setForms] = useState<FormDescription[]>([])
 
   const GetForms = async () => {
-    const data = await FormList({count: 1000, offset: 0})
+    const data = await API.Form.FormList({count: 10000, offset: 0})
     console.log("Received data:");
     console.log(data);
-    setNrDocs(data.forms.length);
+    setForms(data.forms)
   }
 
   useEffect(() => {
     GetForms()
   }, [])
 
-  return <>
-    <p>Number of total documents: {nrDocs}</p>
-  </>
+  return <Box width='100%'>
+    <CustomFormsDrawer forms={forms} title={'MY FORMS'}/>
+
+    <CustomFormsDrawer forms={forms} title={'OTHER FORMS'}/>
+  </Box>
 }
