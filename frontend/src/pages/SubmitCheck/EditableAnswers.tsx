@@ -72,9 +72,11 @@ const EditableAnswers = ({answers, questions, updater}: EAProps) =>
     {answers.map((ans, i) => {
       const q = questions[i]
       return <Box key={i}>
-        <Typography color="gray" variant="h5" sx={{mt: 3, mb: 1}}>
+        <Typography color="gray" variant="h5" sx={{mt: 2}}>
           #{i + 1}
         </Typography>
+        <Divider color="#000" sx={{mb: 1}} style={{borderWidth: '2px'}}/>
+
         <Typography variant="h6">
           {q.title}
         </Typography>
@@ -97,6 +99,9 @@ const EditableAnswers = ({answers, questions, updater}: EAProps) =>
           updater={updateNthAnswer(i)}
         />
       }
+
+
+
       </Box>
     })}
   </>

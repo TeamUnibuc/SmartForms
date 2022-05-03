@@ -15,11 +15,8 @@ interface ModalCardProps
 const ModalCard = ({data, open, setModalClose, setModalData}: ModalCardProps) =>
 {
   const style: SxProps = {
-    // position: 'absolute',
-    // top: '50%',
-    // left: '50%',
-    // transform: 'translate(-50%, -50%)',
-    // width: 400,
+    // width: 'max(50px, 60px)',
+    // width: '100%',
     bgcolor: 'background.paper',
     // border: '2px solid #000',
     boxShadow: 24,
@@ -32,6 +29,8 @@ const ModalCard = ({data, open, setModalClose, setModalData}: ModalCardProps) =>
     onClose={setModalClose}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
+    fullWidth={true}
+    maxWidth={"md"}
   >
   <DialogContent sx={style}>
   {data === undefined ?
