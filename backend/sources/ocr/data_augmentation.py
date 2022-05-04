@@ -14,13 +14,13 @@ def data_augment_single_image(img: np.ndarray) -> np.ndarray:
 
     if random.choice([True, False]):
         # Perform erosion / dilatation
-        kernel_size = random.choice([2, 3])
+        kernel_size = 2  #random.choice([2, 3])
         kernel = np.ones((kernel_size, kernel_size), np.uint8)
 
-        if random.choice([True, False]):
-            img = cv2.erode(img, kernel, iterations=1)
-        else:
-            img = cv2.dilate(img, kernel, iterations=1)
+        # if random.choice([True, False]):
+        #     img = cv2.erode(img, kernel, iterations=1)
+        # else:
+        img = cv2.dilate(img, kernel, iterations=1)
 
     if random.choice([True, False]):
         # zoom in/out
@@ -47,17 +47,18 @@ def data_augment_single_image(img: np.ndarray) -> np.ndarray:
 
 
     # add noise to character
-    char_pixel = np.random.uniform(0.5, 1., (network.IMAGE_SIZE, network.IMAGE_SIZE))
-    char_pixel = gaussian_filter(char_pixel, sigma=5)
+    char_pixel = np.random.uniform(0.6, 1., (network.IMAGE_SIZE, network.IMAGE_SIZE))
+    char_pixel = gaussian_filter(char_pixel, sigma=3)
     img = img * char_pixel
 
     # add noise to background
-    background = np.random.uniform(0, 0.5, (network.IMAGE_SIZE, network.IMAGE_SIZE))
+    background = np.random.uniform(0, 0.2, (network.IMAGE_SIZE, network.IMAGE_SIZE))
     background = gaussian_filter(background, sigma=3)
+    background += np.random.uniform(0, 0.2, (network.IMAGE_SIZE, network.IMAGE_SIZE))
     img = np.maximum(img, background)
 
     # # add salt and pepper
-    nr_broken_pixels = random.randint(0, 100)
+    nr_broken_pixels = random.randint(0, 50)
     indices = np.random.randint(0, network.IMAGE_SIZE - 1, (nr_broken_pixels, 2))
     values = np.random.random((nr_broken_pixels,))
     img[indices[:, 0], indices[:, 1]] = values

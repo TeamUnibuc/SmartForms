@@ -122,7 +122,7 @@ def train_model():
         fig, ax = plt.subplots(nrows=10, ncols=10)
         imgs = data_augmentation.data_augment(x_train[:100])
         for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i][0])
+            ax[i // 10][i % 10].imshow(imgs[i][0], vmin=0., vmax=1.)
 
         plt.show()
 
@@ -137,14 +137,14 @@ def train_model():
     print("Training model...")
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = th.optim.Adam(model.parameters(), lr=1e-3)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
-
     optimizer = th.optim.Adam(model.parameters(), lr=1e-4)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 1)
 
-    optimizer = th.optim.Adam(model.parameters(), lr=1e-5)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 5)
+    # optimizer = th.optim.Adam(model.parameters(), lr=1e-4)
+    # train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+
+    # optimizer = th.optim.Adam(model.parameters(), lr=1e-5)
+    # train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 5)
 
     if not os.path.exists(network.DATA_FOLDER):
         os.makedirs(network.DATA_FOLDER)

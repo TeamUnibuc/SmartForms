@@ -39,20 +39,25 @@ class Network:
         Network.__instance__ = self
 
         self.model = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size=(5, 5), padding=(2, 2)),
+            nn.Conv2d(1, 32, kernel_size=(3, 3), padding=(1, 1)),
             nn.ReLU(),
-            nn.Conv2d(16, 32, kernel_size=(3, 3), padding=(1, 1)),
+            nn.Conv2d(32, 32, kernel_size=(3, 3), padding=(1, 1)),
             nn.ReLU(),
             nn.BatchNorm2d(32),
             nn.MaxPool2d((2, 2)),
+
             nn.Conv2d(32, 64, kernel_size=(3, 3), padding=(1, 1)),
             nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=(3, 3), padding=(1, 1)),
-            nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=(3, 3), padding=(1, 1)),
-            nn.ReLU(),
-
             nn.BatchNorm2d(64),
+            
+            nn.Conv2d(64, 64, kernel_size=(3, 3), padding=(1, 1)),
+            nn.ReLU(),
+            nn.BatchNorm2d(64),
+
+            nn.Conv2d(64, 64, kernel_size=(3, 3), padding=(1, 1)),
+            nn.ReLU(),
+            nn.BatchNorm2d(64),
+
             nn.MaxPool2d((2, 2)),
 
             nn.Flatten(),
