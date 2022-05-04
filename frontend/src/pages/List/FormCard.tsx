@@ -1,5 +1,6 @@
 import { Button, Card, CardActions, CardContent, Typography } from "@mui/material"
 import { FormDescription } from "~/api/models"
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 interface FormCardProps
 {
@@ -25,7 +26,10 @@ const FormCard = (props: FormCardProps) => {
       </Typography>
     </CardContent>
     <CardActions style={{justifyContent: 'center'}}>
-      <Button size="small">Learn More</Button>
+      <Button size="small">
+        <OpenInNewIcon sx={{mr: 1}}/>
+        Learn More
+      </Button>
     </CardActions>
   </Card>
 }

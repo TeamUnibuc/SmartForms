@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import { Box, Collapse, Grow, List } from "@mui/material"
 import { TransitionGroup } from 'react-transition-group';
@@ -9,13 +9,14 @@ import ArrowStateDrawer from "./ArrowStateDrawer";
 
 interface CFDrawerProps
 {
-  forms: FormDescription[],
+  forms: FormDescription[]
   title: string
+  openDelay?: number
 }
 
-const CustomFormsDrawer = ({forms, title}: CFDrawerProps) =>
+const CustomFormsDrawer = ({forms, title, openDelay}: CFDrawerProps) =>
 {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(false)
   const [displayState, setDisplayState] = useState(false)
 
   const transitionEnd = (e: any) => {
@@ -25,20 +26,28 @@ const CustomFormsDrawer = ({forms, title}: CFDrawerProps) =>
       setDisplayState(!displayState)
   }
 
+  const flipAction = () =>
+  {
+    if (!displayState && !checked)
+      setDisplayState(!displayState)
+    setChecked(!checked)
+  }
+
+  useEffect(() => {
+    if (openDelay !== undefined)
+      setTimeout(() => flipAction(), openDelay)
+  }, [])
+
   return <Box style={{display: 'flex', justifyItems: 'center', alignContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
 
   <ArrowStateDrawer
     text={title}
     state={checked}
-    flipState={() => {
-      if (!displayState && !checked)
-        setDisplayState(!displayState)
-      setChecked(!checked)
-    }}
+    flipState={flipAction}
   />
 
   <Box sx={{p: 0}} style={{display: displayState ? 'block' : 'none'}}>
-  <Grow in={checked} onTransitionEnd={transitionEnd}>
+  <Collapse in={checked} onTransitionEnd={transitionEnd}>
     <List sx={{pb: 0}} >
       <TransitionGroup style={{display: 'flex', flexWrap: 'wrap',
     justifyContent: 'space-between'}}>
@@ -49,7 +58,7 @@ const CustomFormsDrawer = ({forms, title}: CFDrawerProps) =>
         ))}
       </TransitionGroup>
     </List>
-  </Grow>
+  </Collapse>
   </Box>
 
 </Box>
