@@ -40,7 +40,8 @@ export default function List(): JSX.Element
 
   return <Box width='100%'>
     {authenticated ?
-      <CustomFormsDrawer forms={formsOwned} title={'MY FORMS'}/>
+      <CustomFormsDrawer forms={formsOwned} title={'MY FORMS'} openDelay=
+      {700}/>
     :
       <></>
     }
