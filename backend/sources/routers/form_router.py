@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from fastapi import APIRouter, Response
 from fastapi.responses import PlainTextResponse
@@ -92,6 +93,8 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
         # when creating a form, we manually set the formID to be empty, to avoid
         # collisions.
         form.formId = str(random.randint(10**10, 10**11))
+        form.creationDate = datetime.now()
+        
         model = pdf_processor.create_form_from_description(form, False)
         database.get_collection(database.FORMS).insert_one(model.to_dict())
         resp = CreateFormReturnModel(

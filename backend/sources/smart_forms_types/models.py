@@ -2,6 +2,8 @@ from enum import Enum
 from typing import List, Optional, Union
 from pydantic import BaseModel
 import pickle
+from datetime import datetime
+
 class FormTextQuestion(BaseModel):
     """
         Stores a single text question.
@@ -31,6 +33,7 @@ class FormDescription(BaseModel):
     canBeFilledOnline: bool
     needsToBeSignedInToSubmit: bool
     authorEmail: Optional[str] = ""
+    creationDate: Optional[datetime]
 
 class FormAnswer(BaseModel):
     """
@@ -42,6 +45,7 @@ class FormAnswer(BaseModel):
     # signed user, if signed in.
     authorEmail: Optional[str] = ""
     answers: List[str]
+    creationDate: Optional[datetime]
 
     def to_dict(self) -> dict:
         return {

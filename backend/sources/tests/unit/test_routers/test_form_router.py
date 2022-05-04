@@ -82,6 +82,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         )
 
         self.assertEqual(extracted_form.formId, form_id)
+        self.assertIsNotNone(extracted_form.creationDate)
 
     def test_list_endpoint(self):
         """

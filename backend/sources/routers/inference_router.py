@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import random
 from typing import List, Union
@@ -87,6 +88,7 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
     # set ids
     for answer in answers:
         answer.answerId = f"entry-{str(random.randint(10**10, 9*10**10))}"
+        answer.creationDate = datetime.now()
 
     # if we have any entries, add them to the DB
     if answers != []:

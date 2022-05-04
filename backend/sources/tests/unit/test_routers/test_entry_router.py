@@ -121,6 +121,7 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
             **response.json()
         )
         self.assertEqual(entry.answerId, returned_id)
+        self.assertIsNotNone(entry.creationDate)
 
     def test_submit_new_entry_and_delete_it(self):
         """

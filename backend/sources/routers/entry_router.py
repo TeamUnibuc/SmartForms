@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 from typing import List
 from fastapi import APIRouter, File, Request
@@ -59,9 +60,10 @@ async def submit_entry(request: Request, entry: smart_forms_types.FormAnswer):
     except:
         return PlainTextResponse(f"Unable to find form {form_id} in our database.", 201)
     
-    # set email
+    # set email and time
     entry.authorEmail = user_email
-
+    entry.creationDate = datetime.now()
+    
     # user needs to be signed in to submit the form
     if form.description.needsToBeSignedInToSubmit and user_email == "":
         return PlainTextResponse("The user needs to be authenticated to submit to this form.", 202)
@@ -196,11 +198,12 @@ async def edit_entry(request: Request, entry: smart_forms_types.FormAnswer):
     if entry.formId != form.description.formId:
         return PlainTextResponse("Entry can't change its formId.", 400)
 
-    entry.authorEmail = entry_db.authorEmail
+    entry_db.answers = entry.answers
+    entry_db.creationDate = datetime.now()
 
     db = database.get_collection(database.ENTRIES)
     # TODO: Check what is here.
-    db.replace_one({ "answerId": entry.answerId }, entry.to_dict())
+    db.replace_one({ "answerId": entry.answerId }, entry_db.to_dict())
     return PlainTextResponse("Ok")
 
 
