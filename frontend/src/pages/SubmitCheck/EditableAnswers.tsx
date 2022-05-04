@@ -33,17 +33,24 @@ const EditMChoiceQ = (props: {
       <TickableOption
         checked={props.state.content[idx] !== ' '}
         content={ch}
+        updater={(state: boolean) => {
+          const replacer = (s: string, i: number, ch: string) => {
+            return s.substring(0, i) + ch + s.substring(i + 1)
+          }
+          let newContent = replacer(props.state.content, idx, state ? 'X' : ' ')
+          props.updater({...props.state, content: newContent})
+        }}
       />
     )}
   </Box>
 }
 
-const TickableOption = ({checked, content}: {checked: boolean, content: string}) =>
+const TickableOption = ({checked, content, updater}: {checked: boolean, content: string, updater(s: boolean): void}) =>
 {
   return <Box>
     <FormControlLabel
       control={<Checkbox checked={checked} />} label={content}
-      sx={{p: 0}}
+      sx={{p: 0}} onChange={(e, e_checked: boolean) => updater(e_checked)}
     />
   </Box>
 }
@@ -64,10 +71,12 @@ const EditableAnswers = ({answers, questions, updater}: EAProps) =>
   return <>
     {answers.map((ans, i) => {
       const q = questions[i]
-      return <Box>
-        <Typography color="gray" variant="h5" sx={{mt: 3, mb: 1}}>
+      return <Box key={i}>
+        <Typography color="gray" variant="h5" sx={{mt: 2}}>
           #{i + 1}
         </Typography>
+        <Divider color="#000" sx={{mb: 1}} style={{borderWidth: '2px'}}/>
+
         <Typography variant="h6">
           {q.title}
         </Typography>
@@ -90,6 +99,9 @@ const EditableAnswers = ({answers, questions, updater}: EAProps) =>
           updater={updateNthAnswer(i)}
         />
       }
+
+
+
       </Box>
     })}
   </>

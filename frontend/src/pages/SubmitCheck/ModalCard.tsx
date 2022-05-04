@@ -9,16 +9,14 @@ interface ModalCardProps
   data: ModalDataType
   open: boolean
   setModalClose(): void
+  setModalData(d: ModalDataType): void
 }
 
-const ModalCard = ({data, open, setModalClose}: ModalCardProps) =>
+const ModalCard = ({data, open, setModalClose, setModalData}: ModalCardProps) =>
 {
   const style: SxProps = {
-    // position: 'absolute',
-    // top: '50%',
-    // left: '50%',
-    // transform: 'translate(-50%, -50%)',
-    width: 400,
+    // width: 'max(50px, 60px)',
+    // width: '100%',
     bgcolor: 'background.paper',
     // border: '2px solid #000',
     boxShadow: 24,
@@ -31,6 +29,8 @@ const ModalCard = ({data, open, setModalClose}: ModalCardProps) =>
     onClose={setModalClose}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
+    fullWidth={true}
+    maxWidth={"md"}
   >
   <DialogContent sx={style}>
   {data === undefined ?
@@ -59,9 +59,10 @@ const ModalCard = ({data, open, setModalClose}: ModalCardProps) =>
       <EditableAnswers
         answers={data.fAns.answers}
         questions={data.fDesc.questions}
-        updater={(answers: SingleQAnswer[]) =>
+        updater={(answers: SingleQAnswer[]) => {
             data.modalFnUpdater({...data.fAns, answers: answers})
-        }
+            setModalData({...data, fAns: {...data.fAns, answers: answers}})
+        }}
       />
 
     </Box>}

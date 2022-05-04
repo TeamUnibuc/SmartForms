@@ -37,8 +37,6 @@ export interface FormTextQuestion
 
 export type Question = FormMultipleChoiceQuestion | FormTextQuestion;
 
-
-
 export interface FormDescription
 {
   title: string,
@@ -47,4 +45,22 @@ export interface FormDescription
   questions: Question[],
   canBeFilledOnline: boolean,
   needsToBeSignedInToSubmit: boolean,
+}
+
+export interface APIError<T>
+{
+  statusCode: number
+  data: T
+}
+
+export interface HVEDetail
+{
+  loc: string | number
+  msg: string
+  type: string
+}
+
+export interface HTTPValidationError
+{
+  detail: HVEDetail[]
 }
