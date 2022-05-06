@@ -1,8 +1,9 @@
 import { FormDescription } from "../models";
 
 interface GetFormListParams {
-  offset: number,
+  offset: number
   count: number
+  isOwner: boolean
 }
 
 interface GetFormListResults {

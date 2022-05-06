@@ -10,7 +10,7 @@ export default function List(): JSX.Element
   const [forms, setForms] = useState<FormDescription[]>([])
 
   const GetForms = async () => {
-    const data = await API.Form.FormList({count: 10000, offset: 0})
+    const data = await API.Form.FormList({count: 10000, offset: 0, isOwner: true})
     console.log("Received data:");
     console.log(data);
     setForms(data.forms)
