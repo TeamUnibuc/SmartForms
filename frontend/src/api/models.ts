@@ -66,3 +66,9 @@ export interface HTTPValidationError
 {
   detail: HVEDetail[]
 }
+
+export interface AllFormEntries
+{
+  entries: FormAnswers[]
+  totalformsCount: number
+}

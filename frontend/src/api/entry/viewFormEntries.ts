@@ -1,4 +1,11 @@
-import { APIError, FormAnswers, HTTPValidationError } from "../models";
+import { AllFormEntries, APIError, FormAnswers, HTTPValidationError } from "../models";
+
+interface VFEBody
+{
+  formId: string
+  offset: number
+  count: number
+}
 
 const transformMChoice = (ans: FormAnswers) =>
 {
@@ -8,14 +15,14 @@ const transformMChoice = (ans: FormAnswers) =>
   }
 }
 
-export const Edit = async(reqBody: FormAnswers): Promise<string> =>
+export const ViewFormEntries = async(reqBody: VFEBody): Promise<AllFormEntries> =>
 {
   const data = await fetch('/api/entry/view-form-entries', {
     method: "POST",
     headers:{
         'Content-Type': 'application/json'
     },
-    body: JSON.stringify(transformMChoice(reqBody))
+    body: JSON.stringify(reqBody)
   })
   if (data.status !== 200) {
     const err: APIError<string | HTTPValidationError> = {
@@ -24,6 +31,6 @@ export const Edit = async(reqBody: FormAnswers): Promise<string> =>
     }
     throw err
   }
-  const content = await data.text()
+  const content = await data.json()
   return content;
 }
