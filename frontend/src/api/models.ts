@@ -41,6 +41,7 @@ export type Question = FormMultipleChoiceQuestion | FormTextQuestion;
 export interface FormDescription
 {
   title: string,
+  authorEmail: string,
   formId: string,
   description: string,
   questions: Question[],
