@@ -5,7 +5,7 @@ import { Container, Grid } from '@mui/material';
 
 import Footer from '~/components/General/Footer';
 import Header from '~/components/General/Header';
-import { Home, EditForm, List, SubmitForm } from '~/pages'
+import { Home, EditForm, List, SubmitForm, FormPage } from '~/pages'
 import { UserContextProvider } from '~/contexts/UserContext';
 
 interface AppProps
@@ -48,6 +48,8 @@ function App(props: AppProps): JSX.Element {
                     element={<List />} />
             <Route key="Submit" path="/submit-form"
                     element={<SubmitForm />}/>
+            <Route key="Form" path="/form"
+                    element={<FormPage />}/>
         </Routes>
 
           <Footer />
