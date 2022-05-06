@@ -22,7 +22,7 @@ const FormCard = (props: FormCardProps) => {
         {fDesc.description}
       </Typography>
       <Typography variant="body2">
-        Nr. of questions: {fDesc.questions.length}
+        Nr. of questions: <span style={{fontWeight: 'bold'}}>{fDesc.questions.length}</span>
       </Typography>
     </CardContent>
     <CardActions style={{justifyContent: 'center'}}>
