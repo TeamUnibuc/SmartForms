@@ -106,10 +106,10 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
 class ListFormReceiveModel(BaseModel):
     offset: int
     count: int
-    # If isOnwer is true, then only shows forms owned by the user.
-    # If isOnwer is false, only shows public editable forms, INCLUDING
+    # If isOwner is true, then only shows forms owned by the user.
+    # If isOwner is false, only shows public editable forms, INCLUDING
     # the forms owned by the user.
-    isOnwer: bool
+    isOwner: bool
 
 class ListFormReturnModel(BaseModel):
     forms: List[smart_forms_types.FormDescription]
@@ -134,20 +134,20 @@ class ListFormReturnModel(BaseModel):
 async def get_forms_list(request: Request, params: ListFormReceiveModel):
     """
         Returns the list of all available forms.
-        If isOnwer is true, then only forms created by the user will be displayed.
+        If isOwner is true, then only forms created by the user will be displayed.
     """
     # if authentication is enabled, just return forms made by the authenticated user
     db_search_params = {}
     if routers.AUTHENTICATION_CHECKS:
-        if request.session.get("user") is None and params.isOnwer:
+        if request.session.get("user") is None and params.isOwner:
             return PlainTextResponse("User isn't signed in.", status_code=202)
-        elif params.isOnwer:
+        elif params.isOwner:
             # get forms we own
             db_search_params["authorEmail"] = request.session.get("user")["email"]
         else:
             # only get forms that can be filled online
             db_search_params["canBeFilledOnline"] = True
-    
+
     db = database.get_collection(database.FORMS)
 
     forms = [
@@ -283,7 +283,7 @@ async def delete_form(request: Request, formId: str):
             return PlainTextResponse("User isn't signed in.", status_code=201)
         elif forms[0].description.authorEmail != request.session.get("user")["email"]:
             return PlainTextResponse("User isn't the owner of the form.", status_code=202)
-            
+
     # delete the form and all of its answers
     db.delete_one({"formId": formId})
     db_entries = database.get_collection(database.ENTRIES)
@@ -325,7 +325,7 @@ async def update_form_visibility(request: Request, params: UpdateFormReceiveMode
     """
     db = database.get_collection(database.FORMS)
     forms = [smart_forms_types.pdf_form_from_dict(i) for i in db.find({"formId": formId})]
-    
+
     if len(forms) == 0:
         return PlainTextResponse("Form wasn't found.", status_code=203)
 
@@ -334,7 +334,7 @@ async def update_form_visibility(request: Request, params: UpdateFormReceiveMode
             return PlainTextResponse("User isn't signed in.", status_code=201)
         elif forms[0].description.authorEmail != request.session.get("user")["email"]:
             return PlainTextResponse("User isn't the owner of the form.", status_code=202)
-    
+
 
     form = forms[0]
     form.description.needsToBeSignedInToSubmit = params.needsToBeSignedInToSubmit
