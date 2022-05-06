@@ -1,6 +1,7 @@
 import { Button, Card, CardActions, CardContent, Typography } from "@mui/material"
 import { FormDescription } from "~/api/models"
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Link } from "react-router-dom";
 
 interface FormCardProps
 {
@@ -26,7 +27,9 @@ const FormCard = (props: FormCardProps) => {
       </Typography>
     </CardContent>
     <CardActions style={{justifyContent: 'center'}}>
-      <Button size="small">
+      <Button size="small"
+        component={Link}
+        to={`/form?formId=${fDesc.formId}`}>
         <OpenInNewIcon sx={{mr: 1}}/>
         Learn More
       </Button>
