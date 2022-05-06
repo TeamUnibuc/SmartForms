@@ -16,6 +16,7 @@ export type SingleQAnswer = TextAnswer | MultipleChoiceAnswer
 export interface FormAnswers
 {
   formId: string
+  creationDate: string
   answerId: string
   authorEmail: string
   answers: SingleQAnswer[]

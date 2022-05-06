@@ -3,6 +3,7 @@ import { FormAnswers } from "../models";
 interface RawFormAnswer
 {
   answerId: string
+  creationDate: string
   formId: string
   authorEmail: string
   answers: string[]
@@ -30,6 +31,7 @@ export const Infer = async(formData: any):
         formId: fa.formId,
         answerId: fa.answerId,
         authorEmail: fa.authorEmail,
+        creationDate: fa.creationDate,
         answers: fa.answers.map(stuff => {
           return {content: stuff}
         })
