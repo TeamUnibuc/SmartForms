@@ -100,7 +100,8 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
             f"/api/form/list",
             json={
                 "offset": 0,
-                "count": 10
+                "count": 10,
+                "isOnwer": False,
             }
         )
 

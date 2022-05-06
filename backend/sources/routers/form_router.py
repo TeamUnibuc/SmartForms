@@ -109,6 +109,10 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
 class ListFormReceiveModel(BaseModel):
     offset: int
     count: int
+    # If isOnwer is true, then only shows forms owned by the user.
+    # If isOnwer is false, only shows public editable forms, INCLUDING
+    # the forms owned by the user.
+    isOnwer: bool
 
 class ListFormReturnModel(BaseModel):
     forms: List[smart_forms_types.FormDescription]
@@ -132,16 +136,20 @@ class ListFormReturnModel(BaseModel):
 )
 async def get_forms_list(request: Request, params: ListFormReceiveModel):
     """
-        Returns the list of all available forms, made by the user.
-        If the user is not signed in, then all forms are returned.
+        Returns the list of all available forms.
+        If isOnwer is true, then only forms created by the user will be displayed.
     """
     # if authentication is enabled, just return forms made by the authenticated user
     db_search_params = {}
     if routers.AUTHENTICATION_CHECKS:
-        if request.session.get("user") is None:
+        if request.session.get("user") is None and params.isOnwer:
             return PlainTextResponse("User isn't signed in.", status_code=202)
-        else:
+        elif params.isOnwer:
+            # get forms we own
             db_search_params["authorEmail"] = request.session.get("user")["email"]
+        else:
+            # only get forms that can be filled online
+            db_search_params["canBeFilledOnline"] = True
     
     db = database.get_collection(database.FORMS)
 
