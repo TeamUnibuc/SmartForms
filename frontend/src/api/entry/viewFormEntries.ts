@@ -25,9 +25,10 @@ export const ViewFormEntries = async(reqBody: VFEBody): Promise<AllFormEntries> 
     body: JSON.stringify(reqBody)
   })
   if (data.status !== 200) {
+    console.log("Status not 200")
     const err: APIError<string | HTTPValidationError> = {
       statusCode: data.status,
-      data: await data.json()
+      data: await data.text()
     }
     throw err
   }

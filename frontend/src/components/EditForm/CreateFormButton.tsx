@@ -21,9 +21,10 @@ const CreateFormButton = () =>
   const onCreateClick = () =>
   {
     API.Form.FormCreate({
+      authorEmail: "",
+      formId: "",
       canBeFilledOnline: true,
       description: "Descriere :)",
-      formId: "",
       needsToBeSignedInToSubmit: false,
       title: "Titlu Form",
       questions: getCuratedQuestions()

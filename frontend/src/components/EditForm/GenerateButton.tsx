@@ -13,6 +13,7 @@ export default function GenerateButton(): JSX.Element
   const generatePdf = async (formData: Question[]) => {
     console.log(JSON.stringify(formData))
     const resp = await API.Form.FormPreview({
+      authorEmail: "",
       formId: "",
       canBeFilledOnline: true,
       needsToBeSignedInToSubmit: true,

@@ -4,7 +4,11 @@ import { useSearchParams } from "react-router-dom"
 import SwipeableViews from 'react-swipeable-views';
 import API from "~/api"
 import { FormDescription } from "~/api/models"
+import MyAgGrid from "./AgGrid";
 import TheDataGrid from "./TheDataGrid";
+
+import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
@@ -74,7 +78,7 @@ const FormPage = () =>
       <TheDataGrid formDesc={formData}/>
     </TabPanel>
     <TabPanel value={value} index={1} dir={theme.direction}>
-      Item Two
+      <MyAgGrid formDesc={formData}/>
     </TabPanel>
   </SwipeableViews>
 
