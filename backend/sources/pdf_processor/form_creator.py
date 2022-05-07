@@ -235,7 +235,14 @@ def add_answer_squares(pdf: fpdf.FPDF, current_height, count: int, params) -> Tu
 
         # add the square
         pdf.rect(x_act, current_height, PDF_ANSWER_SQUARE_SIZE, PDF_ANSWER_SQUARE_SIZE)
-        squares.append(pdf_form.Square(x_act, current_height, PDF_ANSWER_SQUARE_SIZE, len(pdf.pages) - 1))
+        squares.append(
+            pdf_form.Square(
+                x=x_act,
+                y=current_height,
+                width=PDF_ANSWER_SQUARE_SIZE,
+                page=len(pdf.pages) - 1
+            )
+        )
         x_act += PDF_ANSWER_SQUARE_SIZE + 1
 
     # new line
@@ -410,9 +417,11 @@ def create_form_from_description(description: smart_forms_types.FormDescription,
 
     params = FormCreatorParameters(description.title, is_preview)
 
-    form = pdf_form.PdfForm()
-    form.description = description
-    form.pdf_file = fpdf.FPDF()
+    form = pdf_form.PdfForm(
+        description=description,
+        pdf_file=fpdf.FPDF(),
+        answer_squares_location=[]
+    )
     pdf = form.pdf_file
 
     # disable line breaks

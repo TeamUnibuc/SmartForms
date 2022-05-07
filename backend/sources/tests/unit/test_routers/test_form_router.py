@@ -101,7 +101,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
             json={
                 "offset": 0,
                 "count": 10,
-                "isOnwer": False,
+                "isOwner": False,
             }
         )
 
