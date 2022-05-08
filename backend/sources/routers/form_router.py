@@ -92,7 +92,7 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
         # form being too large.
         # when creating a form, we manually set the formID to be empty, to avoid
         # collisions.
-        form.formId = str(random.randint(10**10, 10**11))
+        form.formId = smart_forms_types.generate_uuid()
         form.creationDate = datetime.now()
         
         model = pdf_processor.create_form_from_description(form, False)

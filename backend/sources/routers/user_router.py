@@ -1,7 +1,8 @@
 from asyncio.log import logger
 import datetime
 from typing import Optional
-from fastapi import APIRouter, Response
+from fastapi import APIRouter
+from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel
 from starlette.config import Config
 from starlette.requests import Request
@@ -149,6 +150,7 @@ async def get_user_details(request: Request):
         Returns details from the user.
         If the user is not signed in, then is_signed_in is false, and no other fields are returned.
     """
+    print(request.session)
     user = request.session.get('user')
 
     # the user is not signed in
@@ -164,3 +166,39 @@ async def get_user_details(request: Request):
         given_name=user["given_name"],
         family_name=user["family_name"]
     )
+
+
+@router.delete('/delete-account')
+async def logout(request: Request):
+    """
+    Deletes the user from the database, together with all of
+    its forms.
+    """
+    if "user" not in request.session:
+        return PlainTextResponse("User isn't signed in.", 201)
+
+    # extract user
+    user_email = request.session["user"]["email"]
+
+    # Remove the user
+    request.session.pop('user', None)
+
+    # delete the user from the database
+    database.get_collection(database.USERS).delete_many({ "email": user_email })
+
+    # delete the forms created by the user
+    db_forms = database.get_collection(database.FORMS)
+    db_entries = database.get_collection(database.ENTRIES)
+
+    user_forms = [
+        smart_forms_types.PdfForm.from_dict(i)
+        for i in db_forms.find({ "authorEmail": user_email })
+    ]
+
+    for form in user_forms:
+        # delete all the entries for the form, and
+        # then the form itself
+        db_entries.delete_many({ "formId": form.description.formId })
+        db_forms.delete_one({ "formId": form.description.formId })
+
+    return PlainTextResponse("Ok.")

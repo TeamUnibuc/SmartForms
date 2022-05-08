@@ -87,7 +87,7 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
     logging.info(f"Performed inference. Found {len(result)} forms, out of which {len(answers)} were valid.")
     # set ids
     for answer in answers:
-        answer.answerId = f"entry-{str(random.randint(10**10, 9*10**10))}"
+        answer.answerId = f"entry-{smart_forms_types.generate_uuid()}"
         answer.creationDate = datetime.now()
 
     # if we have any entries, add them to the DB

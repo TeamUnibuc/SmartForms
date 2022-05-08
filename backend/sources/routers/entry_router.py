@@ -76,7 +76,7 @@ async def submit_entry(request: Request, entry: smart_forms_types.FormAnswer):
         return PlainTextResponse("Number of answers is not valid.", 400)
 
     db = database.get_collection(database.ENTRIES)
-    entry.answerId = f"entry-{str(random.randint(10**10, 9*10**10))}"
+    entry.answerId = f"entry-{smart_forms_types.generate_uuid()}"
 
     db.insert_one(entry.dict())
     return PlainTextResponse(entry.answerId)
