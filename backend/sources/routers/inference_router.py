@@ -93,6 +93,6 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
     # if we have any entries, add them to the DB
     if answers != []:
         db = database.get_collection(database.ENTRIES)
-        db.insert_many([answer.to_dict() for answer in answers])
+        db.insert_many([answer.dict() for answer in answers])
 
     return result

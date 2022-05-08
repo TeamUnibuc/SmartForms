@@ -96,7 +96,7 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
         form.creationDate = datetime.now()
         
         model = pdf_processor.create_form_from_description(form, False)
-        database.get_collection(database.FORMS).insert_one(model.to_dict())
+        database.get_collection(database.FORMS).insert_one(model.dict())
         resp = CreateFormReturnModel(
             formId=model.description.formId,
             formPdfBase64=model.extract_base_64_encoded_pdf()
@@ -154,7 +154,7 @@ async def get_forms_list(request: Request, params: ListFormReceiveModel):
     db = database.get_collection(database.FORMS)
 
     forms = [
-        smart_forms_types.pdf_form_from_dict(i).description
+        smart_forms_types.PdfForm.from_dict(i).description
         for i in db.find(
             db_search_params,
             skip=params.offset,
@@ -195,7 +195,10 @@ async def get_form_description(request: Request, formId: str):
         Returns the description of a given form.
     """
     db = database.get_collection(database.FORMS)
-    forms = [smart_forms_types.pdf_form_from_dict(i).description for i in db.find({"formId": formId})]
+    forms = [
+        smart_forms_types.PdfForm.from_dict(i).description
+        for i in db.find({"formId": formId})
+    ]
 
     if len(forms) == 0:
         return PlainTextResponse("Form wasn't found.", 203)
@@ -234,7 +237,10 @@ async def get_form_pdf(request: Request, formId: str):
         Returns the PDF of a given form.
     """
     db = database.get_collection(database.FORMS)
-    forms = [smart_forms_types.pdf_form_from_dict(i) for i in db.find({"formId": formId})]
+    forms = [
+        smart_forms_types.PdfForm.from_dict(i)
+        for i in db.find({"formId": formId})
+    ]
 
     if len(forms) == 0:
         return PlainTextResponse("Form wasn't found.", 203)
@@ -276,7 +282,10 @@ async def delete_form(request: Request, formId: str):
         Deletes a form. The user has to be the owner.
     """
     db = database.get_collection(database.FORMS)
-    forms = [smart_forms_types.pdf_form_from_dict(i) for i in db.find({"formId": formId})]
+    forms = [
+        smart_forms_types.PdfForm.from_dict(i)
+        for i in db.find({"formId": formId})
+    ]
 
     if len(forms) == 0:
         return PlainTextResponse("Form wasn't found.", status_code=203)
@@ -327,7 +336,10 @@ async def update_form_visibility(request: Request, params: UpdateFormReceiveMode
         Note: This does not affect the owner of the form.
     """
     db = database.get_collection(database.FORMS)
-    forms = [smart_forms_types.pdf_form_from_dict(i) for i in db.find({"formId": formId})]
+    forms = [
+        smart_forms_types.PdfForm.from_dict(i)
+        for i in db.find({"formId": formId})
+    ]
 
     if len(forms) == 0:
         return PlainTextResponse("Form wasn't found.", status_code=203)
@@ -343,5 +355,5 @@ async def update_form_visibility(request: Request, params: UpdateFormReceiveMode
     form.description.needsToBeSignedInToSubmit = params.needsToBeSignedInToSubmit
     form.description.canBeFilledOnline = params.canBeFilledOnline
 
-    db.replace_one({ "formId": formId }, form.to_dict())
+    db.replace_one({ "formId": formId }, form.dict())
     return PlainTextResponse("Ok")

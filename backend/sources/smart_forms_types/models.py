@@ -47,14 +47,14 @@ class FormAnswer(BaseModel):
     answers: List[str]
     creationDate: Optional[datetime]
 
-    def to_dict(self) -> dict:
-        return {
-            "formId": self.formId,
-            "answerId": self.answerId,
-            "authorEmail": self.authorEmail,
-            "content": pickle.dumps(self)
-        }
+    # def to_dict(self) -> dict:
+    #     return {
+    #         "formId": self.formId,
+    #         "answerId": self.answerId,
+    #         "authorEmail": self.authorEmail,
+    #         "content": pickle.dumps(self)
+    #     }
 
-def form_answer_from_dict(d: dict) -> FormAnswer:
-    return pickle.loads(d["content"])
+# def form_answer_from_dict(d: dict) -> FormAnswer:
+#     return pickle.loads(d["content"])
     

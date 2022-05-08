@@ -78,7 +78,7 @@ async def submit_entry(request: Request, entry: smart_forms_types.FormAnswer):
     db = database.get_collection(database.ENTRIES)
     entry.answerId = f"entry-{str(random.randint(10**10, 9*10**10))}"
 
-    db.insert_one(entry.to_dict())
+    db.insert_one(entry.dict())
     return PlainTextResponse(entry.answerId)
 
 
@@ -203,7 +203,7 @@ async def edit_entry(request: Request, entry: smart_forms_types.FormAnswer):
 
     db = database.get_collection(database.ENTRIES)
     # TODO: Check what is here.
-    db.replace_one({ "answerId": entry.answerId }, entry_db.to_dict())
+    db.replace_one({ "answerId": entry.answerId }, entry_db.dict())
     return PlainTextResponse("Ok")
 
 
@@ -226,7 +226,7 @@ async def view_entry(entryId: str):
     db = database.get_collection(database.ENTRIES)
     
     forms = [
-        smart_forms_types.form_answer_from_dict(i)
+        smart_forms_types.FormAnswer(**i)
         for i in db.find({ "answerId": entryId })
     ]
 
@@ -280,7 +280,7 @@ async def view_entries(request: Request, params: ViewEntriesReceiveModel):
     db = database.get_collection(database.ENTRIES)
     
     entries = [
-        smart_forms_types.form_answer_from_dict(i) for i in db.find(
+        smart_forms_types.FormAnswer(**i) for i in db.find(
             { "formId": params.formId }, 
             skip=params.offset,
             limit=params.count
