@@ -21,7 +21,8 @@ export default function List(): JSX.Element
   }, [])
 
   return <Box width='100%'>
-    <CustomFormsDrawer forms={forms} title={'MY FORMS'}/>
+    <CustomFormsDrawer forms={forms} title={'MY FORMS'} openDelay=
+    {700}/>
 
     <CustomFormsDrawer forms={forms} title={'OTHER FORMS'}/>
   </Box>

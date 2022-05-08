@@ -10,7 +10,7 @@ import unittest
 from main import init_state
 import database
 import smart_forms_types
-from PyPDF2 import PdfFileReader 
+from PyPDF2 import PdfFileReader
 from fastapi.testclient import TestClient
 import io
 
@@ -55,7 +55,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         """
         form = get_generic_form_description()
         response = self.client.post("/api/form/preview", json=form.dict())
-        self.assertEqual(response.status_code, 200)   
+        self.assertEqual(response.status_code, 200)
         self.assertTrue("formPdfBase64" in json.loads(response.content))
 
     def test_create_and_description_endpoint(self):
@@ -65,7 +65,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         form = get_generic_form_description()
 
         response = self.client.post("/api/form/create", json=form.dict())
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
         self.assertTrue("formPdfBase64" in content)
         self.assertTrue("formId" in content)
@@ -91,7 +91,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         form = get_generic_form_description()
 
         response = self.client.post("/api/form/create", json=form.dict())
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
         self.assertTrue("formId" in content)
 
@@ -116,7 +116,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         form = get_generic_form_description()
 
         response = self.client.post("/api/form/create", json=form.dict())
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
         self.assertTrue("formId" in content)
         form_id = content["formId"]
@@ -152,7 +152,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         form = get_generic_form_description()
 
         response = self.client.post("/api/form/create", json=form.dict())
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
         self.assertTrue("formId" in content)
         form_id = content["formId"]
@@ -161,7 +161,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         response = self.client.delete(
             f"/api/form/delete/{form_id}"
         )
-        
+
         # no errors deleting the form
         self.assertEqual(response.status_code, 200)
 
@@ -182,7 +182,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         form.needsToBeSignedInToSubmit = False
 
         response = self.client.post("/api/form/create", json=form.dict())
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
         self.assertTrue("formId" in content)
         form_id = content["formId"]
@@ -195,7 +195,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
                 "needsToBeSignedInToSubmit": True
             }
         )
-        
+
         # no errors deleting the form
         self.assertEqual(response.status_code, 200)
 
@@ -206,7 +206,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
 
         # should get 200
         self.assertEqual(response.status_code, 200)
-        
+
         extracted_form = smart_forms_types.FormDescription(
             **response.json()
         )
@@ -216,7 +216,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         self.assertTrue(extracted_form.needsToBeSignedInToSubmit)
         self.assertTrue(extracted_form.canBeFilledOnline)
 
-    
+
 if __name__ == '__main__':
     unittest.main()
-    
+
