@@ -31,6 +31,7 @@ def get_database() -> Database:
 
 FORMS = "Forms"
 ENTRIES = "Entries"
+USERS = "Users"
 
 def get_collection(collection: str):
     return get_database().database.get_collection(collection)
@@ -40,13 +41,13 @@ def get_form_by_id(form_id: str) -> smart_forms_types.PdfForm:
     Returns a form description for a given id.
     Throws an exception if no form is found.
     """
-    form_dict = [i for i in get_collection(FORMS).find({ "formId": form_id })]
+    form_dict = get_collection(FORMS).find_one({ "formId": form_id })
 
     # unable to find form
-    if len(form_dict) == 0:
+    if form_dict is None:
         raise Exception(f"Unable to find form {form_id} on mongo cloud!")
 
-    form = smart_forms_types.PdfForm.from_dict(form_dict[0])
+    form = smart_forms_types.PdfForm.from_dict(form_dict)
     return form
 
 def get_entry_by_id(entry_id: str) -> smart_forms_types.FormAnswer:
@@ -62,3 +63,26 @@ def get_entry_by_id(entry_id: str) -> smart_forms_types.FormAnswer:
 
     entry = smart_forms_types.FormAnswer(**entry_dict)
     return entry
+
+def get_user_by_email(email: str) -> smart_forms_types.User:
+    """
+    Returns the user saved in the database for a given email.
+    Throws an exception if no user is found.
+    """
+    user_dict = get_collection(USERS).find_one({ email: email })
+
+    # unable to find user
+    if user_dict is None:
+        raise Exception(f"Unable to find {email} in the DB")
+
+    user = smart_forms_types.User(**user_dict)
+    return user
+
+def update_user(user: smart_forms_types.User, create=True):
+    """
+    Updates the user, and creates it if it doesn't exist
+    """
+    if create:
+        get_collection(USERS).insert_one(user.dict())
+    else:
+        get_collection(USERS).replace_one({ "email": user.email }, user.dict())

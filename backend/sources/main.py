@@ -53,7 +53,10 @@ def init_state():
 
     # register a session middleware, for storing authentication
     # status and cookies
-    app.add_middleware(SessionMiddleware, secret_key=os.environ["COOKIES_SECRET"])
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key=os.environ["COOKIES_SECRET"]
+    )
 
     for router in routers.routers:
         app.include_router(router)
