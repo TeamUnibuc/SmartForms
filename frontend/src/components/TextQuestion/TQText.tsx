@@ -3,8 +3,7 @@ import React,  { ChangeEvent, useState } from "react"
 import { Card, CardActions, CardContent, Grid, IconButton, TextField } from "@mui/material"
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { FormTextQuestion, Question } from "~/api/models"
-import { QuestionList } from "~/contexts/QuestionList"
+import { FormTextQuestion } from "~/api/models"
 import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext"
 
 interface ComponentProps
@@ -17,10 +16,6 @@ export default function TQText(props: ComponentProps): JSX.Element
   const q_ind = props.q_ind;
   const {qList} = useQLContextState()
   const {qOps} = useQLContextUpdater()
-  // const [question, setQuestion] = useState((() => {
-  //     const q = qList.questions[q_ind]
-  //     return q ? q as FormTextQuestion : undefined
-  // })())
 
   const [question, setQuestion] = useState(
     qList.questions[q_ind] as FormTextQuestion
@@ -75,10 +70,8 @@ export default function TQText(props: ComponentProps): JSX.Element
         </Grid>
       <Grid item xs={2}>
         <IconButton onClick={delQuestion}>
-          <DeleteIcon></DeleteIcon>
+          <DeleteIcon />
         </IconButton>
-
-        {/* <DeleteIcon></DeleteIcon> */}
       </Grid>
     </Grid>
 

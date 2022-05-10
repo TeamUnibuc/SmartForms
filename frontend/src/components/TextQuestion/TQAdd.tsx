@@ -29,7 +29,7 @@ export default function TQAdd(): JSX.Element
     const q_ind = getNextInd()
     qOps.setQuestion(q_ind, {
       title: `Text ${q_ind} title`,
-      description: `Description`,
+      description: ``,
       maxAnswerLength: 5
     })
   }

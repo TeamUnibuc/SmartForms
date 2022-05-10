@@ -1,4 +1,5 @@
 import { FormDescription } from "../models";
+import fetchWrapper from "../wrapper";
 
 interface CreateResults {
   formId: string,
@@ -14,6 +15,6 @@ export const FormCreate = async(reqBody: FormDescription): Promise<CreateResults
     },
     body: JSON.stringify(reqBody)
   })
-  const content = await data.json();
-  return content;
+
+  return fetchWrapper(data)
 }

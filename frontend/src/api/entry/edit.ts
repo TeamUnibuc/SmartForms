@@ -1,4 +1,5 @@
 import { APIError, FormAnswers, HTTPValidationError } from "../models";
+import fetchWrapper from "../wrapper";
 
 const transformMChoice = (ans: FormAnswers) =>
 {
@@ -17,13 +18,6 @@ export const Edit = async(reqBody: FormAnswers): Promise<string> =>
     },
     body: JSON.stringify(transformMChoice(reqBody))
   })
-  if (data.status !== 200) {
-    const err: APIError<string | HTTPValidationError> = {
-      statusCode: data.status,
-      data: await data.json()
-    }
-    throw err
-  }
-  const content = await data.text()
-  return content;
+
+  return fetchWrapper<string | HTTPValidationError>(data, "text")
 }
