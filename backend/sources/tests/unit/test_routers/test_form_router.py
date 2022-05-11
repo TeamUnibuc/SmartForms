@@ -66,10 +66,11 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
 
         response = self.client.post("/api/form/create", json=form.dict())
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content)
+        content = response.json()
+
         self.assertTrue("formPdfBase64" in content)
         self.assertTrue("formId" in content)
-        form_id = content["formId"]
+        form_id = response.json()["formId"]
 
         # try to get form from /description
         response_description = self.client.get(
@@ -127,7 +128,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
         )
 
         content = base64.b64decode(
-            str(response.content, encoding="utf-8")
+            response.json()["formPdfBase64"]
         )
 
         # try to read content as pdf
@@ -170,8 +171,8 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
             f"/api/form/description/{form_id}"
         )
 
-        # should get 203
-        self.assertEqual(response.status_code, 203)
+        # should get NOT FOUND
+        self.assertEqual(response.status_code, 201)
 
     def test_visibility_endpoint(self):
         """
@@ -183,9 +184,7 @@ class TestFormEndpointNoAuthChecks(unittest.TestCase):
 
         response = self.client.post("/api/form/create", json=form.dict())
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content)
-        self.assertTrue("formId" in content)
-        form_id = content["formId"]
+        form_id = response.json()["formId"]
 
         # try to get form from /list
         response = self.client.put(

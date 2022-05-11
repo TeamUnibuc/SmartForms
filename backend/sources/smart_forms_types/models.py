@@ -46,15 +46,3 @@ class FormAnswer(BaseModel):
     authorEmail: Optional[str] = ""
     answers: List[str]
     creationDate: Optional[datetime]
-
-    # def to_dict(self) -> dict:
-    #     return {
-    #         "formId": self.formId,
-    #         "answerId": self.answerId,
-    #         "authorEmail": self.authorEmail,
-    #         "content": pickle.dumps(self)
-    #     }
-
-# def form_answer_from_dict(d: dict) -> FormAnswer:
-#     return pickle.loads(d["content"])
-    
