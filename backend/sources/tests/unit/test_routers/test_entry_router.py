@@ -90,8 +90,7 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         # we should get a valid id
-        self.assertIsNotNone(response.content)
-        self.assertTrue(response.content.startswith(b"entry-"))
+        self.assertTrue(response.json()["entryId"].startswith("entry-"))
 
     def test_submit_new_entry_and_retrieve_it(self):
         """
@@ -107,9 +106,8 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         # we should get 200
         self.assertEqual(response.status_code, 200)
         # we should get a valid id
-        self.assertIsNotNone(response.content)
-        self.assertTrue(response.content.startswith(b"entry-"))
-        returned_id = str(response.content, encoding="utf-8")
+        self.assertTrue(response.json()["entryId"].startswith("entry-"))
+        returned_id = response.json()["entryId"]
 
         response = self.client.get(
             f"/api/entry/view-entry/{returned_id}"
@@ -138,9 +136,8 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         # we should get 200
         self.assertEqual(response.status_code, 200)
         # we should get a valid id
-        self.assertIsNotNone(response.content)
-        self.assertTrue(response.content.startswith(b"entry-"))
-        returned_id = str(response.content, encoding="utf-8")
+        self.assertTrue(response.json()["entryId"].startswith("entry-"))
+        returned_id = response.json()["entryId"]
 
         response = self.client.delete(
             f"/api/entry/delete/{returned_id}"
@@ -153,7 +150,7 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
             f"/api/entry/view-entry/{returned_id}"
         )
         # we should get 400
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 201)
 
     
     def test_submit_new_entry_and_edit_it(self):
@@ -172,9 +169,8 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         # we should get 200
         self.assertEqual(response.status_code, 200)
         # we should get a valid id
-        self.assertIsNotNone(response.content)
-        self.assertTrue(response.content.startswith(b"entry-"))
-        returned_id = str(response.content, encoding="utf-8")
+        self.assertTrue(response.json()["entryId"].startswith("entry-"))
+        returned_id = response.json()["entryId"]
 
         # update the entry
         entry.answerId = returned_id
@@ -218,8 +214,8 @@ class TestEntryRouterNotAuthenticated(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         # we should get a valid id
         self.assertIsNotNone(response.content)
-        self.assertTrue(response.content.startswith(b"entry-"))
-        returned_id = str(response.content, encoding="utf-8")
+        self.assertTrue(response.json()["entryId"].startswith("entry-"))
+        returned_id = response.json()["entryId"]
 
         response = self.client.post(
             f"/api/entry/view-form-entries",
