@@ -13,13 +13,14 @@ export default function GenerateButton(): JSX.Element
   const generatePdf = async (formData: Question[]) => {
     console.log(JSON.stringify(formData))
     const resp = await API.Form.FormPreview({
+      authorEmail: "",
+      formId: "",
       canBeFilledOnline: true,
       needsToBeSignedInToSubmit: true,
       description: "useless description",
       questions: formData,
-      title: "First PDF"}
-    )
-    console.log("Setting pdfbase64 new data")
+      title: "First PDF"
+    })
     sOps.setPdfString(resp.formPdfBase64)
   }
 

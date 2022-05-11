@@ -1,4 +1,4 @@
-import { createTheme, CssBaseline, ThemeOptions, ThemeProvider } from "@mui/material";
+import { createTheme, CssBaseline, StyledEngineProvider, ThemeOptions, ThemeProvider } from "@mui/material";
 import React, { useState } from "react"
 import App from "~/App";
 
@@ -31,14 +31,15 @@ const ThemeIncluder: React.FC = (props) =>
 {
   const themeFromStorage = () => {
     return localStorage.getItem("isDarkTheme") == "true"
-
   }
 
   const [isDarkTheme, setIsDarkTheme] = useState(themeFromStorage())
 
   return <ThemeProvider theme={isDarkTheme ? DarkTheme : LightTheme}>
     <CssBaseline />
-    <App isDarkTheme={isDarkTheme} themeChanger={setIsDarkTheme}/>
+    <StyledEngineProvider injectFirst>
+      <App isDarkTheme={isDarkTheme} themeChanger={setIsDarkTheme}/>
+    </StyledEngineProvider>
   </ThemeProvider>
 }
 

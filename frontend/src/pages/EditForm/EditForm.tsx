@@ -1,11 +1,13 @@
 import React from 'react'
 
 import Grid from '@mui/material/Grid';
-import PdfDisplay from './PdfDisplay';
+import EditFormPdfDisplay from './EditFormPdfDisplay';
 
 import GenerateButton from '~/components/EditForm/GenerateButton';
 import DynamicQuestionList from '~/components/EditForm/DynamicQuestionList';
 import { QLContextProvider } from '~/contexts/CoolContext';
+import CreateFormButton from '~/components/EditForm/CreateFormButton';
+import { Divider } from '@mui/material';
 
 export default function EditForm(): JSX.Element
 {
@@ -18,10 +20,11 @@ export default function EditForm(): JSX.Element
 
           <Grid item xs={2}>
             <GenerateButton />
+            <CreateFormButton />
           </Grid>
 
           <Grid item xs={6}>
-            <PdfDisplay />
+            <EditFormPdfDisplay />
           </Grid>
       </Grid>
     </QLContextProvider>

@@ -9,5 +9,7 @@ export const Description = async(formId: string): Promise<FormDescription> =>
     }
   })
   const content = await data.json();
+  console.log("api form description")
+  console.log(content)
   return content;
 }

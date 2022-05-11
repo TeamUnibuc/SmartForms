@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { Box, Collapse, Grow, List } from "@mui/material"
+import { Box, Collapse, Grow, List, Typography, useTheme } from "@mui/material"
 import { TransitionGroup } from 'react-transition-group';
 
 import { FormDescription } from "~/api/models"
@@ -18,6 +18,7 @@ const CustomFormsDrawer = ({forms, title, openDelay}: CFDrawerProps) =>
 {
   const [checked, setChecked] = useState(false)
   const [displayState, setDisplayState] = useState(false)
+  const {palette} = useTheme()
 
   const transitionEnd = (e: any) => {
     if (e.propertyName !== 'opacity') return

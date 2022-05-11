@@ -41,6 +41,7 @@ export type Question = FormMultipleChoiceQuestion | FormTextQuestion;
 export interface FormDescription
 {
   title: string,
+  authorEmail: string,
   formId: string,
   description: string,
   questions: Question[],
@@ -64,4 +65,10 @@ export interface HVEDetail
 export interface HTTPValidationError
 {
   detail: HVEDetail[]
+}
+
+export interface AllFormEntries
+{
+  entries: FormAnswers[]
+  totalformsCount: number
 }
