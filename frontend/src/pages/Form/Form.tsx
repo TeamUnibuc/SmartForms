@@ -33,8 +33,8 @@ const FormPage = () =>
         .finally(() => setLoading(false))
 
       if (formData !== undefined) {
-        const previewData = await API.Form.FormPreview(formData)
-        setPdfString(previewData.formPdfBase64)
+        const previewData = await API.Form.Pdf(formData.formId)
+        setPdfString(previewData)
       }
     }
 

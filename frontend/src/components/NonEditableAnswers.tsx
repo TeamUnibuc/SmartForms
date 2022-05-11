@@ -15,6 +15,7 @@ const MChoiceQ = (props: {
       <TickableOption
         checked={false}
         content={ch}
+        key={idx}
       />
     )}
   </Box>

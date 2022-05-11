@@ -30,9 +30,7 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
   console.log(formDesc.authorEmail)
   console.log("Rendering the grid")
 
-  const [entryData, setEntryData] = useState<{[x: string]: string}[]>([
-    {Nume: "Felix", Prenume: "Puscasu", Domeniu: "ceva"}
-  ])
+  const [entryData, setEntryData] = useState<{[x: string]: string}[]>([])
 
   console.log(entryData)
 
