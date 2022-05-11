@@ -17,7 +17,7 @@ def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[smart_
     A SINGLE FORM CAN BE INCLUDED IN THE PDF FILE.
     """
     # individually extract each page of the pdf
-    images = pdf2image.convert_from_bytes(pdf_file)
+    images = pdf2image.convert_from_bytes(pdf_file[0])
     images = [np.array(image) for image in images]
 
     # process pdf as list of images
