@@ -13,6 +13,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 DEBUG = False
+
 # fixed to 28 as this is what most datasets offer
 IMAGE_SIZE = network.IMAGE_SIZE
 
@@ -43,7 +44,7 @@ def predict_characters(imgs: np.ndarray, allowed_characters: str) -> List[str]:
         print(f"Average value: {np.average(imgs[0])}")
         fig, ax = plt.subplots(nrows=6, ncols=6)
         for i in range(min(36, len(imgs))):
-            ax[i // 5][i % 5].imshow(imgs[i][0])
+            ax[i // 6][i % 6].imshow(imgs[i][0])
 
         plt.show()
 

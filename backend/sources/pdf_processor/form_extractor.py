@@ -29,7 +29,7 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
     def preprocess(img):
         if len(img.shape) == 3 and img.shape[2] == 3:
             img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        _, img = cv.threshold(img, 100, 255, cv.THRESH_BINARY)
+        _, img = cv.threshold(img, 180, 255, cv.THRESH_BINARY)
         return img
         
     picture_not_processed = picture.copy()
