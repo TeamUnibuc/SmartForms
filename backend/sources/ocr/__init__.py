@@ -12,7 +12,7 @@ import cv2 as cv
 import cv2
 import matplotlib.pyplot as plt
 
-DEBUG = True
+DEBUG = False
 
 # fixed to 28 as this is what most datasets offer
 IMAGE_SIZE = network.IMAGE_SIZE

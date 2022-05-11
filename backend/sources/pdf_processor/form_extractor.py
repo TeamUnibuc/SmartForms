@@ -14,7 +14,7 @@ from PIL import Image
 from pyzbar.pyzbar import decode
 
 
-DEBUG = True
+DEBUG = False
 
 def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.ndarray:
     """
