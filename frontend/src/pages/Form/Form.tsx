@@ -9,6 +9,8 @@ import TheDataGrid from "./TheDataGrid";
 
 import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
+import PdfDisplay from "~/components/PdfDisplay";
+import NonEditableAnswers from "~/components/NonEditableAnswers";
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
@@ -18,6 +20,7 @@ const FormPage = () =>
   const [formData, setFormData] = useState<undefined | FormDescription>()
   const [loading, setLoading] = useState(true)
   const [value, setValue] = useState(0);
+  const [pdfString, setPdfString] = useState("")
   const theme = useTheme();
 
   const formId = searchParams.get("formId")
@@ -28,6 +31,11 @@ const FormPage = () =>
         .then(r => setFormData(r))
         .catch(e => console.log(`Error getting formId: ${e}`))
         .finally(() => setLoading(false))
+
+      if (formData !== undefined) {
+        const previewData = await API.Form.FormPreview(formData)
+        setPdfString(previewData.formPdfBase64)
+      }
     }
 
     getter()
@@ -67,6 +75,7 @@ const FormPage = () =>
   >
     <Tab label="Data" {...a11yProps(0)} />
     <Tab label="Questions" {...a11yProps(1)} />
+    <Tab label="Form" {...a11yProps(2)} />
   </Tabs>
 
   <SwipeableViews
@@ -78,7 +87,10 @@ const FormPage = () =>
       <TheDataGrid formDesc={formData}/>
     </TabPanel>
     <TabPanel value={value} index={1} dir={theme.direction}>
-      <MyAgGrid formDesc={formData}/>
+      <NonEditableAnswers questions={formData.questions}/>
+    </TabPanel>
+    <TabPanel value={value} index={2} dir={theme.direction}>
+      <PdfDisplay pdfString={pdfString}/>
     </TabPanel>
   </SwipeableViews>
 

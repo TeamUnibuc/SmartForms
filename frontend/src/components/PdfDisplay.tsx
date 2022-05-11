@@ -1,16 +1,15 @@
-import React from 'react'
+import { Box } from "@mui/material"
 
-import { useQLContextState } from '~/contexts/CoolContext'
-
-export default function PdfDisplay(props: {pdfb64?: string}): JSX.Element
+interface PDProps
 {
-  const {pdfString} = useQLContextState()
+  pdfString: string
+}
 
+const PdfDisplay = ({pdfString}: PDProps) =>
+{
   const embed_string = `data:application/pdf;base64,${pdfString}`
 
-  console.log(`R - pdfDisplay: ${pdfString.length}`)
-
-  return <>
+  return <Box>
      {pdfString.length > 0 ? (
         <div>
           <embed src={embed_string} type="application/pdf" width="100%" height="900px"></embed>
@@ -19,5 +18,7 @@ export default function PdfDisplay(props: {pdfb64?: string}): JSX.Element
       ) : (
         <p>Nothing loaded so far</p>
       )}
-  </>
+  </Box>
 }
+
+export default PdfDisplay

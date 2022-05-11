@@ -1,7 +1,7 @@
 import React from 'react'
 
 import Grid from '@mui/material/Grid';
-import PdfDisplay from './PdfDisplay';
+import EditFormPdfDisplay from './EditFormPdfDisplay';
 
 import GenerateButton from '~/components/EditForm/GenerateButton';
 import DynamicQuestionList from '~/components/EditForm/DynamicQuestionList';
@@ -24,7 +24,7 @@ export default function EditForm(): JSX.Element
           </Grid>
 
           <Grid item xs={6}>
-            <PdfDisplay />
+            <EditFormPdfDisplay />
           </Grid>
       </Grid>
     </QLContextProvider>
