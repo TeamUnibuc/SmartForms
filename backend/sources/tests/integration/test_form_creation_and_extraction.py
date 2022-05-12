@@ -85,8 +85,8 @@ class TestBlankFormCreationAndExtraction(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         results = response.json()
 
-        self.assertEqual(len(results), 1)
-        result = results[0]
+        self.assertEqual(len(results["entries"]), 1)
+        result = results["entries"][0]
 
         self.assertEqual(result["formId"], form_id)
         self.assertTrue(result["answerId"] is not None)

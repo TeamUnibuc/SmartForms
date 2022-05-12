@@ -15,11 +15,15 @@ router = APIRouter(
     tags=["inference"]
 )
 
+class InferenceReturnModel(BaseModel):
+    entries: List[smart_forms_types.FormAnswer]
+    errors: List[str]
+
 @router.post(
     "/infer",
     responses = {
         200: {
-            "model": List[Union[smart_forms_types.FormAnswer, str]],
+            "model": InferenceReturnModel,
             "description": "Ok. Each item is an answer, if found," +\
                     "or a string if an error occured for that particular answer."
         },
@@ -95,4 +99,5 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
         db = database.get_collection(database.ENTRIES)
         db.insert_many([answer.dict() for answer in answers])
 
-    return result
+    # TODO: Fill errors field
+    return InferenceReturnModel(entries=answers, errors=[])

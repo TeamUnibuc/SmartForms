@@ -27,19 +27,25 @@ const FormPage = () =>
 
   useEffect(() => {
     const getter = async () => {
-      await API.Form.Description(formId || "idiot")
-        .then(r => setFormData(r))
-        .catch(e => console.log(`Error getting formId: ${e}`))
-        .finally(() => setLoading(false))
-
-      if (formData !== undefined) {
-        const previewData = await API.Form.Pdf(formData.formId)
-        setPdfString(previewData)
+      console.log("Formdata")
+      console.log(formData)
+      if (formData === undefined) {
+        API.Form.Description(formId || "idiot")
+          .then(async r => {
+            setFormData(r)
+            const previewData = await API.Form.Pdf(r.formId)
+            console.log("Pdf data:")
+            console.log(previewData.formPdfBase64)
+            setPdfString(previewData.formPdfBase64)
+          })
+          .catch(e => console.log(`Error getting formId: ${e}`))
+          .finally(() => setLoading(false))
       }
+
     }
 
     getter()
-  }, [])
+  }, [formData])
 
   if (loading)
     return <Alert severity="info"><Typography>Loading ...</Typography></Alert>
