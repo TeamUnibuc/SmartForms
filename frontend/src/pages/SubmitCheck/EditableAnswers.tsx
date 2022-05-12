@@ -33,6 +33,7 @@ const EditMChoiceQ = (props: {
       <TickableOption
         checked={props.state.content[idx] !== ' '}
         content={ch}
+        key={idx}
         updater={(state: boolean) => {
           const replacer = (s: string, i: number, ch: string) => {
             return s.substring(0, i) + ch + s.substring(i + 1)

@@ -22,6 +22,15 @@ export interface FormAnswers
   answers: SingleQAnswer[]
 }
 
+export interface AllEntriesFormAnswers
+{
+  formId: string
+  creationDate: string
+  answerId: string
+  authorEmail: string
+  answers: string[]
+}
+
 export interface FormMultipleChoiceQuestion
 {
   title: string,
@@ -69,6 +78,6 @@ export interface HTTPValidationError
 
 export interface AllFormEntries
 {
-  entries: FormAnswers[]
+  entries: AllEntriesFormAnswers[]
   totalformsCount: number
 }
