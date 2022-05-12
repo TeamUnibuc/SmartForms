@@ -40,17 +40,20 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
         count: 100000,
         offset: 0,
         formId: formDesc.formId})
+      console.log(data)
       const transformed = data.entries.map(fa => {
         const entry: any = {}
         fa.answers.map((x, i) => {
-          entry[formDesc.questions[i].title] = x.content
+          entry[formDesc.questions[i].title] = x
         })
+        console.log("Entries")
+        console.log(entry)
         return entry
       })
 
+      console.log("Date:")
       console.log(transformed)
       setEntryData(transformed)
-      console.log(transformed)
     }
 
     getter()
