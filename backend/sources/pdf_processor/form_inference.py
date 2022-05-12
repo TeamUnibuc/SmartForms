@@ -114,7 +114,7 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[smart_for
     # process each file
     for file_content, filename in files:
         if filename.endswith(".pdf"):
-            answers += extract_answer_from_pdf_file((file_content, filename))
+            answers.append(extract_answer_from_pdf_file((file_content, filename)))
         elif filename.endswith(".zip"):
             answers += extract_answer_from_zip_file((file_content, filename))
         else:
