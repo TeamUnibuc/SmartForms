@@ -1,7 +1,11 @@
-import { FormDescription } from "../models";
 import fetchWrapper from "../wrapper";
 
-export const Pdf = async(formId: string): Promise<string> =>
+interface PdfResp
+{
+  formPdfBase64: string
+}
+
+export const Pdf = async(formId: string): Promise<PdfResp> =>
 {
   const data = await fetch(`/api/form/pdf/${formId}`, {
       method: "GET",
@@ -9,5 +13,5 @@ export const Pdf = async(formId: string): Promise<string> =>
           'Content-Type': 'application/json'
       }
   })
-  return fetchWrapper(data, "text")
+  return fetchWrapper(data)
 }

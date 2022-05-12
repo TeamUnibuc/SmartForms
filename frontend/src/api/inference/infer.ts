@@ -9,7 +9,11 @@ interface RawFormAnswer
   answers: string[]
 }
 
-type RawInferenceResponse = RawFormAnswer[]
+type RawInferenceResponse =
+{
+  entries: RawFormAnswer[]
+  errors: string[]
+}
 export type InferenceResponse = string | FormAnswers[]
 
 export const Infer = async(formData: any):
@@ -22,12 +26,9 @@ export const Infer = async(formData: any):
 
     })
     const content = await data.json() as RawInferenceResponse;
+    console.log(content)
 
-    if (content.map === undefined || content.length === undefined)
-      throw new Error("Bad parsing")
-
-    return content.map(fa => {
-      return {
+    return content.entries.map(fa => ({
         formId: fa.formId,
         answerId: fa.answerId,
         authorEmail: fa.authorEmail,
@@ -35,8 +36,8 @@ export const Infer = async(formData: any):
         answers: fa.answers.map(stuff => {
           return {content: stuff}
         })
-      }
-    });
+      })
+    );
   } catch (e)
   {
     return "Error parsing document: " + (e as Error).message

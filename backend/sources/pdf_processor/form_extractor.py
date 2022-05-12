@@ -31,7 +31,7 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
             img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         _, img = cv.threshold(img, 180, 255, cv.THRESH_BINARY)
         return img
-        
+
     picture_not_processed = picture.copy()
     picture = preprocess(picture)
     template = preprocess(template)
@@ -81,7 +81,7 @@ def extract_form_id_content_from_image(picture: np.ndarray) -> str:
     # no qr code was found
     if len(qr_codes) == 0:
         return ''
-    
+
     # extract qr code
     content = str(qr_codes[0].data, encoding='utf-8')
 
@@ -115,7 +115,7 @@ def extract_question_answer_from_form(
 
         # page the square is in
         fixed_page = fixed_pages[square.page]
-        
+
         # rescaling factor
         multiplier_h = fixed_page.shape[0] / constants.PDF_H
         multiplier_w = fixed_page.shape[1] / constants.PDF_W
@@ -180,7 +180,7 @@ def extract_answer_from_form(
     page_to_img_gray = {
         i: cv.cvtColor(page_to_img[i], cv.COLOR_BGR2GRAY) for i in page_to_img
     }
-    
+
     template_imgs = pdf2image.convert_from_bytes(pdf_form.extract_raw_pdf_bytes())
     template_imgs = [np.array(i) for i in template_imgs]
 

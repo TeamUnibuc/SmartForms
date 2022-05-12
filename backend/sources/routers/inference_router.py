@@ -15,11 +15,15 @@ router = APIRouter(
     tags=["inference"]
 )
 
+class InferenceReturnModel(BaseModel):
+    entries: List[smart_forms_types.FormAnswer]
+    errors: List[str]
+
 @router.post(
     "/infer",
     responses = {
         200: {
-            "model": List[Union[smart_forms_types.FormAnswer, str]],
+            "model": InferenceReturnModel,
             "description": "Ok. Each item is an answer, if found," +\
                     "or a string if an error occured for that particular answer."
         },
@@ -71,7 +75,7 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
 
     # perform inference
     result = pdf_processor.extract_answers_from_files(files)
-
+    print(result)
     # block all unauthorised entries
     for i in range(len(result)):
         if isinstance(result[i], smart_forms_types.FormAnswer) and not can_submit_answer_to_form(result[i].formId):
@@ -95,4 +99,7 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
         db = database.get_collection(database.ENTRIES)
         db.insert_many([answer.dict() for answer in answers])
 
-    return result
+    print("Result")
+    print(result)
+    # TODO: Fill errors field
+    return InferenceReturnModel(entries=result, errors=[])
