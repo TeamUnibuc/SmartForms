@@ -113,7 +113,7 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
         form.formId = smart_forms_types.generate_uuid()
         form.creationDate = datetime.now()
         form.authorEmail = user_email
-        
+
         model = pdf_processor.create_form_from_description(form, False)
         database.get_collection(database.FORMS).insert_one(model.dict())
         resp = CreateFormReturnModel(
@@ -314,7 +314,7 @@ async def get_form_pdf(request: Request, formId: str):
         )
         
     if routers.AUTHENTICATION_CHECKS:
-        if user_email == "" and form.needsToBeSignedInToSubmit:
+        if user_email == "" and form.description.needsToBeSignedInToSubmit:
             return JSONResponse(
                 routers.StatusReturnModel(
                     statusCode = 202,
@@ -322,7 +322,7 @@ async def get_form_pdf(request: Request, formId: str):
                 ).dict(),
                 202
             )
-        if not form.canBeFilledOnline and user_email != form.authorEmail:
+        if not form.description.canBeFilledOnline and user_email != form.description.authorEmail:
             return JSONResponse(
                 routers.StatusReturnModel(
                     statusCode = 203,
