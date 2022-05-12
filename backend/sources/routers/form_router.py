@@ -112,6 +112,7 @@ async def create_form(request: Request, form: smart_forms_types.FormDescription)
     try:
         form.formId = smart_forms_types.generate_uuid()
         form.creationDate = datetime.now()
+        form.authorEmail = user_email
         
         model = pdf_processor.create_form_from_description(form, False)
         database.get_collection(database.FORMS).insert_one(model.dict())
