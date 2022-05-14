@@ -62,7 +62,7 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
     sortable: true
   }), []);
 
-  return <Box className="ag-theme-alpine-dark" style={{height: "calc(100vh - 300px)"}}>
+  return <Box className="ag-theme-alpine-dark" style={{height: "calc(80vh)"}}>
     <AgGridReact
         // className="ag-theme-alpine"
         animateRows={true}

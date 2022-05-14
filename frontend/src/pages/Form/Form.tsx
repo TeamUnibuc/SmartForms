@@ -80,6 +80,9 @@ const FormPage = () =>
     <Tab label="Data" {...a11yProps(0)} />
     <Tab label="Questions" {...a11yProps(1)} />
     <Tab label="Form" {...a11yProps(2)} />
+    {formOwner &&
+      <Tab label="Settings" {...a11yProps(3)} />
+    }
   </Tabs>
 
   <SwipeableViews
@@ -96,19 +99,25 @@ const FormPage = () =>
     <TabPanel value={value} index={2} dir={theme.direction}>
       <PdfDisplay pdfString={pdfString}/>
     </TabPanel>
+    {formOwner &&
+    <TabPanel value={value} index={3} dir={theme.direction}>
+      <OwnerCommands />
+    </TabPanel>
+    }
   </SwipeableViews>
 
-  {formOwner &&
-  <Box>
+  </Box>
+}
+
+const OwnerCommands = () =>
+{
+  return <Box>
     <Typography color="#a1c9c5" variant="h6" sx={{mb: 2}} style={{fontWeight: 500}}>
       Form Commands:
     </Typography>
     <Button color="error" variant="contained">
       Delete
     </Button>
-  </Box>
-  }
-
   </Box>
 }
 
