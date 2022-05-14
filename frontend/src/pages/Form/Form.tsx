@@ -1,4 +1,4 @@
-import { Box, Alert, Typography, Tabs, Tab, useTheme, Button } from "@mui/material"
+import { Box, Alert, Typography, Tabs, Tab, useTheme, Button, Snackbar, AlertColor } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import SwipeableViews from 'react-swipeable-views';
@@ -11,7 +11,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always nee
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
 import PdfDisplay from "~/components/PdfDisplay";
 import NonEditableAnswers from "~/components/NonEditableAnswers";
-import { useUserState, useUserUpdater } from "~/contexts/UserContext";
+import { useUserState } from "~/contexts/UserContext";
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
@@ -25,6 +25,9 @@ const FormPage = () =>
   const [pdfString, setPdfString] = useState("")
   const userState = useUserState()
   const theme = useTheme();
+
+  const [snackOpen, setSnackOpen] = useState(false)
+  const [snackState, setSnackState] = useState({msg: "", sev: "info"})
 
   const formOwner = userState.data?.email === formData?.authorEmail
   const formId = searchParams.get("formId")
@@ -65,9 +68,16 @@ const FormPage = () =>
     setValue(index);
   };
 
+  const handleSnackClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackOpen(false);
+  };
+
   console.log(`Owner: ${formOwner}`)
   return <Box width='100%'>
-
 
   <Tabs
     value={value}
@@ -101,21 +111,67 @@ const FormPage = () =>
     </TabPanel>
     {formOwner &&
     <TabPanel value={value} index={3} dir={theme.direction}>
-      <OwnerCommands />
+      <OwnerCommands
+        formId={formData.formId}
+        snack={[setSnackOpen, setSnackState]}
+      />
+
     </TabPanel>
     }
   </SwipeableViews>
 
+  <Snackbar
+    anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+    open={snackOpen}
+    autoHideDuration={5000}
+    onClose={handleSnackClose}
+  >
+    <Alert
+      onClose={handleSnackClose}
+      severity={snackState.sev as AlertColor}
+      sx={{ width: '100%' }}
+    >
+      {snackState.msg}
+    </Alert>
+  </Snackbar>
+
   </Box>
 }
 
-const OwnerCommands = () =>
+interface OCProps
 {
+  formId: string,
+  snack: [
+    React.Dispatch<React.SetStateAction<boolean>>,
+    React.Dispatch<React.SetStateAction<{
+        msg: string;
+        sev: string;
+    }>>]
+}
+
+const OwnerCommands = ({formId, snack}: OCProps) =>
+{
+  const [setSnackOpen, setSnackState] = snack
+
+  const deleteClick = async () =>
+  {
+    const rez = await API.Form.Delete(formId)
+      .then(r => {
+        setSnackState({msg: "Form deleted!", sev: "success"})
+      })
+      .catch(e => {
+        setSnackState({msg: "Error occured :/", sev: "error"})
+      })
+      .finally(() => {
+        setSnackOpen(true)
+      })
+  }
+
   return <Box>
     <Typography color="#a1c9c5" variant="h6" sx={{mb: 2}} style={{fontWeight: 500}}>
       Form Commands:
     </Typography>
-    <Button color="error" variant="contained">
+    <Button color="error" variant="contained" onClick={deleteClick}>
       Delete
     </Button>
   </Box>
