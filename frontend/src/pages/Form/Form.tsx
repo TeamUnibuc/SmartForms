@@ -1,4 +1,4 @@
-import { Box, Alert, Typography, Tabs, Tab, useTheme } from "@mui/material"
+import { Box, Alert, Typography, Tabs, Tab, useTheme, Button } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import SwipeableViews from 'react-swipeable-views';
@@ -11,40 +11,37 @@ import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always nee
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
 import PdfDisplay from "~/components/PdfDisplay";
 import NonEditableAnswers from "~/components/NonEditableAnswers";
+import { useUserState, useUserUpdater } from "~/contexts/UserContext";
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
 const FormPage = () =>
 {
+
   const [searchParams, _setSearchParams] = useSearchParams()
   const [formData, setFormData] = useState<undefined | FormDescription>()
   const [loading, setLoading] = useState(true)
   const [value, setValue] = useState(0);
   const [pdfString, setPdfString] = useState("")
+  const userState = useUserState()
   const theme = useTheme();
 
+  const formOwner = userState.data?.email === formData?.authorEmail
   const formId = searchParams.get("formId")
 
   useEffect(() => {
-    const getter = async () => {
-      console.log("Formdata")
-      console.log(formData)
+    (() => {
       if (formData === undefined) {
         API.Form.Description(formId || "idiot")
           .then(async r => {
             setFormData(r)
             const previewData = await API.Form.Pdf(r.formId)
-            console.log("Pdf data:")
-            console.log(previewData.formPdfBase64)
             setPdfString(previewData.formPdfBase64)
           })
           .catch(e => console.log(`Error getting formId: ${e}`))
           .finally(() => setLoading(false))
       }
-
-    }
-
-    getter()
+    })()
   }, [formData])
 
   if (loading)
@@ -53,8 +50,6 @@ const FormPage = () =>
   if (formData === undefined)
     return <Alert severity={"error"}> Could not find form :/ </Alert>
 
-  console.log(formData)
-
   const a11yProps = (index: number) => {
     return {
       id: `full-width-tab-${index}`,
@@ -62,7 +57,7 @@ const FormPage = () =>
     };
   }
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -70,7 +65,10 @@ const FormPage = () =>
     setValue(index);
   };
 
+  console.log(`Owner: ${formOwner}`)
   return <Box width='100%'>
+
+
   <Tabs
     value={value}
     onChange={handleChange}
@@ -99,6 +97,17 @@ const FormPage = () =>
       <PdfDisplay pdfString={pdfString}/>
     </TabPanel>
   </SwipeableViews>
+
+  {formOwner &&
+  <Box>
+    <Typography color="#a1c9c5" variant="h6" sx={{mb: 2}} style={{fontWeight: 500}}>
+      Form Commands:
+    </Typography>
+    <Button color="error" variant="contained">
+      Delete
+    </Button>
+  </Box>
+  }
 
   </Box>
 }

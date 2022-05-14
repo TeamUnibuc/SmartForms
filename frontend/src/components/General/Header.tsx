@@ -24,6 +24,8 @@ const Header = (props: HeaderProps): JSX.Element =>
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const user = useUserState()
 
+    console.log(`Rendering Header, auth? ${user.authenticated}`)
+
     const switchClicked = () => {
       const newVal = !props.isDarkTheme
       props.themeChanger(newVal)

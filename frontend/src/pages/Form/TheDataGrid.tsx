@@ -27,12 +27,7 @@ interface TDGProps
 
 const TheDataGrid = ({formDesc}: TDGProps) =>
 {
-  console.log(formDesc.authorEmail)
-  console.log("Rendering the grid")
-
   const [entryData, setEntryData] = useState<{[x: string]: string}[]>([])
-
-  console.log(entryData)
 
   useEffect(() => {
     const getter = async () => {
@@ -46,13 +41,9 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
         fa.answers.map((x, i) => {
           entry[formDesc.questions[i].title] = x
         })
-        console.log("Entries")
-        console.log(entry)
         return entry
       })
 
-      console.log("Date:")
-      console.log(transformed)
       setEntryData(transformed)
     }
 
@@ -64,9 +55,6 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
   , [formDesc.questions]);
   columnDefs[0] = {...columnDefs[0], headerCheckboxSelection: true,
     headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true}
-
-  console.log("Columns:")
-  console.log(columnDefs)
 
   // never changes, so we can use useMemo
   const defaultColDef = useMemo(() => ({
