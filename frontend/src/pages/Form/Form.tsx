@@ -77,6 +77,23 @@ const FormPage = () =>
     setSnackOpen(false);
   };
 
+  const tabElements = [
+    {tab: "Data",
+     content: <TheDataGrid formDesc={formData}/>},
+    {tab: "Questions",
+     content: <NonEditableAnswers questions={formData.questions}/>},
+    {tab: "Form",
+     content: <PdfDisplay pdfString={pdfString}/>},
+    {tab: "Settings",
+     content: <Settings
+      formId={formData.formId}
+      snack={[setSnackOpen, setSnackState]}
+      formData={formData}
+    />}
+  ]
+
+  const chosenEl = formOwner ? [0, 1, 2, 3] : [1, 2]
+
   console.log(`Owner: ${formOwner}`)
   return <Box width='100%'>
 
@@ -88,12 +105,9 @@ const FormPage = () =>
     variant="fullWidth"
     aria-label="full width tabs example"
   >
-    <Tab label="Data" {...a11yProps(0)} />
-    <Tab label="Questions" {...a11yProps(1)} />
-    <Tab label="Form" {...a11yProps(2)} />
-    {formOwner &&
-      <Tab label="Settings" {...a11yProps(3)} />
-    }
+    {chosenEl.map((id, _index) =>
+      <Tab label={tabElements[id].tab}/>
+    )}
   </Tabs>
 
   <SwipeableViews
@@ -101,25 +115,11 @@ const FormPage = () =>
     index={value}
     onChangeIndex={handleChangeIndex}
   >
-    <TabPanel value={value} index={0} dir={theme.direction}>
-      <TheDataGrid formDesc={formData}/>
-    </TabPanel>
-    <TabPanel value={value} index={1} dir={theme.direction}>
-      <NonEditableAnswers questions={formData.questions}/>
-    </TabPanel>
-    <TabPanel value={value} index={2} dir={theme.direction}>
-      <PdfDisplay pdfString={pdfString}/>
-    </TabPanel>
-    {formOwner &&
-    <TabPanel value={value} index={3} dir={theme.direction}>
-      <Settings
-        formId={formData.formId}
-        snack={[setSnackOpen, setSnackState]}
-        formData={formData}
-      />
-
-    </TabPanel>
-    }
+    {chosenEl.map((id, index) =>
+      <TabPanel value={value} index={index} dir={theme.direction}>
+        {tabElements[id].content}
+      </TabPanel>
+    )}
   </SwipeableViews>
 
   <Snackbar
@@ -159,7 +159,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ mt: 2 }}>
           {children}
         </Box>
       )}
