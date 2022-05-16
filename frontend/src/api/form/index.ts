@@ -4,6 +4,7 @@ import { FormPreview } from "./preview";
 import { Description } from "./description";
 import { Pdf } from "./pdf";
 import { Delete } from "./delete"
+import { OnlineAccess } from "./onlineAccess"
 
 export const Form = {
   FormList,
@@ -11,5 +12,6 @@ export const Form = {
   FormCreate,
   Description,
   Pdf,
-  Delete
+  Delete,
+  OnlineAccess
 }

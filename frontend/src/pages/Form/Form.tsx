@@ -12,6 +12,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CS
 import PdfDisplay from "~/components/PdfDisplay";
 import NonEditableAnswers from "~/components/NonEditableAnswers";
 import { useUserState } from "~/contexts/UserContext";
+import Settings from "./Settings";
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
@@ -111,9 +112,10 @@ const FormPage = () =>
     </TabPanel>
     {formOwner &&
     <TabPanel value={value} index={3} dir={theme.direction}>
-      <OwnerCommands
+      <Settings
         formId={formData.formId}
         snack={[setSnackOpen, setSnackState]}
+        formData={formData}
       />
 
     </TabPanel>
@@ -135,45 +137,6 @@ const FormPage = () =>
     </Alert>
   </Snackbar>
 
-  </Box>
-}
-
-interface OCProps
-{
-  formId: string,
-  snack: [
-    React.Dispatch<React.SetStateAction<boolean>>,
-    React.Dispatch<React.SetStateAction<{
-        msg: string;
-        sev: string;
-    }>>]
-}
-
-const OwnerCommands = ({formId, snack}: OCProps) =>
-{
-  const [setSnackOpen, setSnackState] = snack
-
-  const deleteClick = async () =>
-  {
-    const rez = await API.Form.Delete(formId)
-      .then(r => {
-        setSnackState({msg: "Form deleted!", sev: "success"})
-      })
-      .catch(e => {
-        setSnackState({msg: "Error occured :/", sev: "error"})
-      })
-      .finally(() => {
-        setSnackOpen(true)
-      })
-  }
-
-  return <Box>
-    <Typography color="#a1c9c5" variant="h6" sx={{mb: 2}} style={{fontWeight: 500}}>
-      Form Commands:
-    </Typography>
-    <Button color="error" variant="contained" onClick={deleteClick}>
-      Delete
-    </Button>
   </Box>
 }
 
