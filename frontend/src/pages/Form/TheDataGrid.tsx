@@ -13,10 +13,12 @@ import { ColDef, ModuleRegistry } from '@ag-grid-community/core';
 import 'ag-grid-enterprise'
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine-dark.css';
+import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham-dark.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-material.css';
 import { Box } from "@mui/material";
+import isDarkTheme from "~/utils/themeGetter";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, RangeSelectionModule, RowGroupingModule, RichSelectModule]);
 
@@ -62,7 +64,9 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
     sortable: true
   }), []);
 
-  return <Box className="ag-theme-alpine-dark" style={{height: "calc(80vh)"}}>
+  const themeClass = `ag-theme-alpine${isDarkTheme() ? '-dark' : ''}`
+
+  return <Box className={themeClass} style={{height: "calc(80vh)"}}>
     <AgGridReact
         // className="ag-theme-alpine"
         animateRows={true}
