@@ -7,7 +7,7 @@ import { useQLContextState, useQLContextUpdater } from '~/contexts/CoolContext';
 
 export default function GenerateButton(): JSX.Element
 {
-  const {qList} = useQLContextState()
+  const {qList, title, description} = useQLContextState()
   const {sOps} = useQLContextUpdater()
 
   const generatePdf = async (formData: Question[]) => {
@@ -17,9 +17,9 @@ export default function GenerateButton(): JSX.Element
       formId: "",
       canBeFilledOnline: true,
       needsToBeSignedInToSubmit: true,
-      description: "useless description",
+      description: description,
       questions: formData,
-      title: "First PDF"
+      title: title
     })
     sOps.setPdfString(resp.formPdfBase64)
   }

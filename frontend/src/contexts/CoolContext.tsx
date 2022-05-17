@@ -5,12 +5,18 @@ import { Question } from "~/api/models";
 
 interface QLUpdaterType {
   qOps: {
-    setQuestion: (q_ind: number, q: Question) => void,
+    setQuestion: (q_ind: number, q: Question) => void
     addQuestion: (q: Question | undefined) => void
     delQuestion: (index?: number) => void
-  },
+  }
   sOps: {
     setPdfString: (base64: string) => void
+  }
+  dOps: {
+    setTitle: (t: string) => void
+    setDesc: (d: string) => void
+    setFillOnline: (x: boolean) => void
+    setSigndSubmit: (x: boolean) => void
   }
 }
 
@@ -18,6 +24,10 @@ interface QLStateType {
   qList: {
     questions: (Question | undefined)[]
   },
+  title: string
+  description: string
+  canBeFilledOnline: boolean
+  needsToBeSignedInToSubmit: boolean
   pdfString: string
 }
 
@@ -58,19 +68,19 @@ const QLContextProvider: React.FC = (props) => {
 
   const emptyState: QLStateType = {
     qList: { questions: [] },
-    pdfString: ""
+    pdfString: "",
+    canBeFilledOnline: true,
+    needsToBeSignedInToSubmit: false,
+    title: "",
+    description: ""
   }
 
   const [ql, setQl] = useState<QLStateType>(emptyState);
 
-  // const updateQL = (data: QLStateType) => {
-
-  // }
-
   const myUpdate = (data: QLStateType) => {
     setQl({
-      qList: {questions: [...data.qList.questions]},
-      pdfString: data.pdfString
+      ...data,
+      qList: {questions: [...data.qList.questions]}
     })
   }
 
@@ -101,6 +111,24 @@ const QLContextProvider: React.FC = (props) => {
     sOps: {
       setPdfString: (q: string) => {
         ql.pdfString = q
+        myUpdate(ql)
+      }
+    },
+    dOps: {
+      setDesc: (d: string) => {
+        ql.description = d
+        myUpdate(ql)
+      },
+      setTitle: (t: string) => {
+        ql.title = t
+        myUpdate(ql)
+      },
+      setFillOnline: (b: boolean) => {
+        ql.canBeFilledOnline = b
+        myUpdate(ql)
+      },
+      setSigndSubmit: (b: boolean) => {
+        ql.needsToBeSignedInToSubmit = b
         myUpdate(ql)
       }
     }

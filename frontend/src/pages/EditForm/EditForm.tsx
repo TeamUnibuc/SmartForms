@@ -8,6 +8,7 @@ import DynamicQuestionList from '~/components/EditForm/DynamicQuestionList';
 import { QLContextProvider } from '~/contexts/CoolContext';
 import CreateFormButton from '~/components/EditForm/CreateFormButton';
 import { Divider } from '@mui/material';
+import EditFormInfo from './EditFormInfo';
 
 export default function EditForm(): JSX.Element
 {
@@ -15,6 +16,7 @@ export default function EditForm(): JSX.Element
     <QLContextProvider>
       <Grid container columnSpacing={1}>
           <Grid item xs={4}>
+              <EditFormInfo />
               <DynamicQuestionList />
           </Grid>
 
