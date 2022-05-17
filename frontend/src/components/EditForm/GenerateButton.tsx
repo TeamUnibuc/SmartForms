@@ -7,7 +7,7 @@ import { useQLContextState, useQLContextUpdater } from '~/contexts/CoolContext';
 
 export default function GenerateButton(): JSX.Element
 {
-  const {qList, title, description} = useQLContextState()
+  const {qList, title, description, needsToBeSignedInToSubmit, canBeFilledOnline} = useQLContextState()
   const {sOps} = useQLContextUpdater()
 
   const generatePdf = async (formData: Question[]) => {
@@ -15,8 +15,8 @@ export default function GenerateButton(): JSX.Element
     const resp = await API.Form.FormPreview({
       authorEmail: "",
       formId: "",
-      canBeFilledOnline: true,
-      needsToBeSignedInToSubmit: true,
+      canBeFilledOnline: canBeFilledOnline,
+      needsToBeSignedInToSubmit: needsToBeSignedInToSubmit,
       description: description,
       questions: formData,
       title: title

@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, TextField, Typography } from "@mui/material"
+import { Box, Card, CardContent, Switch, TextField, Typography } from "@mui/material"
 import { ChangeEvent } from "react"
 import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext"
 
@@ -20,6 +20,15 @@ const EditFormInfo = () =>
     dOps.setDesc(e.target.value)
   }
 
+  const fillClick = ()  => {
+    dOps.setFillOnline(!canBeFilledOnline)
+  }
+
+
+  const signedSubmitClick = ()  => {
+    dOps.setFillOnline(!needsToBeSignedInToSubmit)
+  }
+
   return <Card raised sx={{mb: 2, p: 1, pb: 0}}>
   <CardContent>
     <TextField required defaultValue={title}
@@ -37,6 +46,27 @@ const EditFormInfo = () =>
       sx={{m: 0}}
       style={{width: "100%"}}
     />
+
+    <Box display="flex" style={{alignItems: "center"}} sx={{mb: 1, mt: 2}}>
+      <Switch
+        checked={canBeFilledOnline}
+        onChange={fillClick}
+      />
+      <Typography sx={{ml: 2}}>
+        Can the form receive answers?
+      </Typography>
+    </Box>
+
+    <Box display="flex" style={{alignItems: "center"}} sx={{mb: 1}}>
+      <Switch
+        checked={needsToBeSignedInToSubmit}
+        onChange={signedSubmitClick}
+      />
+      <Typography sx={{ml: 2}}>
+        Require authenticateed users?
+      </Typography>
+    </Box>
+
   </CardContent>
   </Card>
 }

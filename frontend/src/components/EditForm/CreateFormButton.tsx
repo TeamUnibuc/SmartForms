@@ -7,7 +7,7 @@ import { useQLContextState } from "~/contexts/CoolContext"
 
 const CreateFormButton = () =>
 {
-  const {qList} = useQLContextState()
+  const {qList, canBeFilledOnline, needsToBeSignedInToSubmit, description, title} = useQLContextState()
   const [snackOpen, setSnackOpen] = useState(false)
   const [snackState, setSnackState] = useState({msg: "", color: "info"})
 
@@ -23,10 +23,10 @@ const CreateFormButton = () =>
     API.Form.FormCreate({
       authorEmail: "",
       formId: "",
-      canBeFilledOnline: true,
-      description: "Descriere :)",
-      needsToBeSignedInToSubmit: false,
-      title: "Titlu Form",
+      canBeFilledOnline: canBeFilledOnline,
+      description: description,
+      needsToBeSignedInToSubmit: needsToBeSignedInToSubmit,
+      title: title,
       questions: getCuratedQuestions()
     })
     .then(r => {
