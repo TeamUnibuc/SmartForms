@@ -387,7 +387,7 @@ async def delete_form(request: Request, formId: str):
                 ).dict(),
                 202
             )
-        if user_email != form.authorEmail:
+        if user_email != form.description.authorEmail:
             return JSONResponse(
                 routers.StatusReturnModel(
                     statusCode = 203,
@@ -469,7 +469,7 @@ async def update_form_visibility(request: Request, params: UpdateFormReceiveMode
                 ).dict(),
                 202
             )
-        if user_email != form.authorEmail:
+        if user_email != form.description.authorEmail:
             return JSONResponse(
                 routers.StatusReturnModel(
                     statusCode = 203,
