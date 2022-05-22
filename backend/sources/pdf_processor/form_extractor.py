@@ -1,5 +1,6 @@
 import logging
 import os
+import pickle
 from typing import Dict, List, Tuple, Union
 import cv2 as cv
 import pdf2image
@@ -94,12 +95,12 @@ def extract_form_id_content_from_image(picture: np.ndarray) -> str:
 def extract_question_answer_from_form(
         fixed_pages: Dict[int, np.ndarray],
         question: Union[smart_forms_types.FormTextQuestion, smart_forms_types.FormMultipleChoiceQuestion],
-        squares_location: List[smart_forms_types.Square]) -> List[str]:
+        squares_location: List[smart_forms_types.Square]) -> Tuple[str, List[Union[bytes, None]]]:
     """
-        fixed_picture: mapping for each page of the form where we already fixed the perspective transform.
-        question: question we are trying to extract.
-        square_locations: location of the squares of the question we are interested in.
-        Returns the result
+    fixed_picture: mapping for each page of the form where we already fixed the perspective transform.
+    question: question we are trying to extract.
+    square_locations: location of the squares of the question we are interested in.
+    Returns the result, and a list with all the squares
     """
 
     # the content, and the nr of the square in the question
@@ -160,17 +161,22 @@ def extract_question_answer_from_form(
 
     # compute the initial answer
     answer = ["?" for i in range(len(squares_location))]
+    answer_square = [None for i in range(len(squares_location))]
 
-    for square_nr, square_prediction in zip(squares_nr, squares_predictions):
+    # combine the extracted values with the initial values
+    # we only consider the `square_nr` positions, as the others are missing
+    for square_nr, square_prediction, square_content in zip(squares_nr, squares_predictions, squares_content):
         answer[square_nr] = square_prediction
+        answer_square[square_nr] = pickle.dumps(square_content)
 
-    return "".join(answer)
+    return "".join(answer), answer_square
 
 
 
 def extract_answer_from_form(
             pdf_form: smart_forms_types.PdfForm,
-            page_to_img: Dict[int, np.ndarray]) -> smart_forms_types.FormAnswer:
+            page_to_img: Dict[int, np.ndarray]) -> \
+                Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, None]]]]:
     """
     Extracts as much as possible from the content of a single form, whose pages
     are saved in page_to_img (note that not all pages must be present).
@@ -192,9 +198,12 @@ def extract_answer_from_form(
     }
 
     answers = []
+    answer_images = []
 
     for question, squares in zip(pdf_form.description.questions, pdf_form.answer_squares_location):
-        answers.append(extract_question_answer_from_form(page_to_img_fixed, question, squares))
+        question_answer, question_images = extract_question_answer_from_form(page_to_img_fixed, question, squares)
+        answers.append(question_answer)
+        answer_images.append(question_images)
 
 
     form_answer = smart_forms_types.FormAnswer(
@@ -205,4 +214,4 @@ def extract_answer_from_form(
         authorEmail=""
     )
 
-    return form_answer
+    return form_answer, answer_images
