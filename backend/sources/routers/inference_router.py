@@ -74,30 +74,34 @@ async def extract_answer(request: Request, fileUploads: List[UploadFile] = File(
     ]
 
     # perform inference
-    result = pdf_processor.extract_answers_from_files(files)
+    inference_result = pdf_processor.extract_answers_from_files(files)
+    errors = []
+    entries = []
 
     # block all unauthorised entries
-    for i in range(len(result)):
-        if isinstance(result[i], smart_forms_types.FormAnswer) and not can_submit_answer_to_form(result[i].formId):
-            result[i] = f"You are not authorized to submit an answer to the form {result[i].formId}"
+    for answer, images in inference_result:
+        if not can_submit_answer_to_form(answer.formId):
+            errors.append(f"You are not authorized to submit an answer to the form {answer.formId}")
+        else:
+            # set additional properties
+            answer.answerId = f"entry-{smart_forms_types.generate_uuid()}"
+            answer.creationDate = datetime.now()
+            answer.authorEmail = user_email
 
-    # parsed result
-    answers = [i for i in result if isinstance(i, smart_forms_types.FormAnswer)]
+            # push characters to the database
+            smart_forms_types.InferedCharacter.populate_database_from_answer(
+                answer,
+                images
+            )
 
-    # add email to entries
-    for answer in answers:
-        answer.authorEmail = user_email
+            # save the entry
+            entries.append(answer)
 
-    logging.info(f"Performed inference. Found {len(result)} forms, out of which {len(answers)} were valid.")
-    # set ids
-    for answer in answers:
-        answer.answerId = f"entry-{smart_forms_types.generate_uuid()}"
-        answer.creationDate = datetime.now()
-
+    logging.info(f"Performed inference. Found {len(entries)} answers, and encountered {len(errors)} permission issues.")
+    
     # if we have any entries, add them to the DB
-    if answers != []:
+    if entries != []:
         db = database.get_collection(database.ENTRIES)
-        db.insert_many([answer.dict() for answer in answers])
+        db.insert_many([answer.dict() for answer in entries])
 
-    # TODO: Fill errors field
-    return InferenceReturnModel(entries=answers, errors=[])
+    return InferenceReturnModel(entries=entries, errors=errors)
