@@ -1,7 +1,7 @@
 from collections import defaultdict
 import numpy as np
 import pdf2image
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Optional, Tuple, List, Union
 import logging
 from PIL import Image
 import cv2 as cv
@@ -11,7 +11,7 @@ import zipfile
 import io
 import pdf_processor.form_extractor as form_extractor
 
-def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[smart_forms_types.FormAnswer]:
+def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, str]]]]]:
     """
     Extracts the content of a form within a PDF file.
     A SINGLE FORM CAN BE INCLUDED IN THE PDF FILE.
@@ -23,7 +23,8 @@ def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[smart_
     # process pdf as list of images
     return extract_answer_from_images(images)
 
-def extract_answer_from_images(images: List[np.ndarray]) -> Optional[smart_forms_types.FormAnswer]:
+def extract_answer_from_images(images: List[np.ndarray]) -> \
+        Optional[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, str]]]]]:
     """
     Extracts a single answer, whose pages are in `images`.
     """
@@ -60,12 +61,13 @@ def extract_answer_from_images(images: List[np.ndarray]) -> Optional[smart_forms
         if page_id in id_to_img:
             page_to_img[page] = id_to_img[page_id]
 
-    answer = form_extractor.extract_answer_from_form(pdf_form, page_to_img)
+    try:
+        return form_extractor.extract_answer_from_form(pdf_form, page_to_img)
+    except Exception as e:
+        logging.warning(f"Unable to extract form: {e}")
+        return None
 
-    return answer
-
-
-def extract_answer_from_zip_file(zip_file: Tuple[bytes, str]) -> List[smart_forms_types.FormAnswer]:
+def extract_answer_from_zip_file(zip_file: Tuple[bytes, str]) -> List[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, str]]]]]:
     """
     Extracts the content of a zip file and processes each folder as an independent
     list of files (pdfs, images or other zips).
@@ -98,14 +100,14 @@ def extract_answer_from_zip_file(zip_file: Tuple[bytes, str]) -> List[smart_form
 
     return answers
 
-def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[smart_forms_types.FormAnswer]:
+def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, None]]]]]:
     """
     Processes files, extracting their answers.
     The files have to be an image, a pdf or a zip.
     """
 
     # all of the answers processed until now
-    answers: List[smart_forms_types.FormAnswer] = []
+    answers = []
 
     # here we store all of the images in our current scope
     images: List[np.ndarray] = []

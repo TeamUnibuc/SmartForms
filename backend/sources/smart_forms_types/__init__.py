@@ -14,3 +14,4 @@ def generate_uuid():
 from smart_forms_types.pdf_form import *
 from smart_forms_types.models import *
 from smart_forms_types.user import *
+from smart_forms_types.inference_dataset import *

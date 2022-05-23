@@ -267,11 +267,12 @@ async def edit_entry(request: Request, entry: smart_forms_types.FormAnswer):
             203
         )
 
-    if len(entry.answers) != len(form.description.questions):
+    if len(entry.answers) != len(form.description.questions) or \
+            [len(i) for i in entry.answers] != [len(i) for i in entry_db.answers]:
         return JSONResponse(
             routers.StatusReturnModel(
                 statusCode = 400,
-                message = "Number of answers is not valid.",
+                message = "Number of answers is not valid or answer lenghts differ.",
             ).dict(),
             400
         )
@@ -285,12 +286,45 @@ async def edit_entry(request: Request, entry: smart_forms_types.FormAnswer):
             400
         )
 
+
+    # for each difference, check if we have an annotation about it,
+    # to populate our inference dataset
+    db_inference = database.get_collection(database.INFERENCE_CHARACTERS)
+    chars_dataset = []
+    for question in range(len(entry_db.answers)):
+        for character in range(len(entry_db.answers[question])):
+            # we have a mismatch, the user corrected the inference
+            if entry_db.answers[question][character] != entry.answers[question][character]:
+                # try to get infered character from database
+                inference_char = db_inference.find_one({
+                    "answerId": entry.answerId,
+                    "questionNr": question,
+                    "characterNr": character
+                })
+                # if the character doesn't exist, it means it wasn't infered. Just skip.
+                if inference_char is None:
+                    continue
+            
+                chars_dataset.append(smart_forms_types.DatasetCharacter(
+                    answerId=entry.answerId,
+                    image=inference_char["image"],
+                    label=entry.answers[question][character]
+                ))
+    # add dataset to database
+    if chars_dataset != []:
+        db_dataset = database.get_collection(database.CHARACTERS_DATASET)
+        db_dataset.insert_many([i.dict() for i in chars_dataset])
+        logging.info(f"Added {len(chars_dataset)} new entries to the character dataset.")
+
+
     entry_db.answers = entry.answers
     entry_db.creationDate = datetime.now()
+    entry_db.authorEmail = user_email
 
+    # replace the entry in the database
     db = database.get_collection(database.ENTRIES)
-    # TODO: Check what is here.
     db.replace_one({ "answerId": entry.answerId }, entry_db.dict())
+    
     return JSONResponse(
         routers.StatusReturnModel(
             statusCode = 200,
