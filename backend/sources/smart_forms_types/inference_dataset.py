@@ -85,22 +85,26 @@ class DatasetCharacter:
     """
     Annotated character, to be used for training the NN.
     """
+    answerId: str
     image: bytes
     label = str
 
-    def __init__(self, image, label):
+    def __init__(self, answerId, image, label):
+        self.answerId = answerId
         self.image = image
         self.label = label
 
     @staticmethod
     def from_dict(d: dict):
         return InferedCharacter(
+            answerId=d["answerId"],
             image=d["image"],
             label=d["label"]
         )
 
     def dict(self):
         return {
+            "answerId": self.answerId,
             "image": self.image,
             "label": self.label
         }
