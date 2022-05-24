@@ -473,7 +473,7 @@ async def update_form_visibility(request: Request, params: UpdateFormReceiveMode
             return JSONResponse(
                 routers.StatusReturnModel(
                     statusCode = 203,
-                    message = "User is not authorized to delete the form!",
+                    message = "User is not authorized to change the form visibility!",
                 ).dict(),
                 203
             )
