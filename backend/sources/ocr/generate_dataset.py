@@ -18,6 +18,7 @@ import random
 DATASET_PATH = "../data/OCR/dataset/"
 IMAGES_PATH = DATASET_PATH + "emnist_imgs.npy"
 LABELS_PATH = DATASET_PATH + "emnist_labels.npy"
+DEBUG = False
 
 def generate_dataset():
     """
@@ -40,12 +41,13 @@ def generate_dataset():
     for i in tqdm(ds):
         img = i["image"]
         img = img.numpy().transpose((1, 0, 2))
+        img = img.reshape((28, 28))
         lbl = i["label"]
         data.append((img, lbl))
 
     # add spaces
     for i in range(100000):
-        data.append((np.zeros((28, 28, 1), dtype=np.uint8), 62))
+        data.append((np.zeros((28, 28), dtype=np.uint8), 62))
 
     np.random.shuffle(data)
 
@@ -70,11 +72,26 @@ def generate_dataset():
     data = None
 
     imgs = np.stack(imgs)
-    imgs = imgs.reshape((-1, 28, 28))
     labels = np.stack(labels)
 
     print(f"Imgs shape:   {imgs.shape}")
     print(f"Labels shape: {labels.shape}")
 
+    if DEBUG:
+        for i in range(10):
+            for j in range(10):
+                print(network.CHARACTERS[labels[i * 10 + j]], end='')
+            print('')
+
+        print(f"Max value: {np.max(imgs[0])}")
+        print(f"Average: {np.sum(imgs[0]) / imgs[0].shape[0] / imgs[0].shape[1]}")
+
+        fig, ax = plt.subplots(nrows=10, ncols=10)
+        for i in range(100):
+            ax[i // 10][i % 10].imshow(imgs[i])
+
+        plt.show()
+
+    os.makedirs(DATASET_PATH)
     np.save(IMAGES_PATH, imgs)
     np.save(LABELS_PATH, labels)

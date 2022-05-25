@@ -4,6 +4,7 @@ import torch as th
 import torch.nn as nn
 import logging
 import os
+import ocr.data_preprocessing as data_preprocessing
 
 IMAGE_SIZE = 28
 DEVICE = th.device("cuda") if th.cuda.is_available() else th.device("cpu")
@@ -78,11 +79,16 @@ class Network:
         """
         Predict the most probable character for a given image.
         images is 3d, where the first dim is the number of images.
+        images has types np.uint8
         """
+        images = th.from_numpy(images)
+        images = data_preprocessing.images_processing(images)
+        inputs = th.tensor(images.reshape((-1, 1, 28, 28)), dtype=th.float32).to(DEVICE)
+
         # pass model in eval mode
         self.model.eval()
         # compute predictions
-        predictions = self.model(th.tensor(images, dtype=th.float32).to(DEVICE))
+        predictions = self.model(inputs)
         # convert to numpy
         predictions = predictions.detach().cpu().numpy()
         # sort according to probabilities

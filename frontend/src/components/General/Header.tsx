@@ -66,7 +66,7 @@ const Header = (props: HeaderProps): JSX.Element =>
     }
 
     return (
-      <AppBar position="static" style={{marginBottom: "1em"}}>
+      <AppBar id="myAppBar" position="static" style={{marginBottom: "1em"}}>
         <Container>
           <Toolbar disableGutters >
             <Typography

@@ -1,12 +1,14 @@
 import React from 'react';
 
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
-import { Container, Grid } from '@mui/material';
+import { Box, Container, Grid } from '@mui/material';
 
 import Footer from '~/components/General/Footer';
 import Header from '~/components/General/Header';
 import { Home, EditForm, List, SubmitForm, FormPage } from '~/pages'
 import { UserContextProvider } from '~/contexts/UserContext';
+
+import './App.css'
 
 interface AppProps
 {
@@ -21,42 +23,45 @@ function App(props: AppProps): JSX.Element {
   }
 
   return (
-  <UserContextProvider>
+  <UserContextProvider >
     <Router basename={import.meta.env.BASE_URL}>
-      <Grid container>
+      <Box style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        // // alignItems: 'center',
+        // // flexGrow: 1,
+        // width: '100%',
+      }}>
 
-      <Grid item xs={12}>
+      <Box >
         <Header {...props} />
-      </Grid>
+      </Box>
 
-      <Grid item xs={12}>
+      <Box style={{height: '100%'}}>
 
         <Container style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          flexGrow: 1,
-          width: '100%',
+          height: '100%'
         }}>
 
-        <Routes>
-            <Route key="Home" path="/"
-                    element={<Home />}/>
-            <Route key="EditForm" path="/edit-form"
-                    element={<EditForm />} />
-            <Route key="List" path="/list"
-                    element={<List />} />
-            <Route key="Submit" path="/submit-form"
-                    element={<SubmitForm />}/>
-            <Route key="Form" path="/form"
-                    element={<FormPage />}/>
-        </Routes>
+          <Routes>
+              <Route key="Home" path="/"
+                      element={<Home />}/>
+              <Route key="EditForm" path="/edit-form"
+                      element={<EditForm />} />
+              <Route key="List" path="/list"
+                      element={<List />} />
+              <Route key="Submit" path="/submit-form"
+                      element={<SubmitForm />}/>
+              <Route key="Form" path="/form"
+                      element={<FormPage />}/>
+          </Routes>
 
-          <Footer />
+          {/* <Footer /> */}
         </Container>
-      </Grid>
+      </Box>
 
-      </Grid>
+      </Box>
     </Router>
   </UserContextProvider>
   );

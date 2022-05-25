@@ -34,7 +34,7 @@ const ThemeIncluder: React.FC = (props) =>
 
   return <ThemeProvider theme={issDarkTheme ? DarkTheme : LightTheme}>
     <CssBaseline />
-    <StyledEngineProvider injectFirst>
+    <StyledEngineProvider injectFirst >
       <App isDarkTheme={issDarkTheme} themeChanger={setIsDarkTheme}/>
     </StyledEngineProvider>
   </ThemeProvider>

@@ -1,4 +1,13 @@
-.App {
+html, body, #root {
+  height: 100%;
+}
+
+#form-page .react-swipeable-view-container {
+  height: 100%;
+}
+
+
+/* .App {
   text-align: center;
 }
 
@@ -39,4 +48,4 @@
 
 button {
   font-size: calc(10px + 2vmin);
-}
+} */

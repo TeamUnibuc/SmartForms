@@ -1,26 +1,47 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import API from "~/api"
 import { FormAnswers, FormDescription } from "~/api/models"
 
 import { AgGridReact } from '@ag-grid-community/react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
+import { GridChartsModule } from '@ag-grid-enterprise/charts';
+import { ClipboardModule } from '@ag-grid-enterprise/clipboard';
+import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
+import { CsvExportModule } from '@ag-grid-community/csv-export';
+import { MenuModule } from '@ag-grid-enterprise/menu';
+import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
+
 
 import { ColDef, ModuleRegistry } from '@ag-grid-community/core';
 
-import 'ag-grid-enterprise'
+// import 'ag-grid-enterprise'
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine-dark.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham-dark.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-material.css';
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import isDarkTheme from "~/utils/themeGetter";
 
-ModuleRegistry.registerModules([ClientSideRowModelModule, RangeSelectionModule, RowGroupingModule, RichSelectModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  CsvExportModule,
+  ExcelExportModule,
+  MenuModule
+
+  // ClientSideRowModelModule,
+  // RangeSelectionModule,
+  // RowGroupingModule,
+  // RichSelectModule,
+  // ClipboardModule,
+  // GridChartsModule,
+  // MenuModule,
+  // ExcelExportModule,
+  // RangeSelectionModule,
+]);
 
 interface TDGProps
 {
@@ -29,7 +50,17 @@ interface TDGProps
 
 const TheDataGrid = ({formDesc}: TDGProps) =>
 {
+  const gridRef = useRef<AgGridReact>(null);
+
   const [entryData, setEntryData] = useState<{[x: string]: string}[]>([])
+
+  const popupParent = useMemo<HTMLElement>(() => {
+    const el = document.querySelector('body')
+    console.log(el)
+    return el  as HTMLElement;
+  }, []);
+
+
 
   useEffect(() => {
     const getter = async () => {
@@ -66,18 +97,54 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
 
   const themeClass = `ag-theme-alpine${isDarkTheme() ? '-dark' : ''}`
 
-  return <Box className={themeClass} style={{height: "calc(80vh)"}}>
-    <AgGridReact
-        // className="ag-theme-alpine"
-        animateRows={true}
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        enableRangeSelection={true}
-        rowData={entryData}
-        rowSelection="multiple"
-        suppressRowClickSelection={true}
-    />
+  const onBtnExport = useCallback(() => {
+    gridRef.current!.api.exportDataAsCsv();
+  }, []);
+
+  const onBtnExcel = useCallback(() => {
+    gridRef.current!.api.exportDataAsExcel();
+  }, [])
+
+  return <Box id="the-grid"
+          style={{display: 'flex', flexFlow: 'column', height: '100%'}}>
+    <Box>
+      <Button
+        onClick={onBtnExport}
+        sx={{m: 1}}
+        variant="contained"
+        color="success"
+      >
+        Export as CSV file
+      </Button>
+
+      <Button
+          onClick={onBtnExcel}
+          sx={{m: 1}}
+          variant="contained"
+          color="success"
+      >
+        Export as XLSX file
+      </Button>
+
+    </Box>
+
+    <Box className={themeClass} height="100%" sx={{pb: 3}} style={{flexGrow: '1'}}>
+      <AgGridReact
+          // className="ag-theme-alpine"
+          ref={gridRef}
+          rowData={entryData}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          // animateRows={true}
+          // enableRangeSelection={true}
+          // rowSelection="multiple"
+          // suppressRowClickSelection={true}
+          // popupParent={popupParent}
+      />
+
+    </Box>
   </Box>
+
 }
 
 export default TheDataGrid
