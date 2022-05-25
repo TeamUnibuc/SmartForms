@@ -1,4 +1,5 @@
 import { FormDescription } from "../models";
+import fetchWrapper from "../wrapper";
 
 export const Description = async(formId: string): Promise<FormDescription> =>
 {
@@ -8,8 +9,5 @@ export const Description = async(formId: string): Promise<FormDescription> =>
         'Content-Type': 'application/json'
     }
   })
-  const content = await data.json();
-  console.log("api form description")
-  console.log(content)
-  return content;
+  return fetchWrapper(data)
 }

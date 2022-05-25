@@ -9,6 +9,7 @@ import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
 import { GridChartsModule } from '@ag-grid-enterprise/charts';
 import { ClipboardModule } from '@ag-grid-enterprise/clipboard';
 import { ExcelExportModule } from '@ag-grid-enterprise/excel-export';
+import { CsvExportModule } from '@ag-grid-community/csv-export';
 import { MenuModule } from '@ag-grid-enterprise/menu';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 
@@ -27,14 +28,19 @@ import isDarkTheme from "~/utils/themeGetter";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
-  RangeSelectionModule,
-  RowGroupingModule,
-  RichSelectModule,
-  ClipboardModule,
-  GridChartsModule,
-  MenuModule,
+  CsvExportModule,
   ExcelExportModule,
-  RangeSelectionModule,
+  MenuModule
+
+  // ClientSideRowModelModule,
+  // RangeSelectionModule,
+  // RowGroupingModule,
+  // RichSelectModule,
+  // ClipboardModule,
+  // GridChartsModule,
+  // MenuModule,
+  // ExcelExportModule,
+  // RangeSelectionModule,
 ]);
 
 interface TDGProps
@@ -123,14 +129,14 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
       <AgGridReact
           // className="ag-theme-alpine"
           ref={gridRef}
-          animateRows={true}
+          rowData={entryData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          enableRangeSelection={true}
-          rowData={entryData}
-          rowSelection="multiple"
+          // animateRows={true}
+          // enableRangeSelection={true}
+          // rowSelection="multiple"
           // suppressRowClickSelection={true}
-          popupParent={popupParent}
+          // popupParent={popupParent}
       />
 
     </Box>
