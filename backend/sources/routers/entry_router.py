@@ -282,7 +282,7 @@ async def edit_entry(request: Request, entry: smart_forms_types.FormAnswer):
         return JSONResponse(
             routers.StatusReturnModel(
                 statusCode = 203,
-                message = "User is not authorized to delete the entry!",
+                message = "User is not authorized to edit the entry!",
             ).dict(),
             203
         )
@@ -427,7 +427,7 @@ async def view_entry(request: Request, entryId: str):
         return JSONResponse(
             routers.StatusReturnModel(
                 statusCode = 203,
-                message = "User is not authorized to delete the entry!",
+                message = "User is not authorized to view the entry!",
             ).dict(),
             203
         )
@@ -502,7 +502,7 @@ async def view_entries(request: Request, params: ViewEntriesReceiveModel):
         return JSONResponse(
             routers.StatusReturnModel(
                 statusCode = 203,
-                message = "User is not authorized to delete the entry!",
+                message = "User is not authorized to view the entry!",
             ).dict(),
             203
         )
