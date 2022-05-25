@@ -11,7 +11,7 @@ import zipfile
 import io
 import pdf_processor.form_extractor as form_extractor
 
-def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, str]]]]]:
+def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, None]]]]]:
     """
     Extracts the content of a form within a PDF file.
     A SINGLE FORM CAN BE INCLUDED IN THE PDF FILE.
@@ -24,7 +24,7 @@ def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[Tuple[
     return extract_answer_from_images(images)
 
 def extract_answer_from_images(images: List[np.ndarray]) -> \
-        Optional[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, str]]]]]:
+        Optional[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, None]]]]]:
     """
     Extracts a single answer, whose pages are in `images`.
     """
@@ -67,7 +67,7 @@ def extract_answer_from_images(images: List[np.ndarray]) -> \
         logging.warning(f"Unable to extract form: {e}")
         return None
 
-def extract_answer_from_zip_file(zip_file: Tuple[bytes, str]) -> List[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, str]]]]]:
+def extract_answer_from_zip_file(zip_file: Tuple[bytes, str]) -> List[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, None]]]]]:
     """
     Extracts the content of a zip file and processes each folder as an independent
     list of files (pdfs, images or other zips).
@@ -116,16 +116,20 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[Tuple[sma
     # process each file
     for file_content, filename in files:
         if filename.endswith(".pdf"):
-            answers.append(extract_answer_from_pdf_file((file_content, filename)))
+            pdf_content = extract_answer_from_pdf_file((file_content, filename))
+            if pdf_content is not None:
+                answers.append(pdf_content)
         elif filename.endswith(".zip"):
             answers += extract_answer_from_zip_file((file_content, filename))
         else:
             # try to read as image
-            # TODO: try-catch
-            image = Image.open(io.BytesIO(file_content))
-            image = np.array(image)
-            images.append(image)
-
+            try:
+                image = Image.open(io.BytesIO(file_content))
+                image = np.array(image)
+                images.append(image)
+            except:
+                pass
+    
     # add the answer from the images, if it exists
     answer_from_images = extract_answer_from_images(images)
     if answer_from_images is not None:

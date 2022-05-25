@@ -3,6 +3,7 @@ import cv2
 import torch as th
 import numpy as np
 import ocr.network as network
+import cv2 as cv
 
 def data_augment_single_image(img: np.ndarray) -> np.ndarray:
     """
@@ -44,7 +45,7 @@ def data_augment_single_image(img: np.ndarray) -> np.ndarray:
     translate_matrix = np.float32([[1, 0, x_offset], [0, 1, y_offset]])
     img = cv2.warpAffine(img, translate_matrix, (network.IMAGE_SIZE, network.IMAGE_SIZE))
 
-    return img.reshape((1, network.IMAGE_SIZE, network.IMAGE_SIZE))
+    return img
 
 def data_augment(imgs: th.Tensor) -> th.Tensor:
     """
@@ -55,3 +56,11 @@ def data_augment(imgs: th.Tensor) -> th.Tensor:
         th.from_numpy(data_augment_single_image(i.numpy()))
         for i in imgs
     ])
+
+def images_processing(imgs: th.Tensor) -> th.Tensor:
+    """
+        Takes images, and performs a canny filter to extract edges.
+    """
+    imgs = imgs.numpy()
+    imgs = [cv.Canny(img, 30, 60) for img in imgs]
+    return th.tensor(np.stack(imgs))
