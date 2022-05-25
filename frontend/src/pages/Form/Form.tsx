@@ -4,15 +4,20 @@ import { useSearchParams } from "react-router-dom"
 import SwipeableViews from 'react-swipeable-views';
 import API from "~/api"
 import { FormDescription } from "~/api/models"
-import MyAgGrid from "./AgGrid";
-import TheDataGrid from "./TheDataGrid";
+import { GridExample } from "./AgGrid";
+// import TheDataGrid from "./TheDataGrid";
 
-import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
+// import {  } from "@ag-grid-community/core/dist/styles"
+
+// import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
+// import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
 import PdfDisplay from "~/components/PdfDisplay";
 import NonEditableAnswers from "~/components/NonEditableAnswers";
 import { useUserState } from "~/contexts/UserContext";
+
+
 import Settings from "./Settings";
+import TheDataGrid from "./TheDataGrid";
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
@@ -79,7 +84,9 @@ const FormPage = () =>
 
   const tabElements = [
     {tab: "Data",
-     content: <TheDataGrid formDesc={formData}/>},
+     content: <TheDataGrid formDesc={formData}/>
+    //  content: <GridExample />
+    },
     {tab: "Questions",
      content: <NonEditableAnswers questions={formData.questions}/>},
     {tab: "Form",
@@ -105,8 +112,8 @@ const FormPage = () =>
     variant="fullWidth"
     aria-label="full width tabs example"
   >
-    {chosenEl.map((id, _index) =>
-      <Tab label={tabElements[id].tab}/>
+    {chosenEl.map((id, index) =>
+      <Tab key={index} label={tabElements[id].tab}/>
     )}
   </Tabs>
 
@@ -116,7 +123,7 @@ const FormPage = () =>
     onChangeIndex={handleChangeIndex}
   >
     {chosenEl.map((id, index) =>
-      <TabPanel value={value} index={index} dir={theme.direction}>
+      <TabPanel key={index} value={value} index={index} dir={theme.direction}>
         {tabElements[id].content}
       </TabPanel>
     )}

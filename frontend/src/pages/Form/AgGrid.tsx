@@ -1,86 +1,73 @@
-import { AgGridReact } from "ag-grid-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { FormDescription } from "~/api/models"
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { render } from 'react-dom';
+import { AgGridReact } from '@ag-grid-community/react';
+import '@ag-grid-community/core/dist/styles/ag-grid.css';
+import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
+import {
+  ColDef,
+  ColGroupDef,
+  Grid,
+  GridOptions,
+} from '@ag-grid-community/core';
+import { ModuleRegistry } from '@ag-grid-community/core';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { CsvExportModule } from '@ag-grid-community/csv-export';
+import { Button } from '@mui/material';
 
+// Register the required feature modules with the Grid
+ModuleRegistry.registerModules([ClientSideRowModelModule, CsvExportModule]);
 
-import 'ag-grid-enterprise'
+export const GridExample = () => {
+  const gridRef = useRef<AgGridReact>(null);
+  const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
+  const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
+  const [rowData, setRowData] = useState<any[]>([
+    { make: 'Toyota', model: 'Celica', price: 35000 },
+    { make: 'Ford', model: 'Mondeo', price: 32000 },
+    { make: 'Porsche', model: 'Boxster', price: 72000 },
+  ]);
+  const defaultColDef = useMemo<ColDef>(() => {
+    return {
+      editable: true,
+      resizable: true,
+      minWidth: 100,
+      flex: 1,
+    };
+  }, []);
+  const popupParent = useMemo<HTMLElement>(() => {
+    return document.body;
+  }, []);
+  const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+    { field: 'make' },
+    { field: 'model' },
+    { field: 'price' },
+  ]);
 
-import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
-// import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
-import 'ag-grid-community/dist/styles/ag-theme-material.css'; // Optional theme CSS
-// import 'ag-grid-community/dist/styles/ag-theme-classic.css'; // Optional theme CSS
-// import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css'; // Optional theme CSS
-import { Box } from "@mui/material";
+  const onBtnExport = useCallback(() => {
+    gridRef.current!.api.exportDataAsCsv();
+  }, []);
 
-interface TDGProps
-{
-  formDesc: FormDescription
-}
-
-const MyAgGrid = ({formDesc}: TDGProps) =>
-{
-  // const gridRef = useRef(); // Optional - for accessing Grid's API
- const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
-
- // Each Column Definition results in one Column.
- const [columnDefs, setColumnDefs] = useState([
-   {field: 'make', filter: true},
-   {field: 'model', filter: true, headerCheckboxSelection: true,
-   headerCheckboxSelectionFilteredOnly: true,
-   checkboxSelection: true},
-   {field: 'price'}
- ]);
-
- // DefaultColDef sets props common to all Columns
- const defaultColDef = useMemo( ()=> ({
-    sortable: true,
-    resizable: true
-  }), []);
-
- // Example of consuming Grid Event
- const cellClickedListener = useCallback( event => {
-   console.log('cellClicked', event);
- }, []);
-
- // Example load data from sever
- useEffect(() => {
-   fetch('https://www.ag-grid.com/example-assets/row-data.json')
-   .then(result => result.json())
-   .then(rowData => setRowData(rowData))
- }, []);
-
- // Example using Grid's API
- const buttonListener = useCallback( e => {
-  // if (!gridRef) return
-  // gridRef.current.api.deselectAll();
- }, []);
-
- return (
-   <div>
-
-     {/* Example using Grid's API */}
-     <button onClick={buttonListener}>Push Me</button>
-
-     {/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
-     <Box className="ag-theme-material" style={{height: "calc(100vh - 300px)"}}>
-
-       <AgGridReact
-          //  ref={gridRef} // Ref for accessing Grid's API
-
-          rowData={rowData} // Row Data for Rows
-
-          enableRangeSelection={true}
-
-          columnDefs={columnDefs} // Column Defs for Columns
-          defaultColDef={defaultColDef} // Default Column Properties
-
-          animateRows={true} // Optional - set to 'true' to have rows animate when sorted
-          rowSelection='multiple' // Options - allows click selection of rows
-          onCellClicked={cellClickedListener} // Optional - registering for Grid Event
-           />
-     </Box>
-   </div>
- )
-}
-
-export default MyAgGrid
+  return (
+    <div style={containerStyle}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Button onClick={onBtnExport} >
+            Download CSV export file
+          </Button>
+        <div style={{ flex: '1 1 0', position: 'relative' }}>
+          <div id="gridContainer">
+            <div style={gridStyle} className="ag-theme-alpine">
+              <AgGridReact
+                ref={gridRef}
+                rowData={rowData}
+                defaultColDef={defaultColDef}
+                suppressExcelExport={true}
+                popupParent={popupParent}
+                columnDefs={columnDefs}
+              ></AgGridReact>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
