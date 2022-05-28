@@ -8,7 +8,6 @@ export interface TextAnswer
 export interface MultipleChoiceAnswer
 {
   content: string
-  index: number
 }
 
 export type SingleQAnswer = TextAnswer | MultipleChoiceAnswer
@@ -16,10 +15,10 @@ export type SingleQAnswer = TextAnswer | MultipleChoiceAnswer
 export interface FormAnswers
 {
   formId: string
-  creationDate: string
   answerId: string
   authorEmail: string
   answers: SingleQAnswer[]
+  creationDate: string
 }
 
 export interface AllEntriesFormAnswers

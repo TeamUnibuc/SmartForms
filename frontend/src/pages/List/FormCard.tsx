@@ -1,6 +1,10 @@
-import { Button, Card, CardActions, CardContent, Typography } from "@mui/material"
+import { Box, Button, Card, CardActions, CardContent, Typography } from "@mui/material"
 import { FormDescription } from "~/api/models"
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+import CircleIcon from '@mui/icons-material/Circle';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+
 import { Link } from "react-router-dom";
 
 interface FormCardProps
@@ -11,11 +15,20 @@ interface FormCardProps
 const FormCard = (props: FormCardProps) => {
   const fDesc = props.formDesc
 
-  return <Card  variant="outlined" sx={{m: 1, boxShadow: 5}}>
+  return <Card
+      variant="outlined"
+      sx={{boxShadow: 5}}
+      style={{width: '100%'}}>
     <CardContent>
-      <Typography variant="h5" component="div">
-        {fDesc.title}
-      </Typography>
+      <Box display="flex" justifyContent={'space-between'}>
+        <Typography variant="h5" component="div">
+          {fDesc.title}
+        </Typography>
+        <CircleIcon
+          color={fDesc.canBeFilledOnline ? "success" : "error"}
+          style={{opacity: '85%'}}
+        />
+      </Box>
       <Typography sx={{ fontSize: 14 }} color="gray" gutterBottom>
         ID: {fDesc.formId}
       </Typography>
@@ -26,12 +39,19 @@ const FormCard = (props: FormCardProps) => {
         Nr. of questions: <span style={{fontWeight: 'bold'}}>{fDesc.questions.length}</span>
       </Typography>
     </CardContent>
-    <CardActions style={{justifyContent: 'center'}}>
+    <CardActions style={{justifyContent: 'left'}}>
       <Button size="small"
         component={Link}
+        sx={{ml: 1, mr: 2}}
         to={`/form?formId=${fDesc.formId}`}>
-        <OpenInNewIcon sx={{mr: 1}}/>
+        <FormatListNumberedIcon sx={{mr: 1}}/>
         Learn More
+      </Button>
+      <Button size="small"
+        component={Link}
+        to={`/fast-submit?formId=${fDesc.formId}`}>
+        <AddBoxOutlinedIcon sx={{mr: 1}}/>
+        Complete Form
       </Button>
     </CardActions>
   </Card>

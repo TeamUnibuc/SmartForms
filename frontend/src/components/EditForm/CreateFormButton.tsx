@@ -4,12 +4,13 @@ import { Alert, AlertColor, Button, IconButton, Snackbar } from "@mui/material"
 import API from "~/api"
 import { Question } from "~/api/models"
 import { useQLContextState } from "~/contexts/CoolContext"
+import DownSnackbar from "../DownSnackbar"
 
 const CreateFormButton = () =>
 {
   const {qList, canBeFilledOnline, needsToBeSignedInToSubmit, description, title} = useQLContextState()
   const [snackOpen, setSnackOpen] = useState(false)
-  const [snackState, setSnackState] = useState({msg: "", color: "info"})
+  const [snackState, setSnackState] = useState<{msg: string, color: AlertColor}>({msg: "", color: "info"})
 
   const getCuratedQuestions = (): Question[] => {
     const notundef = <T,>(x: T | undefined): x is T => {
@@ -49,14 +50,6 @@ const CreateFormButton = () =>
     })
   }
 
-  const handleSnackClose = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setSnackOpen(false);
-  };
-
   return <>
   <Button sx={{mt: 2}}
     variant="contained"
@@ -66,19 +59,13 @@ const CreateFormButton = () =>
   Create Form
 
   </Button>
-  <Snackbar
-    open={snackOpen}
-    autoHideDuration={6000}
-    onClose={handleSnackClose}
-  >
-    <Alert
-      onClose={handleSnackClose}
-      severity={snackState.color as AlertColor}
-      sx={{ width: '100%' }}
-    >
-      {snackState.msg}
-    </Alert>
-  </Snackbar>
+
+  <DownSnackbar
+    snackOpen={snackOpen}
+    setSnackOpen={setSnackOpen}
+    color={snackState.color}
+    msg={snackState.msg}
+  />
   </>
 }
 

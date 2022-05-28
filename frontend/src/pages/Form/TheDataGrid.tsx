@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import API from "~/api"
-import { FormAnswers, FormDescription } from "~/api/models"
+import { FormAnswers, FormDescription, FormMultipleChoiceQuestion, FormTextQuestion, Question } from "~/api/models"
 
 import { AgGridReact } from '@ag-grid-community/react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -54,14 +54,6 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
 
   const [entryData, setEntryData] = useState<{[x: string]: string}[]>([])
 
-  const popupParent = useMemo<HTMLElement>(() => {
-    const el = document.querySelector('body')
-    console.log(el)
-    return el  as HTMLElement;
-  }, []);
-
-
-
   useEffect(() => {
     const getter = async () => {
       const data = await API.Entry.ViewFormEntries({
@@ -71,8 +63,23 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
       console.log(data)
       const transformed = data.entries.map(fa => {
         const entry: any = {}
-        fa.answers.map((x, i) => {
-          entry[formDesc.questions[i].title] = x
+
+        const modifyIfMultipleChoice = (q: Question, a: string) => {
+          const qmc = q as FormMultipleChoiceQuestion
+          if (qmc.choices !== undefined) {
+            return qmc.choices
+              .filter((_opt, i) => a[i] !== ' ')
+              .join(' | ')
+          }
+          else {
+            return a
+          }
+        }
+
+        fa.answers.map((answer, i) => {
+          const q = formDesc.questions[i]
+          const toPrint = modifyIfMultipleChoice(q, answer)
+          entry[q.title] = toPrint
         })
         return entry
       })
@@ -130,7 +137,6 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
 
     <Box className={themeClass} height="100%" sx={{pb: 3}} style={{flexGrow: '1'}}>
       <AgGridReact
-          // className="ag-theme-alpine"
           ref={gridRef}
           rowData={entryData}
           columnDefs={columnDefs}

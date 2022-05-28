@@ -1,8 +1,11 @@
-import { Button, Divider, FormControl, FormHelperText, Input } from "@mui/material"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Button, Divider, FormControl, FormHelperText, Input, List, ListItem, ListItemIcon, ListItemText, Typography } from "@mui/material"
+import { Dispatch, ReactNode, SetStateAction, useState } from "react"
 import API from "~/api"
 import { InferenceResponse } from "~/api/inference/infer"
 
+import FolderIcon from '@mui/icons-material/Folder';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import UploadIcon from '@mui/icons-material/Upload';
 
 interface SubmitCompProps {
   setInferenceDone: Dispatch<SetStateAction<boolean>>
@@ -11,7 +14,8 @@ interface SubmitCompProps {
 
 const SubmitComp = (props: SubmitCompProps) =>
 {
-  const [files, setFiles] = useState<unknown>(undefined)
+  const [additionalText, setAdditionalText] = useState("")
+  const [files, setFiles] = useState<FileList | undefined>()
   const {setInferenceDone, setAnswers} = props
 
   const doUpload = async (files: FileList) => {
@@ -27,6 +31,10 @@ const SubmitComp = (props: SubmitCompProps) =>
 
   const selectFile = (e: any) => {
     const files = e.target.files as FileList
+    if (files.length == 1)
+      setAdditionalText(`Uploaded 1 file: ${files[0].name}`)
+    else
+      setAdditionalText(`Uploaded ${files.length} files`)
     setFiles(files)
   }
 
@@ -36,19 +44,45 @@ const SubmitComp = (props: SubmitCompProps) =>
 
   return <>
   <FormControl variant="filled">
-    <Input id="my-file" type="file" name='fileUploads'
-      onChange={selectFile}
-      inputProps={{
-        multiple: true
-      }}/>
 
-    <FormHelperText id="my-helper-text">
-        Placeholder text
-      </FormHelperText>
+    <input
+      // className={classes.input}
+      style={{ display: 'none' }}
+      id="my-file" type="file" name='fileUploads'
+      multiple
+      onChange={selectFile}
+    />
+    <label htmlFor="my-file">
+      <Button variant="contained" component="span" sx={{mb: 2}}>
+        <UploadIcon />
+        Upload
+      </Button>
+    </label>
 
   </FormControl>
-  <Divider />
-  <Button onClick={sendButton} variant="contained">
+
+  {files &&
+    <List>
+    {Array.from(files).map((f, i) =>
+      <ListItem key={i}>
+        <ListItemIcon>
+          <InsertDriveFileIcon />
+        </ListItemIcon>
+        <ListItemText
+          primary={f.name}
+        />
+      </ListItem>
+    )}
+    </List>
+  }
+
+  <Divider sx={{mt: 2}}/>
+  <Button
+      sx={{mt: 5}}
+      onClick={sendButton}
+      variant="contained"
+      color="success"
+      disabled={files === undefined}>
     Send
   </Button>
   </>

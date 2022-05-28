@@ -18,6 +18,7 @@ import { useUserState } from "~/contexts/UserContext";
 
 import Settings from "./Settings";
 import TheDataGrid from "./TheDataGrid";
+import SimpleMessage from "~/components/SimpleMessage";
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
@@ -54,17 +55,10 @@ const FormPage = () =>
   }, [formData])
 
   if (loading)
-    return <Alert severity="info"><Typography>Loading ...</Typography></Alert>
+    return <SimpleMessage color="info" msg="Loading..." />
 
   if (formData === undefined)
-    return <Alert severity={"error"}> Could not find form :/ </Alert>
-
-  const a11yProps = (index: number) => {
-    return {
-      id: `full-width-tab-${index}`,
-      'aria-controls': `full-width-tabpanel-${index}`,
-    };
-  }
+    return <SimpleMessage color="error" msg="Could not find form :/" />
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
