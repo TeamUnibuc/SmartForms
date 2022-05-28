@@ -14,8 +14,8 @@ interface HeaderProps
   isDarkTheme: boolean
 }
 
-const navMenuLinks = ['/list', '/edit-form', '/submit-form']
-const pages = ['ㅤListㅤ', 'ㅤCreate Formㅤ', 'ㅤSubmit Answersㅤ'];
+const navMenuLinks = ['/list', '/edit-form', '/submit-form', '/fast-submit']
+const pages = ['ㅤListㅤ', 'ㅤCreate Formㅤ', 'ㅤSubmit Answersㅤ', 'ㅤFast Submitㅤ'];
 const settings = ['Logout'];
 
 const Header = (props: HeaderProps): JSX.Element =>
