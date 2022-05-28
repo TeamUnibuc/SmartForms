@@ -178,10 +178,10 @@ async def get_forms_list(request: Request, params: ListFormReceiveModel):
             )
         elif params.isOwner:
             # get forms we own
-            db_search_params["authorEmail"] = request.session.get("user")["email"]
+            db_search_params["authorEmail"] = user_email
         else:
             # only get forms that can be filled online
-            db_search_params["canBeFilledOnline"] = True
+            db_search_params["description.canBeFilledOnline"] = True
 
     db = database.get_collection(database.FORMS)
 
