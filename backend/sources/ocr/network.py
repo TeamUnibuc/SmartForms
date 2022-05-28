@@ -5,6 +5,8 @@ import torch.nn as nn
 import logging
 import os
 import ocr.data_preprocessing as data_preprocessing
+import matplotlib.pyplot as plt
+
 
 IMAGE_SIZE = 28
 DEVICE = th.device("cuda") if th.cuda.is_available() else th.device("cpu")
@@ -20,6 +22,7 @@ CHARACTERS = " " +\
              "01234567890" +\
              "!@#$%^&*()-_=+[]\{}|;':\",./<>?"
 CHARACTERS_INDEX = { c: i for i, c in enumerate(CHARACTERS) }
+DEBUG = False
 
 class Network:
     """
@@ -83,6 +86,14 @@ class Network:
         """
         images = th.from_numpy(images)
         images = data_preprocessing.images_processing(images)
+        
+        if DEBUG:
+            fig, ax = plt.subplots(nrows=6, ncols=6)
+            for i in range(min(36, len(images))):
+                ax[i // 6][i % 6].imshow(images[i])
+
+            plt.show()
+
         inputs = th.tensor(images.reshape((-1, 1, 28, 28)), dtype=th.float32).to(DEVICE)
 
         # pass model in eval mode
