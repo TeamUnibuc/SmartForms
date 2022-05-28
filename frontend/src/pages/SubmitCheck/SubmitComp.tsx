@@ -44,11 +44,6 @@ const SubmitComp = (props: SubmitCompProps) =>
 
   return <>
   <FormControl variant="filled">
-    {/* <Input id="my-file" type="file" name='fileUploads'
-      onChange={selectFile}
-      inputProps={{
-        multiple: true
-    }}/> */}
 
     <input
       // className={classes.input}
@@ -64,9 +59,6 @@ const SubmitComp = (props: SubmitCompProps) =>
       </Button>
     </label>
 
-    {/* <FormHelperText id="my-helper-text">
-        Placeholder text
-      </FormHelperText> */}
   </FormControl>
 
   {files &&

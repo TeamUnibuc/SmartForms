@@ -11,7 +11,10 @@ interface FormCardProps
 const FormCard = (props: FormCardProps) => {
   const fDesc = props.formDesc
 
-  return <Card  variant="outlined" sx={{m: 1, boxShadow: 5}}>
+  return <Card
+      variant="outlined"
+      sx={{m: 1, boxShadow: 5}}
+      style={{width: '100%'}}>
     <CardContent>
       <Typography variant="h5" component="div">
         {fDesc.title}
@@ -26,9 +29,10 @@ const FormCard = (props: FormCardProps) => {
         Nr. of questions: <span style={{fontWeight: 'bold'}}>{fDesc.questions.length}</span>
       </Typography>
     </CardContent>
-    <CardActions style={{justifyContent: 'center'}}>
+    <CardActions style={{justifyContent: 'left'}}>
       <Button size="small"
         component={Link}
+        sx={{ml: 1}}
         to={`/form?formId=${fDesc.formId}`}>
         <OpenInNewIcon sx={{mr: 1}}/>
         Learn More
