@@ -55,17 +55,10 @@ const FormPage = () =>
   }, [formData])
 
   if (loading)
-    <SimpleMessage color="info" msg="Loading..." />
+    return <SimpleMessage color="info" msg="Loading..." />
 
   if (formData === undefined)
-    return <Alert severity={"error"}> Could not find form :/ </Alert>
-
-  const a11yProps = (index: number) => {
-    return {
-      id: `full-width-tab-${index}`,
-      'aria-controls': `full-width-tabpanel-${index}`,
-    };
-  }
+    return <SimpleMessage color="error" msg="Could not find form :/" />
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

@@ -1,5 +1,5 @@
 import { Alert, AlertColor, Snackbar } from "@mui/material"
-import { useState } from "react"
+import SimpleMessage from "./SimpleMessage"
 
 interface DSProps
 {

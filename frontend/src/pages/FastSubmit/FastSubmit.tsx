@@ -48,11 +48,9 @@ const FastSubmit = () =>
     </Box>
   }
 
-  return <Box id="fast-submit" display="flex" justifyContent={'center'}>
+  return <Box>
       {loading ?
-        <Box  width='min-content'>
           <SimpleMessage color="info" msg="Loading..." />
-        </Box>
       :
         formData ?
           <EditAndSubmit form={formData} onOkSubmit={() => setFormSent(true)}/>
