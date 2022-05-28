@@ -1,4 +1,5 @@
-import { Box, Checkbox, Divider, FormControlLabel, Input, Typography } from "@mui/material"
+import { StatusPanelComponent } from "@ag-grid-community/core/dist/cjs/es5/components/framework/componentTypes"
+import { Box, Checkbox, Divider, FormControlLabel, Input, TextField, Typography } from "@mui/material"
 import { FormMultipleChoiceQuestion, FormTextQuestion, MultipleChoiceAnswer, Question, SingleQAnswer, TextAnswer } from "~/api/models"
 
 interface EAProps
@@ -15,10 +16,25 @@ const EditTextQ = (props: {
 }) =>
 {
   return <Box>
-    <Input multiline={true} style={{width: '100%'}} type="text" value={props.state.content}
+    <TextField defaultValue={props.state.content}
+      id="form-desc"
+      label="Answer"
+      variant="filled"
+      margin="normal"
       onChange={(e) => props.updater({...props.state,
-          content: e.target.value || ""})}
+        content: e.target.value || ""})}
+      sx={{m: 0, p: 0}}
+      style={{width: "100%"}}
     />
+
+    {/* <Input
+        multiline={true}
+        style={{width: '100%'}}
+        type="text"
+        value={props.state.content}
+        onChange={(e) => props.updater({...props.state,
+          content: e.target.value || ""})}
+    /> */}
   </Box>
 }
 
@@ -101,13 +117,9 @@ const EditableAnswers = ({answers, questions, updater}: EAProps) =>
         />
       }
 
-
-
       </Box>
     })}
   </>
 }
-
-
 
 export default EditableAnswers

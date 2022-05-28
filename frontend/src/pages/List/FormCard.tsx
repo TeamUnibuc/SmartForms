@@ -1,6 +1,8 @@
 import { Button, Card, CardActions, CardContent, Typography } from "@mui/material"
 import { FormDescription } from "~/api/models"
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+
 import { Link } from "react-router-dom";
 
 interface FormCardProps
@@ -36,6 +38,12 @@ const FormCard = (props: FormCardProps) => {
         to={`/form?formId=${fDesc.formId}`}>
         <OpenInNewIcon sx={{mr: 1}}/>
         Learn More
+      </Button>
+      <Button size="small"
+        component={Link}
+        to={`/fast-submit?formId=${fDesc.formId}`}>
+        <AddBoxOutlinedIcon sx={{mr: 1}}/>
+        Complete Form
       </Button>
     </CardActions>
   </Card>

@@ -9,6 +9,7 @@ import { Home, EditForm, List, SubmitForm, FormPage } from '~/pages'
 import { UserContextProvider } from '~/contexts/UserContext';
 
 import './App.css'
+import FastSubmit from './pages/FastSubmit/FastSubmit';
 
 interface AppProps
 {
@@ -55,6 +56,8 @@ function App(props: AppProps): JSX.Element {
                       element={<SubmitForm />}/>
               <Route key="Form" path="/form"
                       element={<FormPage />}/>
+              <Route key="FastSubmit" path="/fast-submit"
+                      element={<FastSubmit />}/>
           </Routes>
 
           {/* <Footer /> */}

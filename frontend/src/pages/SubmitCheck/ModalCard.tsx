@@ -1,6 +1,6 @@
 import { Box, Dialog, DialogContent, DialogTitle, Modal, SxProps, Typography } from "@mui/material"
 import { SingleQAnswer } from "~/api/models"
-import EditableAnswers from "./EditableAnswers"
+import EditableAnswers from "../../components/EditableAnswers"
 
 import { ModalDataType } from "./FormCardCheck"
 

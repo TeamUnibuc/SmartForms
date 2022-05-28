@@ -18,6 +18,7 @@ import { useUserState } from "~/contexts/UserContext";
 
 import Settings from "./Settings";
 import TheDataGrid from "./TheDataGrid";
+import SimpleMessage from "~/components/SimpleMessage";
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
@@ -54,7 +55,7 @@ const FormPage = () =>
   }, [formData])
 
   if (loading)
-    return <Alert severity="info"><Typography>Loading ...</Typography></Alert>
+    <SimpleMessage color="info" msg="Loading..." />
 
   if (formData === undefined)
     return <Alert severity={"error"}> Could not find form :/ </Alert>
