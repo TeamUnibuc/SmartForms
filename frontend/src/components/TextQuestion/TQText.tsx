@@ -50,20 +50,22 @@ export default function TQText(props: ComponentProps): JSX.Element
     <CardContent>
     <Grid container>
       <Grid item xs={10}>
-        <TextField required defaultValue={question.title}
-          id="first-question-title" label="Question title"
+        <TextField required fullWidth
+          style={{width: '95%'}}
+          defaultValue={question.title}
+          label="Question title"
           variant="standard" margin="normal"
           onChange={changeQuestionTitle}
           sx={{m: 0}}/>
 
         <TextField defaultValue={question.description}
-          id="first-question-content" label="Question description"
+          label="Question description"
           variant="filled" margin="normal"
           onChange={changeQuestionContent}
           sx={{p: 0}}/>
 
         <TextField required defaultValue={question.maxAnswerLength}
-          id="first-question-length" label="Answer length"
+          label="Answer length"
           variant="filled" margin="normal" type='number'
           onChange={changeQuestionLength}
           sx={{p: 0}}/>
