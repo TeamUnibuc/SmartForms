@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactNode } from "react"
 
 import { createContext, useContext, useState } from "react";
 import { Question } from "~/api/models";
@@ -62,7 +62,7 @@ const useQLContextUpdater = () => {
 };
 
 
-const QLContextProvider: React.FC = (props) => {
+const QLContextProvider: React.FC<{children: ReactNode}> = (props) => {
   // the value that will be given to the context
   console.log("QLContest Provider render")
 

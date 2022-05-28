@@ -39,7 +39,7 @@ export default function TQAdd(): JSX.Element
     const q_ind = getNextInd()
     qOps.setQuestion(q_ind, {
       title: `Multiple ${q_ind} title`,
-      description: `Description`,
+      description: ``,
       choices: [
         'Option 1',
         'Option 2'

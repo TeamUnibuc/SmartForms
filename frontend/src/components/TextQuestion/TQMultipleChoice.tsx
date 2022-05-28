@@ -43,6 +43,11 @@ export default function TQMultipleChoice(props: ComponentProps): JSX.Element
     myUpdateQ(newq)
   }
 
+  const changeQuestionDescription = (e: ChangeEvent<HTMLInputElement>)  => {
+    const newq = {...question, description: e.target.value}
+    myUpdateQ(newq)
+  }
+
   const changeChoice = (index: number) => {
     const updater = (e: ChangeEvent<HTMLInputElement>) => {
       question.choices[index] = e.target.value
@@ -75,7 +80,7 @@ export default function TQMultipleChoice(props: ComponentProps): JSX.Element
       console.log(`Reredering option ${i} with: ${choice}`)
       return (<Box key={q_ind + "-" + i}>
         <TextField value={choice}
-          id="first-question-content" label="Question description"
+          label="Question description"
           variant="filled" margin="normal"
           onChange={changeChoice(i)}
           sx={{p: 0, marginTop: 0.5}}
@@ -115,8 +120,10 @@ export default function TQMultipleChoice(props: ComponentProps): JSX.Element
     <CardContent>
     <Grid container>
       <Grid item xs={10}>
-        <TextField required defaultValue={question.title}
-          id="first-question-title" label="Question title"
+        <TextField required fullWidth
+          defaultValue={question.title}
+          style={{maxWidth: '95%'}}
+          label="Question title"
           variant="standard" margin="normal"
           onChange={changeQuestionTitle}
           sx={{m: 0}}/>
@@ -125,10 +132,20 @@ export default function TQMultipleChoice(props: ComponentProps): JSX.Element
       </Grid>
       <Grid item xs={2}>
         <IconButton onClick={delQuestion}
-         sx={{marginBottom: "20px"}}>
+         sx={{mb: 2}}>
           <DeleteIcon />
         </IconButton>
 
+      </Grid>
+
+      <Grid item xs={12}>
+        <TextField fullWidth
+            defaultValue={question.description}
+            style={{maxWidth: '95%'}}
+            label="Question description"
+            variant="standard" margin="normal"
+            onChange={changeQuestionDescription}
+            sx={{mb: 1}}/>
       </Grid>
 
       <Grid item xs={12}>
