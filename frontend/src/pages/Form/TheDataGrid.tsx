@@ -130,7 +130,6 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
 
     <Box className={themeClass} height="100%" sx={{pb: 3}} style={{flexGrow: '1'}}>
       <AgGridReact
-          // className="ag-theme-alpine"
           ref={gridRef}
           rowData={entryData}
           columnDefs={columnDefs}
