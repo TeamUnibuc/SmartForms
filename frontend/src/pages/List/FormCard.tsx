@@ -13,7 +13,7 @@ const FormCard = (props: FormCardProps) => {
 
   return <Card
       variant="outlined"
-      sx={{m: 1, boxShadow: 5}}
+      sx={{boxShadow: 5}}
       style={{width: '100%'}}>
     <CardContent>
       <Typography variant="h5" component="div">
