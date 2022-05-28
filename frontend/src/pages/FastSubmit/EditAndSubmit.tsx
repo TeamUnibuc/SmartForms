@@ -18,7 +18,7 @@ const EditAndSubmit = ({form, onOkSubmit}: EASProps) =>
   const {questions} = form
   const [snackMsg, setSnackMsg] = useState("")
   const [snackColor, setSnackColor] = useState<AlertColor>("info")
-  const [showSnack, setShowSnack] = useState(false)
+  const [snackOpen, setSnackOpen] = useState(false)
 
   const transformContent = (idx: number) => {
     const qmc = questions[idx] as FormMultipleChoiceQuestion
@@ -36,6 +36,8 @@ const EditAndSubmit = ({form, onOkSubmit}: EASProps) =>
     .then(r => {
       setSnackMsg("Answers submitted!")
       setSnackColor("success")
+      // onOkSubmit()
+      setTimeout(onOkSubmit, 2500)
     })
     .catch(er => {
       console.log(er)
@@ -43,7 +45,8 @@ const EditAndSubmit = ({form, onOkSubmit}: EASProps) =>
       setSnackColor("error")
     })
     .finally(() => {
-      setShowSnack(true)
+      console.log("Snack true")
+      setSnackOpen(true)
     })
   }
 
@@ -59,9 +62,8 @@ const EditAndSubmit = ({form, onOkSubmit}: EASProps) =>
       questions={questions}
       updater={(a) => {setAnswers(a)}} />
 
-    <DownSnackbar color={snackColor} msg={snackMsg} initShow={showSnack}/>
-
-
+    <DownSnackbar color={snackColor} msg={snackMsg}
+      setSnackOpen={setSnackOpen} snackOpen={snackOpen}/>
   </Box>
 }
 
