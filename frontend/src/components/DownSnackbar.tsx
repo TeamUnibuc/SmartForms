@@ -6,19 +6,19 @@ interface DSProps
   onClose?(event: React.SyntheticEvent | Event, reason?: string): void
   color?: AlertColor
   msg?: string
-  initShow?: boolean
+  snackOpen: boolean
+  setSnackOpen(x: boolean): void
 }
 
 const DownSnackbar = ({
   onClose: prop_onClose,
   color = "info",
   msg = "---",
-  initShow = false
+  snackOpen,
+  setSnackOpen
 }: DSProps) =>
 
 {
-  const [snackOpen, setSnackOpen] = useState(!!initShow)
-
   const defaultOnClose = (event: React.SyntheticEvent | Event, reason?: string) =>
   {
     if (reason === 'clickaway') {

@@ -36,9 +36,11 @@ const FastSubmit = () =>
         You are done!
       </Typography>
       <Button
+        variant="contained"
         component={Link}
+        style={{backgroundColor: '#568e00'}}
         // onClick={handleCloseNavMenu}
-        sx={{ my: 2, color: 'white', display: 'block' }}
+        sx={{ my: 2, color: 'white' }}
         to={'/list'}
       >
         Go to All Forms

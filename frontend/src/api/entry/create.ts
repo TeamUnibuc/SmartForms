@@ -7,7 +7,7 @@ interface CreateProps
   answers: SingleQAnswer[]
 }
 
-const transformMChoice = (ans: FormAnswers) =>
+const transformMChoice = (ans: CreateProps) =>
 {
   return {
     ...ans,
@@ -23,11 +23,8 @@ export const Create = async(reqBody: CreateProps): Promise<string> =>
         'Content-Type': 'application/json'
     },
     body: JSON.stringify(transformMChoice({
-      answerId: "",
-      authorEmail: "",
       answers: reqBody.answers,
-      formId: reqBody.formId,
-      creationDate: ""
+      formId: reqBody.formId
     }))
   })
 
