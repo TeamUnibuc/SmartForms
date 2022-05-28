@@ -102,7 +102,12 @@ const FormPage = () =>
   const chosenEl = formOwner ? [0, 1, 2, 3] : [1, 2]
 
   console.log(`Owner: ${formOwner}`)
-  return <Box width='100%'>
+  return <Box id="form-page" width='100%' height='100%'
+    style={{
+      display: 'flex',
+      flexFlow: 'column'
+    }}
+  >
 
   <Tabs
     value={value}
@@ -117,7 +122,8 @@ const FormPage = () =>
     )}
   </Tabs>
 
-  <SwipeableViews
+  <SwipeableViews id="swipeable-views"
+    style={{flexGrow: '1', height: '100%'}}
     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
     index={value}
     onChangeIndex={handleChangeIndex}
@@ -159,6 +165,7 @@ function TabPanel(props: TabPanelProps) {
 
   return (
     <div
+      style={{height: '100%'}}
       role="tabpanel"
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
@@ -166,7 +173,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ mt: 2 }}>
+        <Box height='100%'>
           {children}
         </Box>
       )}

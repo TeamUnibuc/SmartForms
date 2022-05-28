@@ -105,27 +105,30 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
     gridRef.current!.api.exportDataAsExcel();
   }, [])
 
-  return <>
-    <Box display="flex">
+  return <Box id="the-grid"
+          style={{display: 'flex', flexFlow: 'column', height: '100%'}}>
+    <Box>
       <Button
         onClick={onBtnExport}
         sx={{m: 1}}
         variant="contained"
+        color="success"
       >
-        Download CSV export file
+        Export as CSV file
       </Button>
 
       <Button
           onClick={onBtnExcel}
           sx={{m: 1}}
           variant="contained"
+          color="success"
       >
-        Download XLSX export file
+        Export as XLSX file
       </Button>
 
     </Box>
 
-    <Box className={themeClass} style={{height: "calc(80vh)"}}>
+    <Box className={themeClass} height="100%" sx={{pb: 3}} style={{flexGrow: '1'}}>
       <AgGridReact
           // className="ag-theme-alpine"
           ref={gridRef}
@@ -140,7 +143,7 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
       />
 
     </Box>
-  </>
+  </Box>
 
 }
 

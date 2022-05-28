@@ -33,10 +33,10 @@ const TickableOption = ({checked, content}: {checked: boolean, content: string})
 
 const NonEditableAnswers = ({questions}: EAProps) =>
 {
-  return <>
+  return <Box>
     {questions.map((q, i) => {
       return <Box key={i}>
-        <Typography color="#a1c9c5" variant="h5" sx={{mt: 2}} style={{fontWeight: 700}}>
+        <Typography color="#a1c9c5" variant="h5" sx={{pt: 2}} style={{fontWeight: 700}}>
           #{i + 1}
         </Typography>
         <Divider color="#000" sx={{mb: 1}} style={{borderWidth: '2px'}}/>
@@ -67,7 +67,7 @@ const NonEditableAnswers = ({questions}: EAProps) =>
 
       </Box>
     })}
-  </>
+  </Box>
 }
 
 
