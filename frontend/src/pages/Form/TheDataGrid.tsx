@@ -66,7 +66,6 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
 
         const modifyIfMultipleChoice = (q: Question, a: string) => {
           const qmc = q as FormMultipleChoiceQuestion
-          const qtext = q as FormTextQuestion
           if (qmc.choices !== undefined) {
             return qmc.choices
               .filter((_opt, i) => a[i] !== ' ')
@@ -75,7 +74,6 @@ const TheDataGrid = ({formDesc}: TDGProps) =>
           else {
             return a
           }
-
         }
 
         fa.answers.map((answer, i) => {
