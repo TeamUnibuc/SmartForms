@@ -47,14 +47,17 @@ const CustomFormsDrawer = ({forms, title, openDelay}: CFDrawerProps) =>
     flipState={flipAction}
   />
 
-  <Box sx={{p: 0}} style={{display: displayState ? 'block' : 'none'}}>
+  <Box sx={{p: 0}} style={{display: displayState ? 'block' : 'none'}} width='100%'>
   <Collapse in={checked} onTransitionEnd={transitionEnd}>
     <List sx={{pb: 0}} >
-      <TransitionGroup style={{display: 'flex', flexWrap: 'wrap',
-    justifyContent: 'space-between'}}>
+      <TransitionGroup style={{
+        // display: 'flex',
+        // flexWrap: 'wrap',
+        // justifyContent: 'space-between'
+      }}>
         {forms.map((item, idx) => (
           <Collapse key={idx}>
-            <FormCard formDesc={item} />
+            <FormCard formDesc={item}/>
           </Collapse>
         ))}
       </TransitionGroup>
