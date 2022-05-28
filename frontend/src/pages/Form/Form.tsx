@@ -4,15 +4,20 @@ import { useSearchParams } from "react-router-dom"
 import SwipeableViews from 'react-swipeable-views';
 import API from "~/api"
 import { FormDescription } from "~/api/models"
-import MyAgGrid from "./AgGrid";
-import TheDataGrid from "./TheDataGrid";
+import { GridExample } from "./AgGrid";
+// import TheDataGrid from "./TheDataGrid";
 
-import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
+// import {  } from "@ag-grid-community/core/dist/styles"
+
+// import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
+// import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
 import PdfDisplay from "~/components/PdfDisplay";
 import NonEditableAnswers from "~/components/NonEditableAnswers";
 import { useUserState } from "~/contexts/UserContext";
+
+
 import Settings from "./Settings";
+import TheDataGrid from "./TheDataGrid";
 
 // Code inspired from https://mui.com/material-ui/react-tabs/#full-width
 
@@ -79,7 +84,9 @@ const FormPage = () =>
 
   const tabElements = [
     {tab: "Data",
-     content: <TheDataGrid formDesc={formData}/>},
+     content: <TheDataGrid formDesc={formData}/>
+    //  content: <GridExample />
+    },
     {tab: "Questions",
      content: <NonEditableAnswers questions={formData.questions}/>},
     {tab: "Form",
@@ -95,7 +102,12 @@ const FormPage = () =>
   const chosenEl = formOwner ? [0, 1, 2, 3] : [1, 2]
 
   console.log(`Owner: ${formOwner}`)
-  return <Box width='100%'>
+  return <Box id="form-page" width='100%' height='100%'
+    style={{
+      display: 'flex',
+      flexFlow: 'column'
+    }}
+  >
 
   <Tabs
     value={value}
@@ -105,18 +117,19 @@ const FormPage = () =>
     variant="fullWidth"
     aria-label="full width tabs example"
   >
-    {chosenEl.map((id, _index) =>
-      <Tab label={tabElements[id].tab}/>
+    {chosenEl.map((id, index) =>
+      <Tab key={index} label={tabElements[id].tab}/>
     )}
   </Tabs>
 
-  <SwipeableViews
+  <SwipeableViews id="swipeable-views"
+    style={{flexGrow: '1', height: '100%'}}
     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
     index={value}
     onChangeIndex={handleChangeIndex}
   >
     {chosenEl.map((id, index) =>
-      <TabPanel value={value} index={index} dir={theme.direction}>
+      <TabPanel key={index} value={value} index={index} dir={theme.direction}>
         {tabElements[id].content}
       </TabPanel>
     )}
@@ -152,6 +165,7 @@ function TabPanel(props: TabPanelProps) {
 
   return (
     <div
+      style={{height: '100%'}}
       role="tabpanel"
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
@@ -159,7 +173,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ mt: 2 }}>
+        <Box height='100%'>
           {children}
         </Box>
       )}

@@ -9,12 +9,9 @@ const PdfDisplay = ({pdfString}: PDProps) =>
 {
   const embed_string = `data:application/pdf;base64,${pdfString}`
 
-  return <Box>
+  return <Box height="100%" sx={{py: 3}}>
      {pdfString.length > 0 ? (
-        <div>
-          <embed src={embed_string} type="application/pdf" width="100%" height="900px"></embed>
-
-        </div>
+          <embed src={embed_string} type="application/pdf" width="100%" height="100%"></embed>
       ) : (
         <p>Nothing loaded so far</p>
       )}

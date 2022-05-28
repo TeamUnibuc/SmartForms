@@ -32,6 +32,11 @@ def get_database() -> Database:
 FORMS = "Forms"
 ENTRIES = "Entries"
 USERS = "Users"
+# stores all the characters we received as feedback from the users
+CHARACTERS_DATASET = "Characters-Datasets"
+# stores characters used for inference
+INFERENCE_CHARACTERS = "Inference-Characters"
+
 
 def get_collection(collection: str):
     return get_database().database.get_collection(collection)

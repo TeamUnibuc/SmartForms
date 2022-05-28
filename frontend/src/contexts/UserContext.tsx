@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { ReactNode, useEffect } from "react"
 
 import { createContext, useContext, useState } from "react";
 import { GetUserDetails, UserDetails } from "~/api/user/UserDetails";
@@ -43,7 +43,7 @@ const useUserUpdater = () => {
 };
 
 
-const UserContextProvider: React.FC = (props) => {
+const UserContextProvider = (props: {children: ReactNode}) => {
   // the value that will be given to the context
   console.log("UserContextProvider Provider render")
 

@@ -24,27 +24,26 @@ def predict_characters(imgs: np.ndarray, allowed_characters: str) -> List[str]:
         2-3 dim - image dimensions
     """
 
-    imgs = [cv.resize(i, (IMAGE_SIZE, IMAGE_SIZE)).reshape(1, IMAGE_SIZE, IMAGE_SIZE) for i in imgs]
+    imgs = [cv.resize(i, (IMAGE_SIZE, IMAGE_SIZE)) for i in imgs]
     imgs = np.stack(imgs)
 
     # sanity check
     for i in imgs:
-        if i.shape != (1, IMAGE_SIZE, IMAGE_SIZE):
+        if i.shape != (IMAGE_SIZE, IMAGE_SIZE):
             raise Exception(
-                f"Invalid size passed. Expected (1, {IMAGE_SIZE}, {IMAGE_SIZE}), received {i.shape}"
+                f"Invalid size passed. Expected ({IMAGE_SIZE}, {IMAGE_SIZE}), received {i.shape}"
             )
 
     # Normalize to be the same format as training data
     for i in range(len(imgs)):
-        imgs[i] = imgs[i] / 255
-        imgs[i] = 1. - imgs[i]
+        imgs[i] = 255 - imgs[i]
 
     if DEBUG:
         print(f"Max value: {np.max(imgs[0])}")
-        print(f"Average value: {np.average(imgs[0])}")
+        print(f"Average value: {np.sum(imgs[0]) / (IMAGE_SIZE**2)}")
         fig, ax = plt.subplots(nrows=6, ncols=6)
         for i in range(min(36, len(imgs))):
-            ax[i // 6][i % 6].imshow(imgs[i][0])
+            ax[i // 6][i % 6].imshow(imgs[i])
 
         plt.show()
 

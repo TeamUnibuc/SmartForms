@@ -13,7 +13,7 @@ import torch as th
 import torch.nn as nn
 import logging
 import ocr.generate_dataset as generate_dataset
-import ocr.data_augmentation as data_augmentation
+import ocr.data_preprocessing as data_preprocessing
 
 DATASET_PATH = generate_dataset.DATASET_PATH
 IMAGES_PATH = DATASET_PATH + "emnist_imgs.npy"
@@ -38,7 +38,9 @@ def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: n
 
             inputs, targets = batch
             # data augmentation
-            inputs = data_augmentation.data_augment(inputs)
+            inputs = data_preprocessing.data_augment(inputs)
+            inputs = data_preprocessing.images_processing(inputs)
+            inputs = th.tensor(inputs.reshape((-1, 1, 28, 28)), dtype=th.float32)
 
             inputs = inputs.to(network.DEVICE)
             targets = targets.to(network.DEVICE)
@@ -67,6 +69,9 @@ def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: n
         eval_all_targets = []
         for batch in test_dataloader:
             inputs, targets = batch
+            inputs = data_preprocessing.images_processing(inputs)
+            inputs = th.tensor(inputs.reshape((-1, 1, 28, 28)), dtype=th.float32)
+
             inputs = inputs.to(network.DEVICE)
             targets = targets.to(network.DEVICE)
 
@@ -98,17 +103,13 @@ def train_model():
         x = np.load(IMAGES_PATH)
         y = np.load(LABELS_PATH)    
 
-    x = x.reshape((-1, 1, 28, 28))
+    x = x.reshape((-1, 28, 28))
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state=21)
 
-    # normalize
-    x_train = x_train / 255.0
-    x_test = x_test / 255.0
-
-    x_train = th.tensor(x_train, dtype=th.float32)
-    y_train = th.tensor(y_train)
-    x_test = th.tensor(x_test, dtype=th.float32)
-    y_test = th.tensor(y_test)
+    x_train = th.from_numpy(x_train)
+    y_train = th.from_numpy(y_train)
+    x_test = th.from_numpy(x_test)
+    y_test = th.from_numpy(y_test)
 
     if DEBUG:
         for i in range(10):
@@ -117,13 +118,36 @@ def train_model():
             print('')
 
         print(f"Max value: {th.max(x_train[0])}")
-        print(f"Average: {th.mean(x_train[0])}")
+        print(f"Average: {th.sum(x_train[0]) / x_train[0].shape[0] / x_train[0].shape[1]}")
 
+        print("Raw data:")
         fig, ax = plt.subplots(nrows=10, ncols=10)
-        imgs = data_augmentation.data_augment(x_train[:100])
+        imgs = x_train[:100]
         for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i][0])
+            ax[i // 10][i % 10].imshow(imgs[i])
+        plt.show()
 
+        print("Processed data:")
+        fig, ax = plt.subplots(nrows=10, ncols=10)
+        imgs = data_preprocessing.data_augment(x_train[:100])
+        for i in range(100):
+            ax[i // 10][i % 10].imshow(imgs[i])
+        plt.show()
+
+        print("Raw data processed:")
+        fig, ax = plt.subplots(nrows=10, ncols=10)
+        imgs = data_preprocessing.images_processing(x_train[:100])
+        for i in range(100):
+            ax[i // 10][i % 10].imshow(imgs[i])
+        plt.show()
+
+        print("Processed data:")
+        fig, ax = plt.subplots(nrows=10, ncols=10)
+        imgs = data_preprocessing.images_processing(
+            data_preprocessing.data_augment(x_train[:100])
+        )
+        for i in range(100):
+            ax[i // 10][i % 10].imshow(imgs[i])
         plt.show()
 
     model = network.Network.get_instance().model
@@ -157,6 +181,9 @@ def train_model():
 
     for batch in test_dataloader:
         inputs, targets = batch
+        inputs = data_preprocessing.images_processing(inputs)
+        inputs = th.tensor(inputs.reshape((-1, 1, 28, 28)), dtype=th.float32)
+
         inputs = inputs.to(network.DEVICE)
         targets = targets.to(network.DEVICE)
 

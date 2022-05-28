@@ -1,7 +1,4 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
 import './index.css'
-import App from './App'
 
 // ReactDOM.render(
 //   <React.StrictMode>
@@ -12,13 +9,11 @@ import App from './App'
 
 
 // index.js
-import { ThemeProvider } from "@mui/material/styles";
-import { CssBaseline } from "@mui/material";
 import ThemeIncluder from './components/General/ThemeIncluder';
 
-const rootElement = document.getElementById("root");
-ReactDOM.render(
-  <ThemeIncluder />,
-
-  rootElement
+import { createRoot } from 'react-dom/client';
+const rootElement = document.getElementById('root')!;
+const root = createRoot(rootElement);
+root.render(
+  <ThemeIncluder />
 );
