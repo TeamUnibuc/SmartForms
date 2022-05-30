@@ -153,7 +153,7 @@ def extract_question_answer_from_form(
 
         # draw square, for debug
         # TODO: maybe delete this?
-        cv.rectangle(fixed_page, (x, y), (x+dx, y+dy), (0, 255, 255), thickness=2)
+        cv.rectangle(fixed_page, (x, y), (x+dx, y+dy), (255, 0, 0), thickness=10)
 
         # This offset makes sure we don't include any borders in the square character.
         # TODO: if we switch to our own dataset, then maybe excluding the border won't
@@ -163,8 +163,8 @@ def extract_question_answer_from_form(
             y + SQUARES_OFFSET : y + dy - SQUARES_OFFSET,
             x + SQUARES_OFFSET : x + dx - SQUARES_OFFSET
         ]
-        squares_content.append(sq_img)
-        squares_nr.append(square_nr)
+        # squares_content.append(sq_img)
+        # squares_nr.append(square_nr)
 
 
     # if DEBUG:
@@ -172,7 +172,7 @@ def extract_question_answer_from_form(
     #     plt.show()
 
     # convert square array to a ndarray, and perform OCR
-    squares_content = np.stack(squares_content)
+    # squares_content = np.stack(squares_content)
 
     # find allowed characters, depending on the type of question
     # TODO:
@@ -181,7 +181,7 @@ def extract_question_answer_from_form(
         if isinstance(question, smart_forms_types.FormTextQuestion)
         else " X*+"
     )
-    squares_predictions = ocr.predict_characters(squares_content, allowed_characters)
+    # squares_predictions = ocr.predict_characters(squares_content, allowed_characters)
 
     # compute the initial answer
     answer = ["?" for i in range(len(squares_location))]
@@ -189,9 +189,9 @@ def extract_question_answer_from_form(
 
     # combine the extracted values with the initial values
     # we only consider the `square_nr` positions, as the others are missing
-    for square_nr, square_prediction, square_content in zip(squares_nr, squares_predictions, squares_content):
-        answer[square_nr] = square_prediction
-        answer_square[square_nr] = pickle.dumps(square_content)
+    # for square_nr, square_prediction, square_content in zip(squares_nr, squares_predictions, squares_content):
+    #     answer[square_nr] = square_prediction
+    #     answer_square[square_nr] = pickle.dumps(square_content)
 
     return "".join(answer), answer_square
 
@@ -220,6 +220,12 @@ def extract_answer_from_form(
             template_imgs[i]
         ) for i in page_to_img_gray
     }
+    page_to_img_fixed = {
+        i: cv.merge([page_to_img_fixed[i]] * 3)
+        for i in page_to_img_fixed
+    }
+
+    print(page_to_img_fixed)
 
     answers = []
     answer_images = []
@@ -229,6 +235,10 @@ def extract_answer_from_form(
         answers.append(question_answer)
         answer_images.append(question_images)
 
+    print("Got here")
+    for page in page_to_img_fixed:
+        img = page_to_img_fixed[page]
+        plt.imsave(f"Img-{page}.jpg", img, dpi=1200)
 
     form_answer = smart_forms_types.FormAnswer(
         answerId="",
