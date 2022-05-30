@@ -11,7 +11,6 @@ class FormTextQuestion(BaseModel):
     title: str
     description: str
     maxAnswerLength: int
-    # TODO: Consider this in OCR
     allowedCharacters: Optional[str] = ""
 
 class FormMultipleChoiceQuestion(BaseModel):
