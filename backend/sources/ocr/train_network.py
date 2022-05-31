@@ -18,19 +18,58 @@ import ocr.data_preprocessing as data_preprocessing
 DATASET_PATH = generate_dataset.DATASET_PATH
 IMAGES_PATH = DATASET_PATH + "emnist_imgs.npy"
 LABELS_PATH = DATASET_PATH + "emnist_labels.npy"
-DEBUG = True
+DEBUG = False
+
+def compute_network_accuracy_by_classes(predictions: th.Tensor, labels: th.Tensor):
+    """
+    Computes the accuracy, taking into account classes (for a lowercase only consider lowercase letters etc).
+    """
+    def is_same_class(a: int, b: int):
+        if a == b:
+            return True
+        if a > b:
+            a, b = b, a
+        if a == b == network.CHARACTERS_INDEX[' ']:
+            return True
+        if network.CHARACTERS_INDEX['a'] <= a and b <= network.CHARACTERS_INDEX['z']:
+            return True
+        if network.CHARACTERS_INDEX['A'] <= a and b <= network.CHARACTERS_INDEX['Z']:
+            return True
+        if network.CHARACTERS_INDEX['0'] <= a and b <= network.CHARACTERS_INDEX['9']:
+            return True
+        return False
+    
+    def check(ord_preds: th.Tensor, label: int):
+        for i in ord_preds:
+            if is_same_class(i, label):
+                return i == label
+        assert False
+
+    ordered_predictions = th.flip(np.argsort(predictions, axis=1), [1])
+    return sum([check(pred, label) for pred, label in zip(ordered_predictions, labels)]) / labels.shape[0]
+
+train_loss = []
+validation_loss = []
+train_raw_accuracy = []
+train_class_accuracy = []
+validation_raw_accuracy = []
+validation_class_accuracy = []
+
 
 def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: nn.CrossEntropyLoss,
         train_dataloader: th.utils.data.DataLoader, test_dataloader: th.utils.data.DataLoader, epochs: int):
     """
     Run the algorithm a few epochs
     """
+    global train_loss, train_raw_accuracy, train_class_accuracy
+    global validation_loss, validation_raw_accuracy, validation_class_accuracy
+
     for epoch_n in range(epochs):
         print(f"Epoch #{epoch_n + 1}")
 
-        train_all_predictions = []
-        train_all_targets = []
-        train_loss = []
+        running_loss = []
+        running_accuracy = []
+        running_class_accuracy = []
 
         model.train()
         for batch in tqdm(train_dataloader):
@@ -46,27 +85,37 @@ def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: n
             targets = targets.to(network.DEVICE)
 
             output = model(inputs)
-            loss = loss_fn(output, targets)
-            predictions = output.argmax(1)
 
+            loss = loss_fn(output, targets)
+            
             loss.backward()
             optimizer.step()
+
+            loss = loss.detach().cpu().item()
+            predictions = output.detach().cpu()
+            targets = targets.detach().cpu()
+
+            raw_accuracy = sum(predictions.argmax(1) == targets) / predictions.shape[0]
+            class_accuracy = compute_network_accuracy_by_classes(predictions, targets)
             
-            train_loss.append(loss.detach().cpu().item())
-            train_all_targets.append(targets.detach().cpu())
-            train_all_predictions.append(predictions.detach().cpu())
+            train_loss.append(loss)
+            train_raw_accuracy.append(raw_accuracy)
+            train_class_accuracy.append(class_accuracy)
+            running_loss.append(loss)
+            running_accuracy.append(raw_accuracy)
+            running_class_accuracy.append(class_accuracy)
 
-        train_all_predictions = th.cat(train_all_predictions)
-        train_all_targets = th.cat(train_all_targets)
-
-        val_acc = (train_all_predictions == train_all_targets).float().mean().numpy()
-        print(f"Train Accuracy: {val_acc}")
-        print(f"Train Loss: {np.mean(np.array(train_loss))}")
-
+        print(f"Train loss: {th.mean(th.tensor(running_loss))}")
+        print(f"Train raw accuracy: {th.mean(th.tensor(running_accuracy))}")
+        print(f"Train class accuracy: {th.mean(th.tensor(running_class_accuracy))}")
+            
         # validare
         model.eval()
-        eval_all_predictions = []
-        eval_all_targets = []
+
+        running_loss = []
+        running_accuracy = []
+        running_class_accuracy = []
+
         for batch in test_dataloader:
             inputs, targets = batch
             inputs = data_preprocessing.images_processing(inputs)
@@ -78,16 +127,23 @@ def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: n
             with th.no_grad():
                 output = model(inputs)
 
-            predictions = output.argmax(1)
-            eval_all_targets.append(targets.detach().cpu())
-            eval_all_predictions.append(predictions.detach().cpu())
+            loss = loss_fn(output, targets).detach().cpu()
+            predictions = output.detach().cpu()
+            targets = targets.detach().cpu()
 
-        eval_all_predictions = th.cat(eval_all_predictions)
-        eval_all_targets = th.cat(eval_all_targets)
+            raw_accuracy = sum(predictions.argmax(1) == targets) / predictions.shape[0]
+            class_accuracy = compute_network_accuracy_by_classes(predictions, targets)
+            
+            validation_loss.append(loss)
+            validation_raw_accuracy.append(raw_accuracy)
+            validation_class_accuracy.append(class_accuracy)
+            running_loss.append(loss)
+            running_accuracy.append(raw_accuracy)
+            running_class_accuracy.append(class_accuracy)
 
-        val_acc = (eval_all_predictions == eval_all_targets).float().mean().numpy()
-
-        print(f"Val Accuracy: {val_acc}")
+        print(f"Validation loss: {th.mean(th.tensor(running_loss))}")
+        print(f"Validation raw accuracy: {th.mean(th.tensor(running_accuracy))}")
+        print(f"Validation class accuracy: {th.mean(th.tensor(running_class_accuracy))}")
 
 def train_model():
     """
@@ -211,6 +267,18 @@ def train_model():
     print("Biggest confusions:")
     for nr_conf, a, b, id_a, id_b in confusion[:30]:
         print(f" * '{a}' read as '{b}': {nr_conf}  -  '{a}' seen correctly: {conf_matrix[id_a][id_a]}, '{b}' seen correctly: {conf_matrix[id_b][id_b]}")
+
+
+    global train_class_accuracy, train_raw_accuracy, train_loss
+    global validation_class_accuracy, validation_raw_accuracy, validation_loss
+
+    np.save(network.DATA_FOLDER + "train_class_accuracy.npy", np.array(train_class_accuracy))
+    np.save(network.DATA_FOLDER + "val_class_accuracy.npy", np.array(validation_class_accuracy))
+    np.save(network.DATA_FOLDER + "train_raw_accuracy.npy", np.array(train_raw_accuracy))
+    np.save(network.DATA_FOLDER + "val_raw_accuracy.npy", np.array(validation_raw_accuracy))
+    np.save(network.DATA_FOLDER + "train_loss.npy", np.array(train_loss))
+    np.save(network.DATA_FOLDER + "val_loss.npy", np.array(validation_loss))
+    
     # conf_matrix = metrics.ConfusionMatrixDisplay.from_predictions(labels, predictions) # , display_labels=[i for i in network.CHARACTERS])
 
     # plt.show()
