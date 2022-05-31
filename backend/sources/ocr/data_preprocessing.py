@@ -45,7 +45,7 @@ def data_augment_single_image(img: np.ndarray) -> np.ndarray:
     translate_matrix = np.float32([[1, 0, x_offset], [0, 1, y_offset]])
     img = cv2.warpAffine(img, translate_matrix, (network.IMAGE_SIZE, network.IMAGE_SIZE))
 
-    if random.choice([True, False]):
+    if random.choice([True, False, True, True]):
         nr_pixels = random.randint(0, 20)
         for i in range(nr_pixels):
             a = random.randint(0, network.IMAGE_SIZE - 1)

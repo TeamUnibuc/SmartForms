@@ -119,35 +119,39 @@ def train_model():
 
         print(f"Max value: {th.max(x_train[0])}")
         print(f"Average: {th.sum(x_train[0]) / x_train[0].shape[0] / x_train[0].shape[1]}")
+        img_size = network.IMAGE_SIZE
+        nr_figs = 6
 
         print("Raw data:")
-        fig, ax = plt.subplots(nrows=10, ncols=10)
-        imgs = x_train[:100]
-        for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i])
-        plt.show()
+        raw_data = np.zeros((img_size * nr_figs, img_size * nr_figs))
+
+        imgs = x_train[:nr_figs**2]
+        for i in range(nr_figs**2):
+            raw_data[(i // nr_figs) * img_size : ((i // nr_figs) + 1) * img_size, (i % nr_figs) * img_size: (i % nr_figs + 1) * img_size] = imgs[i]
+        plt.imsave("raw-emnist-data.png", raw_data, dpi=1200)
 
         print("Processed data:")
-        fig, ax = plt.subplots(nrows=10, ncols=10)
-        imgs = data_preprocessing.data_augment(x_train[:100])
-        for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i])
-        plt.show()
+        imgs = data_preprocessing.data_augment(x_train[:nr_figs**2])
+        for i in range(nr_figs**2):
+            raw_data[(i // nr_figs) * img_size : ((i // nr_figs) + 1) * img_size, (i % nr_figs) * img_size: (i % nr_figs + 1) * img_size] = imgs[i]
+        plt.imsave("augmented-emnist-data.png", raw_data, dpi=1200)
 
         print("Raw data processed:")
-        fig, ax = plt.subplots(nrows=10, ncols=10)
-        imgs = data_preprocessing.images_processing(x_train[:100])
-        for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i])
+        imgs = data_preprocessing.images_processing(x_train[:nr_figs**2])
+        for i in range(nr_figs**2):
+            raw_data[(i // nr_figs) * img_size : ((i // nr_figs) + 1) * img_size, (i % nr_figs) * img_size: (i % nr_figs + 1) * img_size] = imgs[i]
+        plt.imsave("processed-emnist-data.png", raw_data, dpi=1200)
+
         plt.show()
 
         print("Processed data:")
-        fig, ax = plt.subplots(nrows=10, ncols=10)
         imgs = data_preprocessing.images_processing(
-            data_preprocessing.data_augment(x_train[:100])
-        )
-        for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i])
+            data_preprocessing.data_augment(x_train[:nr_figs**2])
+        ) 
+        for i in range(nr_figs**2):
+            raw_data[(i // nr_figs) * img_size : ((i // nr_figs) + 1) * img_size, (i % nr_figs) * img_size: (i % nr_figs + 1) * img_size] = imgs[i]
+        plt.imsave("processed-augmented-emnist-data.png", raw_data, dpi=1200)
+
         plt.show()
 
     model = network.Network.get_instance().model
