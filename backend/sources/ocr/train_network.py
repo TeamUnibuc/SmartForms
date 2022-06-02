@@ -218,13 +218,13 @@ def train_model():
 
     criterion = nn.CrossEntropyLoss()
     optimizer = th.optim.Adam(model.parameters(), lr=1e-3)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 1)
 
     optimizer = th.optim.Adam(model.parameters(), lr=1e-4)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 1)
 
     optimizer = th.optim.Adam(model.parameters(), lr=1e-5)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 5)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 2)
 
     if not os.path.exists(network.DATA_FOLDER):
         os.makedirs(network.DATA_FOLDER)
