@@ -25,6 +25,8 @@ def compute_network_accuracy_by_classes(predictions: th.Tensor, labels: th.Tenso
     Computes the accuracy, taking into account classes (for a lowercase only consider lowercase letters etc).
     """
     def is_same_class(a: int, b: int):
+        if a == network.CHARACTERS_INDEX[' '] or b == network.CHARACTERS_INDEX[' ']:
+            return a == b
         if a == b:
             return True
         if a > b:
@@ -98,16 +100,19 @@ def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: n
             raw_accuracy = sum(predictions.argmax(1) == targets) / predictions.shape[0]
             class_accuracy = compute_network_accuracy_by_classes(predictions, targets)
             
-            train_loss.append(loss)
-            train_raw_accuracy.append(raw_accuracy)
-            train_class_accuracy.append(class_accuracy)
+            # train_loss.append(loss)
+            # train_raw_accuracy.append(raw_accuracy)
+            # train_class_accuracy.append(class_accuracy)
             running_loss.append(loss)
             running_accuracy.append(raw_accuracy)
             running_class_accuracy.append(class_accuracy)
 
-        print(f"Train loss: {th.mean(th.tensor(running_loss))}")
-        print(f"Train raw accuracy: {th.mean(th.tensor(running_accuracy))}")
-        print(f"Train class accuracy: {th.mean(th.tensor(running_class_accuracy))}")
+        train_loss.append(th.mean(th.tensor(running_loss)))
+        print(f"Train loss: {train_loss[-1]}")
+        train_raw_accuracy.append(th.mean(th.tensor(running_accuracy)))
+        print(f"Train raw accuracy: {train_raw_accuracy[-1]}")
+        train_class_accuracy.append(th.mean(th.tensor(running_class_accuracy)))
+        print(f"Train class accuracy: {train_class_accuracy[-1]}")
             
         # validare
         model.eval()
@@ -115,7 +120,7 @@ def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: n
         running_loss = []
         running_accuracy = []
         running_class_accuracy = []
-
+        
         for batch in test_dataloader:
             inputs, targets = batch
             inputs = data_preprocessing.images_processing(inputs)
@@ -134,16 +139,16 @@ def train_model_epoch(model: nn.Sequential, optimizer: th.optim.Adam, loss_fn: n
             raw_accuracy = sum(predictions.argmax(1) == targets) / predictions.shape[0]
             class_accuracy = compute_network_accuracy_by_classes(predictions, targets)
             
-            validation_loss.append(loss)
-            validation_raw_accuracy.append(raw_accuracy)
-            validation_class_accuracy.append(class_accuracy)
             running_loss.append(loss)
             running_accuracy.append(raw_accuracy)
             running_class_accuracy.append(class_accuracy)
 
-        print(f"Validation loss: {th.mean(th.tensor(running_loss))}")
-        print(f"Validation raw accuracy: {th.mean(th.tensor(running_accuracy))}")
-        print(f"Validation class accuracy: {th.mean(th.tensor(running_class_accuracy))}")
+        validation_loss.append(th.mean(th.tensor(running_loss)))
+        print(f"validation loss: {validation_loss[-1]}")
+        validation_raw_accuracy.append(th.mean(th.tensor(running_accuracy)))
+        print(f"validation raw accuracy: {validation_raw_accuracy[-1]}")
+        validation_class_accuracy.append(th.mean(th.tensor(running_class_accuracy)))
+        print(f"validation class accuracy: {validation_class_accuracy[-1]}")
 
 def train_model():
     """
@@ -158,6 +163,16 @@ def train_model():
         generate_dataset.generate_dataset()
         x = np.load(IMAGES_PATH)
         y = np.load(LABELS_PATH)    
+
+    # fig, ax = plt.subplots(nrows=8, ncols=8)
+    # plt.figure(figsize=(9, 7))
+    # for i in range(1000):
+    #     l = y[i]
+    #     print(l)
+    #     ax[l // 8, l % 8].imshow(x[i])
+
+    # plt.show()
+    # return
 
     x = x.reshape((-1, 28, 28))
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state=21)
@@ -212,23 +227,34 @@ def train_model():
 
     model = network.Network.get_instance().model
 
-    train_dataset = th.utils.data.TensorDataset(x_train, y_train)
-    train_dataloader = th.utils.data.DataLoader(train_dataset, batch_size=256, shuffle=True)
+    # split dataset into small chunks to make a nice graph
+    CHUNKS = 100
+    x_train = th.tensor_split(x_train, CHUNKS)
+    y_train = th.tensor_split(y_train, CHUNKS)
+    x_test = th.tensor_split(x_test, CHUNKS)
+    y_test = th.tensor_split(y_test, CHUNKS)
 
-    test_dataset = th.utils.data.TensorDataset(x_test, y_test)
-    test_dataloader = th.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=False)
+    train_dataset = [th.utils.data.TensorDataset(x_train[i], y_train[i]) for i in range(CHUNKS)]
+    train_dataloader = [th.utils.data.DataLoader(train_dataset[i], batch_size=256, shuffle=True) for i in range(CHUNKS)]
+
+    test_dataset = [th.utils.data.TensorDataset(x_test[i], y_test[i]) for i in range(CHUNKS)]
+    test_dataloader = [th.utils.data.DataLoader(test_dataset[i], batch_size=128, shuffle=False) for i in range(CHUNKS)]
 
     print("Training model...")
 
     criterion = nn.CrossEntropyLoss()
     optimizer = th.optim.Adam(model.parameters(), lr=1e-3)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+    for train_dl, test_dl in zip(train_dataloader, test_dataloader):
+        train_model_epoch(model, optimizer, criterion, train_dl, test_dl, 1)
 
     optimizer = th.optim.Adam(model.parameters(), lr=1e-4)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 4)
+    for train_dl, test_dl in zip(train_dataloader, test_dataloader):
+        train_model_epoch(model, optimizer, criterion, train_dl, test_dl, 1)
 
     optimizer = th.optim.Adam(model.parameters(), lr=1e-5)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 5)
+    for train_dl, test_dl in zip(train_dataloader, test_dataloader):
+        train_model_epoch(model, optimizer, criterion, train_dl, test_dl, 1)
+
 
     if not os.path.exists(network.DATA_FOLDER):
         os.makedirs(network.DATA_FOLDER)
@@ -238,21 +264,21 @@ def train_model():
     # Final evaluation of the model
     labels = []
     predictions = []
+    for test_dl in test_dataloader:
+        for batch in test_dl:
+            inputs, targets = batch
+            inputs = data_preprocessing.images_processing(inputs)
+            inputs = th.tensor(inputs.reshape((-1, 1, 28, 28)), dtype=th.float32)
 
-    for batch in test_dataloader:
-        inputs, targets = batch
-        inputs = data_preprocessing.images_processing(inputs)
-        inputs = th.tensor(inputs.reshape((-1, 1, 28, 28)), dtype=th.float32)
+            inputs = inputs.to(network.DEVICE)
+            targets = targets.to(network.DEVICE)
 
-        inputs = inputs.to(network.DEVICE)
-        targets = targets.to(network.DEVICE)
+            with th.no_grad():
+                output = model(inputs)
 
-        with th.no_grad():
-            output = model(inputs)
-
-        predicted = output.argmax(1)
-        labels.append(targets.detach().cpu())
-        predictions.append(predicted.detach().cpu())
+            predicted = output.argmax(1)
+            labels.append(targets.detach().cpu())
+            predictions.append(predicted.detach().cpu())
 
     labels = th.concat(labels).numpy()
     predictions = th.concat(predictions).numpy()
