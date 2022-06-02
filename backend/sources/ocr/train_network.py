@@ -2,6 +2,7 @@
 Trains the network on the EMNIST dataset.
 """
 
+from collections import defaultdict
 import sklearn.metrics as metrics
 from tqdm import tqdm
 import numpy as np
@@ -14,17 +15,20 @@ import torch.nn as nn
 import logging
 import ocr.generate_dataset as generate_dataset
 import ocr.data_preprocessing as data_preprocessing
+from sklearn.utils.class_weight import compute_class_weight
 
 DATASET_PATH = generate_dataset.DATASET_PATH
 IMAGES_PATH = DATASET_PATH + "emnist_imgs.npy"
 LABELS_PATH = DATASET_PATH + "emnist_labels.npy"
-DEBUG = False
+DEBUG = True
 
 def compute_network_accuracy_by_classes(predictions: th.Tensor, labels: th.Tensor):
     """
     Computes the accuracy, taking into account classes (for a lowercase only consider lowercase letters etc).
     """
     def is_same_class(a: int, b: int):
+        if a == network.CHARACTERS_INDEX[' '] or b == network.CHARACTERS_INDEX[' ']:
+            return a == b
         if a == b:
             return True
         if a > b:
@@ -159,6 +163,11 @@ def train_model():
         x = np.load(IMAGES_PATH)
         y = np.load(LABELS_PATH)    
 
+    # x = x[:100000]
+    # y = y[:100000]
+
+    weights = compute_class_weight('balanced', classes=np.array([i for i in range(len(network.CHARACTERS))]), y=y)
+
     x = x.reshape((-1, 28, 28))
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state=21)
 
@@ -176,26 +185,26 @@ def train_model():
         print(f"Max value: {th.max(x_train[0])}")
         print(f"Average: {th.sum(x_train[0]) / x_train[0].shape[0] / x_train[0].shape[1]}")
 
-        print("Raw data:")
-        fig, ax = plt.subplots(nrows=10, ncols=10)
-        imgs = x_train[:100]
-        for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i])
-        plt.show()
+        # print("Raw data:")
+        # fig, ax = plt.subplots(nrows=10, ncols=10)
+        # imgs = x_train[:100]
+        # for i in range(100):
+        #     ax[i // 10][i % 10].imshow(imgs[i])
+        # plt.show()
 
-        print("Processed data:")
-        fig, ax = plt.subplots(nrows=10, ncols=10)
-        imgs = data_preprocessing.data_augment(x_train[:100])
-        for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i])
-        plt.show()
+        # print("Processed data:")
+        # fig, ax = plt.subplots(nrows=10, ncols=10)
+        # imgs = data_preprocessing.data_augment(x_train[:100])
+        # for i in range(100):
+        #     ax[i // 10][i % 10].imshow(imgs[i])
+        # plt.show()
 
-        print("Raw data processed:")
-        fig, ax = plt.subplots(nrows=10, ncols=10)
-        imgs = data_preprocessing.images_processing(x_train[:100])
-        for i in range(100):
-            ax[i // 10][i % 10].imshow(imgs[i])
-        plt.show()
+        # print("Raw data processed:")
+        # fig, ax = plt.subplots(nrows=10, ncols=10)
+        # imgs = data_preprocessing.images_processing(x_train[:100])
+        # for i in range(100):
+        #     ax[i // 10][i % 10].imshow(imgs[i])
+        # plt.show()
 
         print("Processed data:")
         fig, ax = plt.subplots(nrows=10, ncols=10)
@@ -216,15 +225,25 @@ def train_model():
 
     print("Training model...")
 
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=th.tensor(weights, dtype=th.float32)).to(network.DEVICE)
+
     optimizer = th.optim.Adam(model.parameters(), lr=1e-3)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 1)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 2)
+
+    th.save(model.state_dict(), network.MODEL_LOCATION)
 
     optimizer = th.optim.Adam(model.parameters(), lr=1e-4)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 1)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 2)
+
+    th.save(model.state_dict(), network.MODEL_LOCATION)
 
     optimizer = th.optim.Adam(model.parameters(), lr=1e-5)
-    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 2)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 1)
+
+    th.save(model.state_dict(), network.MODEL_LOCATION)
+
+    optimizer = th.optim.Adam(model.parameters(), lr=1e-6)
+    train_model_epoch(model, optimizer, criterion, train_dataloader, test_dataloader, 1)
 
     if not os.path.exists(network.DATA_FOLDER):
         os.makedirs(network.DATA_FOLDER)

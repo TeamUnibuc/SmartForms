@@ -19,10 +19,10 @@ MODEL_LOCATION = DATA_FOLDER + "ocr_model.pth"
 CHARACTERS = " " +\
              "abcdefghijklmnopqrstuvwxyz" +\
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +\
-             "01234567890" +\
-             "!@#$%^&*()-_=+[]\{}|;':\",./<>?"
+             "0123456789" # +\
+             #"!@#$%^&*()-_=+[]\{}|;':\",./<>?"
 CHARACTERS_INDEX = { c: i for i, c in enumerate(CHARACTERS) }
-DEBUG = False
+DEBUG = True
 
 class Network:
     """
