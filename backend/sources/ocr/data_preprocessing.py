@@ -12,15 +12,15 @@ def data_augment_single_image(img: np.ndarray) -> np.ndarray:
     # change shape
     img = img.reshape((network.IMAGE_SIZE, network.IMAGE_SIZE))
 
-    if random.choice([True, False]):
-        # Perform erosion / dilatation
-        kernel_size = 2#  random.choice([2, 3])
-        kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    # if random.choice([True, False]):
+    #     # Perform erosion / dilatation
+    #     kernel_size = 2#  random.choice([2, 3])
+    #     kernel = np.ones((kernel_size, kernel_size), np.uint8)
 
-        if random.choice([True, False]):
-            img = cv2.erode(img, kernel, iterations=1)
-        else:
-            img = cv2.dilate(img, kernel, iterations=1)
+    #     if random.choice([True, False]):
+    #         img = cv2.erode(img, kernel, iterations=1)
+    #     else:
+    #         img = cv2.dilate(img, kernel, iterations=1)
 
     if random.choice([True, False]):
         # zoom in/out
