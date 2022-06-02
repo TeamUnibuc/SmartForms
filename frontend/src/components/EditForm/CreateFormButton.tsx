@@ -6,7 +6,12 @@ import { Question } from "~/api/models"
 import { useQLContextState } from "~/contexts/CoolContext"
 import DownSnackbar from "../DownSnackbar"
 
-const CreateFormButton = () =>
+interface FormBtnProps
+{
+  disabled?: boolean
+}
+
+const CreateFormButton = ({disabled}: FormBtnProps) =>
 {
   const {qList, canBeFilledOnline, needsToBeSignedInToSubmit, description, title} = useQLContextState()
   const [snackOpen, setSnackOpen] = useState(false)
@@ -51,7 +56,7 @@ const CreateFormButton = () =>
   }
 
   return <>
-  <Button sx={{mt: 2}}
+  <Button sx={{mt: 2}} disabled={disabled}
     variant="contained"
     color="success"
     onClick={onCreateClick}>
