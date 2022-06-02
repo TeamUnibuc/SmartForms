@@ -5,7 +5,12 @@ import API from '~/api'
 import { Question } from '~/api/models';
 import { useQLContextState, useQLContextUpdater } from '~/contexts/CoolContext';
 
-export default function GenerateButton(): JSX.Element
+interface BtnProps
+{
+  disabled?: boolean
+}
+
+export default function GenerateButton({disabled}: BtnProps): JSX.Element
 {
   const {qList, title, description, needsToBeSignedInToSubmit, canBeFilledOnline} = useQLContextState()
   const {sOps} = useQLContextUpdater()
@@ -33,7 +38,7 @@ export default function GenerateButton(): JSX.Element
     return qList.questions.filter(notundef)
   }
 
-  return <Button
+  return <Button disabled={disabled}
     variant="contained"
     onClick={() => generatePdf(getCuratedQuestions())}>
 
