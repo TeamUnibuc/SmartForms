@@ -20,7 +20,7 @@ from sklearn.utils.class_weight import compute_class_weight
 DATASET_PATH = generate_dataset.DATASET_PATH
 IMAGES_PATH = DATASET_PATH + "emnist_imgs.npy"
 LABELS_PATH = DATASET_PATH + "emnist_labels.npy"
-DEBUG = True
+DEBUG = False
 
 def compute_network_accuracy_by_classes(predictions: th.Tensor, labels: th.Tensor):
     """
@@ -166,7 +166,8 @@ def train_model():
     # x = x[:100000]
     # y = y[:100000]
 
-    weights = compute_class_weight('balanced', classes=np.array([i for i in range(len(network.CHARACTERS))]), y=y)
+    weights = compute_class_weight('balanced', classes=np.unique(y), y=y)
+    weights = np.concatenate([weights, np.zeros(len(network.CHARACTERS) - len(weights))])
 
     x = x.reshape((-1, 28, 28))
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state=21)
