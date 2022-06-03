@@ -35,13 +35,20 @@ const CreateFormButton = ({disabled}: FormBtnProps) =>
       title: title,
       questions: getCuratedQuestions()
     })
-    .then(r => {
+    .then(async r => {
       console.log(r)
       setSnackState({
         color: "success",
-        msg: `Form created successfully with ID: ${r.formId}`
+        msg: `Form created successfully with ID: ${r.formId}   Redirecting ...`
       })
       setSnackOpen(true)
+
+      const sleep = (time: number) => {
+        return new Promise((resolve) => setTimeout(resolve, time));
+      }
+
+      await sleep(2000)
+      window.location.href = `/form?formId=${r.formId}`
     })
     .catch(r => {
       setSnackState({
