@@ -1,4 +1,5 @@
 import { FormDescription } from "../models";
+import fetchWrapper from "../wrapper";
 
 interface PreviewResults {
   formPdfBase64: string
@@ -13,6 +14,5 @@ export const FormPreview = async(reqBody: FormDescription): Promise<PreviewResul
     },
     body: JSON.stringify(reqBody)
   })
-  const content = await data.json();
-  return content;
+  return fetchWrapper(data)
 }

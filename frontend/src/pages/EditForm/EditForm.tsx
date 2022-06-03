@@ -9,9 +9,15 @@ import { QLContextProvider } from '~/contexts/CoolContext';
 import CreateFormButton from '~/components/EditForm/CreateFormButton';
 import { Divider } from '@mui/material';
 import EditFormInfo from './EditFormInfo';
+import { useUserState } from '~/contexts/UserContext';
+import SimpleMessage from '~/components/SimpleMessage';
 
 export default function EditForm(): JSX.Element
 {
+  const {authenticated} = useUserState()
+
+  const disabled = !authenticated
+
   return <>
     <QLContextProvider>
       <Grid container columnSpacing={1}>
@@ -21,8 +27,13 @@ export default function EditForm(): JSX.Element
           </Grid>
 
           <Grid item xs={2}>
-            <GenerateButton />
-            <CreateFormButton />
+            {disabled ?
+              <SimpleMessage color='warning' msg='You need to be logged in'/>
+            : <>
+              <GenerateButton disabled={disabled}/>
+              <CreateFormButton disabled={disabled}/>
+            </>
+            }
           </Grid>
 
           <Grid item xs={6}>
