@@ -42,6 +42,7 @@ export interface FormTextQuestion
   title: string,
   description: string,
   maxAnswerLength: number,
+  allowedCharacters: string
 }
 
 export type Question = FormMultipleChoiceQuestion | FormTextQuestion;
