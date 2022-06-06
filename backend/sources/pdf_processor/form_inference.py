@@ -131,7 +131,11 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[Tuple[sma
                 pass
     
     # add the answer from the images, if it exists
-    answer_from_images = extract_answer_from_images(images)
+    answer_from_images = None
+    try:
+        answer_from_images = extract_answer_from_images(images)
+    except:
+        pass
     if answer_from_images is not None:
         answers.append(answer_from_images)
 
