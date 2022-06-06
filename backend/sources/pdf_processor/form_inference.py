@@ -21,51 +21,70 @@ def extract_answer_from_pdf_file(pdf_file: Tuple[bytes, str]) -> Optional[Tuple[
     images = [np.array(image) for image in images]
 
     # process pdf as list of images
-    return extract_answer_from_images(images)
+    return extract_answers_from_images(images)
 
-def extract_answer_from_images(images: List[np.ndarray]) -> \
+def extract_single_answer_from_images(images: List[Tuple[np.ndarray, str, int]]) -> \
         Optional[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, None]]]]]:
     """
-    Extracts a single answer, whose pages are in `images`.
+    Extracts a single answer from a list of images, all of which belong
+    TO THE SAME form.
     """
-    # TODO: Do this in a try-catch block
-
-    # images, joined with their id
-    id_to_img = dict()
-    form_id = ''
-
-    for img in images:
-        id = form_extractor.extract_form_id_content_from_image(img)
-        if id == '':
-            logging.debug("Unable to extract QR code content! Skipping file...")
-        else:
-            id_to_img[id] = img
-            form_id = (id if id.find("?") == -1 else id[:id.find("?")])
-
-    logging.debug(f"Found form #{form_id} from images.")
-
-    if form_id == '':
+    if len(images) == 0:
         return None
 
-    # retrieve form from database
-    pdf_form = database.get_form_by_id(form_id)
-
-    # try to reconstruct images
+    try:
+        pdf_form = database.get_form_by_id(images[0][1])
+    except:
+        logging.info(f"Unable to find form #{images[0][1]}!")
+        return None
+    
     page_to_img = dict()
-
-    for page in range(len(pdf_form.pdf_file.pages)):
-        page_id = form_id
-        # TODO: Maybe some common way to fix this with the form creator?
-        if page != 0:
-            page_id += f"?page={page+1}"
-        if page_id in id_to_img:
-            page_to_img[page] = id_to_img[page_id]
-
+    for img, id, page in images:
+        page_to_img[page] = img
+    
     try:
         return form_extractor.extract_answer_from_form(pdf_form, page_to_img)
     except Exception as e:
         logging.warning(f"Unable to extract form: {e}")
         return None
+
+
+def extract_answers_from_images(images: List[np.ndarray]) -> \
+        List[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, None]]]]]:
+    """
+    Extracts a list of answers, whose pages are in `images`.
+    This does:
+      For each page, check if it is following the previous stack of pages.
+            If yes, append it
+            If not, start a new stack
+    """
+    # all of the answers we extracted
+    answers = []
+    # pages, with their form ID and their page nr
+    current_pages: List[Tuple[np.ndarray, str, int]] = []
+
+    def flush_current_pages():
+        """
+        Flushes the content of current_pages into an answer
+        """
+        nonlocal answers, current_pages
+        try:
+            answer = extract_single_answer_from_images(current_pages)
+            if answer is not None:
+                answers.append(answer)
+        except Exception as e:
+            logging.info(f"Unable to extract answer: {e}")
+        current_pages = []
+
+    for img in images:
+        id, page = form_extractor.extract_form_id_content_from_image(img)
+        if current_pages != [] and (current_pages[-1][1] != id or current_pages[-1][2] >= page):
+            flush_current_pages()
+        current_pages.append((img, id, page))
+    flush_current_pages()
+    
+    return answers
+
 
 def extract_answer_from_zip_file(zip_file: Tuple[bytes, str]) -> List[Tuple[smart_forms_types.FormAnswer, List[List[Union[bytes, None]]]]]:
     """
@@ -131,8 +150,12 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[Tuple[sma
                 pass
     
     # add the answer from the images, if it exists
-    answer_from_images = extract_answer_from_images(images)
+    answer_from_images = None
+    try:
+        answer_from_images = extract_answers_from_images(images)
+    except:
+        pass
     if answer_from_images is not None:
-        answers.append(answer_from_images)
+        answers += answer_from_images
 
     return answers
