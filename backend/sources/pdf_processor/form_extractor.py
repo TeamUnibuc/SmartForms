@@ -86,7 +86,7 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
 
     return corrected_img
 
-def extract_form_id_content_from_image(picture: np.ndarray) -> str:
+def extract_form_id_content_from_image(picture: np.ndarray) -> Tuple[str, int]:
     """
     Extracts the QR code content from an image.
     Returns: the QR code, if readable, '' if nothing is found.
@@ -95,21 +95,38 @@ def extract_form_id_content_from_image(picture: np.ndarray) -> str:
     # this requires special packages:
     # https://pypi.org/project/pyzbar/
     # for fedora, use `zbar`
+    try:
+        qr_codes = decode(Image.fromarray(picture))
 
-    qr_codes = decode(Image.fromarray(picture))
+        # no qr code was found
+        if len(qr_codes) == 0:
+            return '', -1
 
-    # no qr code was found
-    if len(qr_codes) == 0:
-        return ''
+        # extract qr code
+        content = str(qr_codes[0].data, encoding='utf-8')
 
-    # extract qr code
-    content = str(qr_codes[0].data, encoding='utf-8')
+        # should start with the URL prefix
+        if not content.startswith(os.environ["FORM_ID_PREFIX"]):
+            logging.info(f"Received different ID begining: {content}")
+            return '', -1
 
-    # should start with the URL prefix
-    assert content.startswith(os.environ["FORM_ID_PREFIX"])
+        # remove prefix
+        id = content[len(os.environ["FORM_ID_PREFIX"]):]
 
-    # remove the prefix from the ID
-    return content[len(os.environ["FORM_ID_PREFIX"]):]
+        if id.find('?') == -1:
+            return id, 0
+        
+        page_nr = int(id[id.find('?'):])
+        real_id = id[:id.find('?')]
+        
+        if page_nr <= 0:
+            logging.info(f"Received a form with the page hardcoded as {page_nr}, which should not exist!")
+            return '', -1
+        
+        return real_id, page_nr
+    except Exception as e:
+        logging.info(f"Unable to extract QR code from image: {e}")
+        return '', -1
 
 def extract_question_answer_from_form(
         fixed_pages: Dict[int, np.ndarray],
