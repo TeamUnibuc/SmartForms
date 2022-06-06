@@ -121,13 +121,15 @@ def extract_form_id_content_from_image(picture: np.ndarray) -> Tuple[str, int]:
         if id.find('?') == -1:
             return id, 0
         
-        page_nr = int(id[id.find('?'):])
+        page_nr = int(id[id.find('?') + 6:])
+        page_nr -= 1
+
         real_id = id[:id.find('?')]
         
         if page_nr <= 0:
             logging.info(f"Received a form with the page hardcoded as {page_nr}, which should not exist!")
             return '', -1
-        
+
         return real_id, page_nr
     except Exception as e:
         logging.info(f"Unable to extract QR code from image: {e}")
