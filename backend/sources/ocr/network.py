@@ -94,7 +94,7 @@ class Network:
 
             plt.show()
 
-        inputs = th.tensor(images.reshape((-1, 1, 28, 28)), dtype=th.float32).to(DEVICE)
+        inputs = images.reshape((-1, 1, 28, 28)).type(th.float32).to(DEVICE)
 
         # pass model in eval mode
         self.model.eval()
