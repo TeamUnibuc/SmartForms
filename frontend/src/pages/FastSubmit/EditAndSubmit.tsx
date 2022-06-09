@@ -34,7 +34,7 @@ const EditAndSubmit = ({form, onOkSubmit}: EASProps) =>
   {
     API.Entry.Create({answers: answers, formId: form.formId})
     .then(r => {
-      setSnackMsg("Answers submitted!")
+      setSnackMsg("Answers submitted!  Redirecting ...")
       setSnackColor("success")
       // onOkSubmit()
       setTimeout(onOkSubmit, 2500)
