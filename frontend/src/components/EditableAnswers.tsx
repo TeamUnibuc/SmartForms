@@ -1,5 +1,6 @@
 import { StatusPanelComponent } from "@ag-grid-community/core/dist/cjs/es5/components/framework/componentTypes"
 import { Box, Checkbox, Divider, FormControlLabel, Input, TextField, Typography } from "@mui/material"
+import { useState } from "react"
 import { FormMultipleChoiceQuestion, FormTextQuestion, MultipleChoiceAnswer, Question, SingleQAnswer, TextAnswer } from "~/api/models"
 
 interface EAProps
@@ -15,6 +16,8 @@ const EditTextQ = (props: {
   updater(a: TextAnswer): void
 }) =>
 {
+  
+
   return <Box>
     <TextField defaultValue={props.state.content}
       id="form-desc"
@@ -26,6 +29,8 @@ const EditTextQ = (props: {
       sx={{m: 0, p: 0}}
       style={{width: "100%"}}
     />
+
+    
 
     {/* <Input
         multiline={true}
