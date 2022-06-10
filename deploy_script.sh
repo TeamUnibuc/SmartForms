@@ -10,12 +10,12 @@ conda activate SmartForms
 # Check conda env
 conda info
 
+# Build the frontend
 echo "========  Installing npm/yarn dependencies"
 cd frontend
 yarn install --check-file
 
 echo "========  Building for production"
-# Build the frontend
 cd ../frontend
 rm -rf dist
 npx vite build

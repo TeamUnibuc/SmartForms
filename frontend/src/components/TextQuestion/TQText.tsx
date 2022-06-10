@@ -55,10 +55,10 @@ export default function TQText(props: ComponentProps): JSX.Element
     const newq: FormTextQuestion = {
       ...question,
       allowedCharacters:
-        (cLower ? 'abcdefghijklmnopqrstuvwxyz' : '') +
-        (cUpper ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' : '') + 
-        (cDigits ? '0123456789' : '') + 
-        (cOther ? '-_*+.' : '') 
+        (cLower ? 'abcdefghijklmnopqrstuvwxyz ' : '') +
+        (cUpper ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ' : '') +
+        (cDigits ? '0123456789 ' : '') +
+        (cOther ? '-_*+. ' : '')
     }
 
     myUpdateQ(newq)
