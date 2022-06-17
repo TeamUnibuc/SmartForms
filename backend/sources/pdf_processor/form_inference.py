@@ -135,9 +135,12 @@ def extract_answers_from_files(files: List[Tuple[bytes, str]]) -> List[Tuple[sma
     # process each file
     for file_content, filename in files:
         if filename.endswith(".pdf"):
-            pdf_content = extract_answer_from_pdf_file((file_content, filename))
-            if pdf_content is not None:
-                answers.append(pdf_content)
+            try:
+                pdf_content = extract_answer_from_pdf_file((file_content, filename))
+                assert type(pdf_content) == list
+                answers += pdf_content
+            except Exception as e:
+                logging.warning(f"Error parsing pdf file: {e}")
         elif filename.endswith(".zip"):
             answers += extract_answer_from_zip_file((file_content, filename))
         else:
