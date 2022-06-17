@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "@ag-grid-enterprise/charts": "^27.3.0",
-    "@ag-grid-enterprise/clipboard": "^27.3.0",
-    "@ag-grid-enterprise/excel-export": "^27.3.0",
-    "@ag-grid-enterprise/menu": "^27.3.0"
-  }
-}

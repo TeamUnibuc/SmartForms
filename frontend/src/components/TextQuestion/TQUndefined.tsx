@@ -28,6 +28,7 @@ export default function TQUndefined(props: ComponentProps): JSX.Element
   const addText = () =>
   {
     qOps.setQuestion(props.q_ind, {
+      allowedCharacters: " ",
       title: `Question ${props.q_ind} title`,
       description: `Description`,
       maxAnswerLength: 5
