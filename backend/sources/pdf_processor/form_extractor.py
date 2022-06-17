@@ -192,6 +192,12 @@ def extract_question_answer_from_form(
         if isinstance(question, smart_forms_types.FormTextQuestion)
         else " X*+"
     )
+
+    if allowed_characters == "":
+        allowed_characters = ocr.network.CHARACTERS
+    if allowed_characters.find(' ') == -1:
+        allowed_characters = allowed_characters + ' '
+
     squares_predictions = ocr.predict_characters(squares_content, allowed_characters)
 
     # compute the initial answer
