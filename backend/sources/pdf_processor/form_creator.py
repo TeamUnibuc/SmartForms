@@ -89,10 +89,8 @@ def add_square_grid_corners(pdf: fpdf.FPDF):
         lambda x, y: x < BORDER_SHORT_EDGE_SQUARE
     )
 
-#TODO: change this name
 def add_borders_to_page(pdf: fpdf.FPDF, qr_code_content: str = '') -> fpdf.FPDF:
-    """Creates an empty PDF form, with the
-    appropriate markings.
+    """Adds markers and QR code to the active page of the PDF document.
     """
     # Default settings (A4, mm)
     # A4 size: 210 x 297 mm
@@ -102,7 +100,6 @@ def add_borders_to_page(pdf: fpdf.FPDF, qr_code_content: str = '') -> fpdf.FPDF:
     add_square_grid_corners(pdf)
     
     # upper-right (QR code)
-    # TODO: Check if this is ok (temp file leak)
     filename = None
     with tempfile.NamedTemporaryFile(suffix='.png') as temp_file:
         filename = temp_file.name
@@ -428,7 +425,6 @@ def create_form_from_description(description: smart_forms_types.FormDescription,
     pdf.set_auto_page_break(False)
 
     # force a new page
-    # TODO: get rid of 10**10
     current_height = add_page_if_required(pdf, 10**10, params)
 
     form.answer_squares_location = []

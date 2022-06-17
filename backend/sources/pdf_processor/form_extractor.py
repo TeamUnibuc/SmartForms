@@ -21,12 +21,7 @@ def change_image_perspective(picture: np.ndarray, template: np.ndarray) -> np.nd
     """
         Changes the perspective of the picture, to make it look like the template
     """
-    # TODO:
     # https://docs.opencv.org/3.4/dc/dc3/tutorial_py_matcher.html
-    # NOT apply a threshold on the final image
-    # i.e. return a copy of the image WITHOUT a threshold
-    # as it reduces the quality of the image
-
     def preprocess(img):
         if len(img.shape) == 3 and img.shape[2] == 3:
             img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -170,13 +165,11 @@ def extract_question_answer_from_form(
         dx = int(multiplier_h * square.width)
         dy = int(multiplier_w * square.width)
 
-        # draw square, for debug
-        # TODO: maybe delete this?
-        cv.rectangle(fixed_page, (x, y), (x+dx, y+dy), (0, 255, 255), thickness=2)
+        if DEBUG:
+            # draw square, for debug
+            cv.rectangle(fixed_page, (x, y), (x+dx, y+dy), (0, 255, 255), thickness=2)
 
         # This offset makes sure we don't include any borders in the square character.
-        # TODO: if we switch to our own dataset, then maybe excluding the border won't
-        # be required.
         SQUARES_OFFSET = 10
         sq_img = fixed_page[
             y + SQUARES_OFFSET : y + dy - SQUARES_OFFSET,
@@ -194,12 +187,17 @@ def extract_question_answer_from_form(
     squares_content = np.stack(squares_content)
 
     # find allowed characters, depending on the type of question
-    # TODO:
     allowed_characters = (
         question.allowedCharacters
         if isinstance(question, smart_forms_types.FormTextQuestion)
         else " X*+"
     )
+
+    if allowed_characters == "":
+        allowed_characters = ocr.network.CHARACTERS
+    if allowed_characters.find(' ') == -1:
+        allowed_characters = allowed_characters + ' '
+
     squares_predictions = ocr.predict_characters(squares_content, allowed_characters)
 
     # compute the initial answer
