@@ -107,11 +107,21 @@ const Header = (props: HeaderProps): JSX.Element =>
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                {pages.map((page) => (
+                {pages.map((page, i) => (
                   <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">
+                    {/* <Typography textAlign="center">
                       {page}
                     </Typography>
+                     */}
+                     <Button
+                      component={Link}
+                      key={i}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 0, color: 'white' }}
+                      to={navMenuLinks[i]}
+                    >
+                      {page}
+                    </Button>
                   </MenuItem>
                 ))}
               </Menu>
@@ -122,7 +132,7 @@ const Header = (props: HeaderProps): JSX.Element =>
               component="div"
               sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
             >
-              LOGO
+              Smart Forms
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
