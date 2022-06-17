@@ -28,6 +28,7 @@ export default function TQAdd(): JSX.Element
   {
     const q_ind = getNextInd()
     qOps.setQuestion(q_ind, {
+      allowedCharacters: " ",
       title: `Text ${q_ind} title`,
       description: ``,
       maxAnswerLength: 5
