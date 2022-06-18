@@ -6,7 +6,7 @@ import { FormTextQuestion, Question } from '~/api/models'
 import TQMultipleChoice from './TQMultipleChoice'
 import TQText from './TQText'
 import TQUndefined from './TQUndefined'
-import { useQLContextUpdater } from '~/contexts/CoolContext';
+import { useQLContextUpdater } from '~/contexts/QLContext';
 
 function TextQuestion(props:
     {q_ind: number,

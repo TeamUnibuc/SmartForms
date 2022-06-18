@@ -3,8 +3,6 @@ import React, { ReactNode, useEffect } from "react"
 import { createContext, useContext, useState } from "react";
 import { GetUserDetails, UserDetails } from "~/api/user/UserDetails";
 
-// TODO: Renamme CoolContext To DynamicListQuestion stuff
-
 interface UserUpdater {
   doUpdate(): void
 }
