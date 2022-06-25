@@ -45,6 +45,7 @@
     "@types/react-pdf": "^5.0.9",
     "jest": "^27.5.1",
     "jest-watch-typeahead": "^1.0.0",
+    "react-scripts": "^5.0.1",
     "typescript": "^4.5.4"
   }
 }
