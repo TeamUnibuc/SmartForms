@@ -1,7 +1,7 @@
 import { Button, CardActions, CardContent, Typography } from "@mui/material";
 import React from "react";
 
-import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext";
+import { useQLContextState, useQLContextUpdater } from "~/contexts/QLContext";
 
 interface ComponentProps
 {
@@ -28,6 +28,7 @@ export default function TQUndefined(props: ComponentProps): JSX.Element
   const addText = () =>
   {
     qOps.setQuestion(props.q_ind, {
+      allowedCharacters: " ",
       title: `Question ${props.q_ind} title`,
       description: `Description`,
       maxAnswerLength: 5

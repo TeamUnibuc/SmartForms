@@ -5,7 +5,7 @@ import EditFormPdfDisplay from './EditFormPdfDisplay';
 
 import GenerateButton from '~/components/EditForm/GenerateButton';
 import DynamicQuestionList from '~/components/EditForm/DynamicQuestionList';
-import { QLContextProvider } from '~/contexts/CoolContext';
+import { QLContextProvider } from '~/contexts/QLContext';
 import CreateFormButton from '~/components/EditForm/CreateFormButton';
 import { Divider } from '@mui/material';
 import EditFormInfo from './EditFormInfo';

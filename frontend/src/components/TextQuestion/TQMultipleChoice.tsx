@@ -3,7 +3,7 @@ import React, { ChangeEvent, useState } from "react"
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
 import { FormMultipleChoiceQuestion } from "~/api/models";
-import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext";
+import { useQLContextState, useQLContextUpdater } from "~/contexts/QLContext";
 import { Box, CardContent, Grid, IconButton, TextField } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import PdfDisplay from '~/components/PdfDisplay'
 
-import { useQLContextState } from '~/contexts/CoolContext'
+import { useQLContextState } from '~/contexts/QLContext'
 
 export default function EditFormPdfDisplay(): JSX.Element
 {

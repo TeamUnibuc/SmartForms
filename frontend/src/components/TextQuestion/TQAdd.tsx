@@ -1,7 +1,7 @@
 import React from "react"
 
 import { Button } from "@mui/material";
-import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext";
+import { useQLContextState, useQLContextUpdater } from "~/contexts/QLContext";
 
 const TQAddText = (props: {action: () => void}) => {
   return <Button variant="contained" onClick={props.action} sx={{m: 1}}>
@@ -28,6 +28,7 @@ export default function TQAdd(): JSX.Element
   {
     const q_ind = getNextInd()
     qOps.setQuestion(q_ind, {
+      allowedCharacters: " ",
       title: `Text ${q_ind} title`,
       description: ``,
       maxAnswerLength: 5
