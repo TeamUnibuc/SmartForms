@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Switch, TextField, Typography } from "@mui/material"
 import { ChangeEvent } from "react"
-import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext"
+import { useQLContextState, useQLContextUpdater } from "~/contexts/QLContext"
 
 const EditFormInfo = () =>
 {

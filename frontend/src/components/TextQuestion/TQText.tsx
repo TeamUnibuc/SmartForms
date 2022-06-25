@@ -4,7 +4,7 @@ import { Box, Card, CardActions, CardContent, Checkbox, FormControlLabel, Grid, 
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import { FormTextQuestion } from "~/api/models"
-import { useQLContextState, useQLContextUpdater } from "~/contexts/CoolContext"
+import { useQLContextState, useQLContextUpdater } from "~/contexts/QLContext"
 
 interface ComponentProps
 {

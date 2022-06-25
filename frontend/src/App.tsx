@@ -60,7 +60,7 @@ function App(props: AppProps): JSX.Element {
                       element={<FastSubmit />}/>
           </Routes>
 
-          {/* <Footer /> */}
+          <Footer />
         </Container>
       </Box>
 

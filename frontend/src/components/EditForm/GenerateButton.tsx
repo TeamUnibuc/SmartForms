@@ -3,7 +3,7 @@ import React from 'react'
 import Button from "@mui/material/Button";
 import API from '~/api'
 import { Question } from '~/api/models';
-import { useQLContextState, useQLContextUpdater } from '~/contexts/CoolContext';
+import { useQLContextState, useQLContextUpdater } from '~/contexts/QLContext';
 
 interface BtnProps
 {
