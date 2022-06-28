@@ -60,7 +60,7 @@ const EditAndSubmit = ({form, onOkSubmit}: EASProps) =>
     <Typography variant="h4">
       {form.title}
     </Typography>
-    <Typography>
+    <Typography color="gray">
       {form.description}
     </Typography>
 
