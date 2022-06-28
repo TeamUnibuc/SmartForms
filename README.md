@@ -11,6 +11,22 @@ This project aims to help managing simple forms, allowing:
 
 ## Usage
 
+The main prerequisite for this project is to have [conda](https://docs.conda.io/en/latest/) installed.
+
+In order to build & run the project, the `SmartForms` environment needs to be activated..
+
+1. Load the conda environment
+
+    `bash
+        conda env update -f conda_environment.yaml
+    `
+
+2. Activate the environment
+
+    `bash
+        conda activate SmartForms
+    `
+
 ### Backend
 
 1. Copy `.env.sample` to `.env` - `cp backend/.env.sample backend/.env`.
@@ -23,7 +39,15 @@ This project aims to help managing simple forms, allowing:
 
 ### Frontend
 
-TBD
+1. The following `Make` command will install the frontend packages and run the development build:
+
+    `
+        make frontend
+    `
+
+* Runs `yarn install` inside the `frontend` folder.
+* Runs `yarn dev` which in turn calls [Vite](https://vitejs.dev/) for creating & running the dev build.
+
 
 ### Documentation
 
