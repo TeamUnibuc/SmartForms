@@ -57,6 +57,15 @@ const EditAndSubmit = ({form, onOkSubmit}: EASProps) =>
 
     <Divider sx={{my: 2}} />
 
+    <Typography variant="h4">
+      {form.title}
+    </Typography>
+    <Typography>
+      {form.description}
+    </Typography>
+
+    <Divider sx={{my: 2}} />
+
     <EditableAnswers
       answers={answers}
       questions={questions}
